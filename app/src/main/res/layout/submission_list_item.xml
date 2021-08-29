@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_subreddit_name"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        tools:text="tommyinnit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_submission_flair"
+        style="@style/Text.Label"
+        android:background="@drawable/flair_background"
+        app:layout_constraintStart_toEndOf="@id/text_subreddit_name"
+        app:layout_constraintTop_toTopOf="@id/text_subreddit_name"
+        app:layout_constraintBottom_toBottomOf="@id/text_subreddit_name"
+        android:layout_marginStart="8dp"
+        android:padding="3dp"
+        tools:text="Tanboo"
+        tools:textColor="@color/white" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_submission_title"
+        style="@style/Text.Bold.H2"
+        app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
+        app:layout_constraintTop_toBottomOf="@id/text_subreddit_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        tools:text="This is a random post in this subreddit" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_submission_content_preview"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toStartOf="@id/text_submission_title"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:maxLines="3"
+        android:ellipsize="end"
+        tools:text="This is a random post in this subreddit and here is it's preview to see what a really long preview looks like when viewing it in the submission list oh wo this is a very long bit of text please help me I cant think of any more!" />
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:id="@+id/image_upvote_indicator"
+        style="@style/Icon"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_content_preview"
+        app:layout_constraintStart_toStartOf="@id/text_submission_content_preview"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_arrow_upward"
+        android:contentDescription="@string/upvote_icon_content_description" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_upvote_count"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toEndOf="@id/image_upvote_indicator"
+        app:layout_constraintTop_toTopOf="@id/image_upvote_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/image_upvote_indicator"
+        android:layout_marginStart="4dp"
+        tools:text="1.6K" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:id="@+id/image_comments_indicator"
+        style="@style/Icon"
+        app:layout_constraintTop_toTopOf="@id/image_upvote_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/image_upvote_indicator"
+        app:layout_constraintStart_toEndOf="@id/text_upvote_count"
+        android:layout_marginStart="6dp"
+        android:src="@drawable/ic_comment"
+        android:contentDescription="@string/comment_icon_content_description" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_comments_count"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toEndOf="@id/image_comments_indicator"
+        app:layout_constraintTop_toTopOf="@id/image_comments_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/image_comments_indicator"
+        android:layout_marginStart="4dp"
+        tools:text="398" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:id="@+id/image_time_indicator"
+        style="@style/Icon"
+        app:layout_constraintTop_toTopOf="@id/image_comments_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/image_comments_indicator"
+        app:layout_constraintStart_toEndOf="@id/text_comments_count"
+        android:layout_marginStart="4dp"
+        android:src="@drawable/ic_clock"
+        android:contentDescription="@string/clock_icon_content_description" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_time_since_post"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toEndOf="@id/image_time_indicator"
+        app:layout_constraintTop_toTopOf="@id/image_time_indicator"
+        app:layout_constraintBottom_toBottomOf="@id/image_time_indicator"
+        android:layout_marginStart="3dp"
+        tools:text="16h" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

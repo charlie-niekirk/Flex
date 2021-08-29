@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Flex</string>
+    <string name="submission_sort_content_description">Submission sort icon</string>
+    <string name="upvote_icon_content_description">Upvote icon indicator</string>
+    <string name="comment_icon_content_description">Comment Icon</string>
+    <string name="clock_icon_content_description">Clock Icon</string>
+</resources>
