@@ -9,4 +9,11 @@
     <string name="text_tab_inbox">Inbox</string>
     <string name="text_tab_settings">Settings</string>
     <string name="author_format">by %1$s</string>
+    <string name="sort_top">Top</string>
+    <string name="sort_hot">Hot</string>
+    <string name="sort_best">Best</string>
+    <string name="sort_new">New</string>
+    <string name="sort_title">Sort by...</string>
+    <string name="smile_icon_content_description">Upvote ratio icon</string>
+    <string name="upvote_action_content_description">Upvote action button</string>
 </resources>

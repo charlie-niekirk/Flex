@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_title"
+        style="@style/Text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:text="@string/sort_title" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_best"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:padding="@dimen/spacing_l"
+        android:textSize="18sp"
+        android:text="@string/sort_best"
+        android:includeFontPadding="false"
+        app:drawableStartCompat="@drawable/ic_celebration"
+        android:drawablePadding="@dimen/spacing_l"
+        app:drawableTint="@color/black"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_top"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sort_best"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/spacing_l"
+        android:textSize="18sp"
+        android:text="@string/sort_top"
+        android:includeFontPadding="false"
+        app:drawableStartCompat="@drawable/ic_arrow_upward"
+        android:drawablePadding="@dimen/spacing_l"
+        app:drawableTint="@color/black"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_hot"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sort_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/spacing_l"
+        android:textSize="18sp"
+        android:text="@string/sort_hot"
+        android:includeFontPadding="false"
+        app:drawableStartCompat="@drawable/ic_fire"
+        android:drawablePadding="@dimen/spacing_l"
+        app:drawableTint="@color/black"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/sort_new"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sort_hot"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/spacing_l"
+        android:textSize="18sp"
+        android:text="@string/sort_new"
+        android:includeFontPadding="false"
+        app:drawableStartCompat="@drawable/ic_clock"
+        android:drawablePadding="@dimen/spacing_l"
+        app:drawableTint="@color/black"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

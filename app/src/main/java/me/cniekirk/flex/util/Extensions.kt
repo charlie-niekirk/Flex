@@ -75,7 +75,6 @@ fun Long.getElapsedTime(): String {
 }
 
 fun String.processLink(block: (Link) -> Unit) {
-    Timber.d(this)
     when {
         imageRegex.matches(this) -> {
             block(Link.ImageLink(this))
@@ -87,7 +86,6 @@ fun String.processLink(block: (Link) -> Unit) {
             block(Link.VideoLink(this))
         }
         else -> {
-            Timber.d("EXTERNAL")
             block(Link.ExternalLink)
         }
     }

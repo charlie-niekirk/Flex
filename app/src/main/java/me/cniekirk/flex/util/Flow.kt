@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
+/**
+ * Scope flow collection to the appropriate [LifecycleOwner] depending on call site
+ *
+ * @param flow the flow being collected
+ * @param block the function to call on collection
+ */
 fun <T: Any?> LifecycleOwner.observe(flow: Flow<T>, block: suspend (T) -> Unit) {
     val lifecycleOwner = if (this is Fragment) viewLifecycleOwner else this
     lifecycleOwner.lifecycleScope.launch {

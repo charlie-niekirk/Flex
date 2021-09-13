@@ -8,5 +8,14 @@
         android:id="@+id/submissionListFragment"
         android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"
         android:label="submission_list_fragment"
-        tools:layout="@layout/submission_list_fragment" />
+        tools:layout="@layout/submission_list_fragment" >
+        <action
+            android:id="@+id/action_submissionListFragment_to_submissionListSortDialogFragment"
+            app:destination="@id/submissionListSortDialogFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/submissionListSortDialogFragment"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionListSortDialogFragment"
+        android:label="SubmissionListSortDialogFragment"
+        tools:layout="@layout/submission_list_sort_dialog" />
 </navigation>

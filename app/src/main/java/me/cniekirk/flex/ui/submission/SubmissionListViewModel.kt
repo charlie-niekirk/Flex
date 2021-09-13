@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
@@ -18,8 +19,10 @@ class SubmissionListViewModel @Inject constructor(
     private val redditApi: RedditApi
 ) : ViewModel() {
 
-    private val subredditFlow = MutableStateFlow(value = "tommyinnit")
-    private val sortFlow = MutableStateFlow(value = "")
+    private val _subredditFlow = MutableStateFlow(value = "politics")
+    val subredditFlow = _subredditFlow.asStateFlow()
+    private val _sortFlow = MutableStateFlow(value = "")
+    val sortFlow = _sortFlow.asStateFlow()
 
     @ExperimentalCoroutinesApi
     val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
@@ -30,4 +33,14 @@ class SubmissionListViewModel @Inject constructor(
         }
     }
 
+    fun onUiEvent(submissionListEvent: SubmissionListEvent) {
+        when (submissionListEvent) {
+            is SubmissionListEvent.SortUpdated -> {
+                _sortFlow.value = "/${submissionListEvent.sort}"
+            }
+            is SubmissionListEvent.SubredditUpdated -> {
+                _subredditFlow.value = submissionListEvent.subreddit
+            }
+        }
+    }
 }

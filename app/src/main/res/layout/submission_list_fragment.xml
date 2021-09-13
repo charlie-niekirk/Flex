@@ -28,7 +28,9 @@
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:orientation="horizontal"
-        android:background="?attr/selectableItemBackground">
+        android:foreground="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
         <ImageView
             android:layout_width="24dp"
