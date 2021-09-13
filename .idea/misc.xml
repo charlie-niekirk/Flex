@@ -3,10 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
         <entry key="app/src/main/res/drawable/shadow.xml" value="0.2984375" />
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
-        <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/submission_list_fragment.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/container_activity.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/layout/submission_detail_fragment.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/layout/submission_image_preview.xml" value="0.3234375" />
+        <entry key="app/src/main/res/layout/submission_link_preview.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/layout/submission_list_fragment.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/submission_list_item.xml" value="0.5307167235494881" />
+        <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />
+        <entry key="app/src/main/res/layout/submission_video_preview.xml" value="0.5348717948717949" />
+        <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />
       </map>
     </option>
   </component>

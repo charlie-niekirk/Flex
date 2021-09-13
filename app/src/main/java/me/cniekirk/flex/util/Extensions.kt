@@ -2,6 +2,12 @@ package me.cniekirk.flex.util
 
 import android.icu.text.CompactDecimalFormat
 import android.icu.util.ULocale
+import android.media.session.PlaybackState
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.ui.StyledPlayerView
+import timber.log.Timber
 
 
 fun Int.condense(): String {
@@ -24,6 +30,9 @@ private const val HOUR_MILLIS = 60 * MINUTE_MILLIS
 private const val DAY_MILLIS = 24 * HOUR_MILLIS
 private const val MONTH_MILLIS = 30 * DAY_MILLIS
 private const val YEAR_MILLIS = 12 * MONTH_MILLIS
+
+private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gifv?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
+private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
 
 fun Long.getElapsedTime(): String {
     val now = System.currentTimeMillis()
@@ -63,4 +72,45 @@ fun Long.getElapsedTime(): String {
             "${diff / YEAR_MILLIS}Y"
         }
     }
+}
+
+fun String.processLink(block: (Link) -> Unit) {
+    Timber.d(this)
+    when {
+        imageRegex.matches(this) -> {
+            block(Link.ImageLink(this))
+        }
+        this.startsWith("https://v.redd.it") -> {
+            block(Link.RedditVideo)
+        }
+        videoRegex.matches(this) -> {
+            block(Link.VideoLink(this))
+        }
+        else -> {
+            Timber.d("EXTERNAL")
+            block(Link.ExternalLink)
+        }
+    }
+}
+
+fun StyledPlayerView.initialise(url: String): SimpleExoPlayer {
+    return SimpleExoPlayer.Builder(this.context)
+        .build()
+        .also { exoPlayer ->
+            this.player = exoPlayer
+            val mediaItem = MediaItem.fromUri(url)
+            exoPlayer.setMediaItem(mediaItem)
+            this.player?.playWhenReady = true
+            this.player?.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_ENDED -> {
+                            this@initialise.player?.seekTo(0)
+                            this@initialise.player?.playWhenReady = true
+                        }
+                    }
+                }
+            })
+            this.player?.prepare()
+        }
 }

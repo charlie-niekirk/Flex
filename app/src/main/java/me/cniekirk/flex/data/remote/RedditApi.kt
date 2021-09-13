@@ -12,8 +12,14 @@ import retrofit2.http.FormUrlEncoded
 
 interface RedditApi {
 
-    @GET("r/{subreddit}/hot.json")
-    suspend fun getTopPosts(@Path("subreddit") subreddit: String): RedditResponse<Listing>
+    @GET("r/{subreddit}{sortType}.json")
+    suspend fun getPosts(
+        @Path("subreddit") subreddit: String,
+        @Path("sortType") sortType: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int? = null,
+        @Query("limit") limit: Int = 15): RedditResponse<Listing>
 
     @GET("/{sort}.json")
     suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing>

@@ -4,4 +4,9 @@
     <string name="upvote_icon_content_description">Upvote icon indicator</string>
     <string name="comment_icon_content_description">Comment Icon</string>
     <string name="clock_icon_content_description">Clock Icon</string>
+    <string name="text_tab_posts">Posts</string>
+    <string name="text_tab_account">Account</string>
+    <string name="text_tab_inbox">Inbox</string>
+    <string name="text_tab_settings">Settings</string>
+    <string name="author_format">by %1$s</string>
 </resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/external_link_bg"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/external_link_container">
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:id="@+id/link_image"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/web_icon"
+        app:layout_constraintTop_toBottomOf="@id/link_image"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginVertical="@dimen/spacing_m"
+        android:src="@drawable/ic_chrome" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="12dp"
+        android:id="@+id/divider"
+        app:layout_constraintTop_toTopOf="@id/web_icon"
+        app:layout_constraintBottom_toBottomOf="@id/web_icon"
+        app:layout_constraintStart_toEndOf="@id/web_icon"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:background="@color/black" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/link_content"
+        style="@style/Text.Label"
+        app:layout_constraintTop_toTopOf="@id/web_icon"
+        app:layout_constraintBottom_toBottomOf="@id/web_icon"
+        app:layout_constraintStart_toEndOf="@id/divider"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/spacing_m"
+        android:maxLines="1"
+        android:ellipsize="end"
+        tools:text="https://bbc.co.uk/article/1647798" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

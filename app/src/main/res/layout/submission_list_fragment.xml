@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.SubmissionListFragment">
+    tools:context=".ui.submission.SubmissionListFragment">
 
     <TextView
         android:layout_width="wrap_content"
@@ -16,6 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="24dp"
+        android:text="Home"
         tools:text="r/tommyinnit" />
 
     <LinearLayout
@@ -43,9 +44,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/text_submission_sort_label"
             style="@style/Text.Label"
+            android:includeFontPadding="false"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
-            tools:text="Top" />
+            android:text="Top" />
 
     </LinearLayout>
 
@@ -57,6 +59,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/submission_sort"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/submission_list_item"
         tools:itemCount="12" />
 

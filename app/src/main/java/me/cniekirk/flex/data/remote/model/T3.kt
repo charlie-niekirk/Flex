@@ -102,7 +102,7 @@ data class T3(
     @Json(name = "link_flair_type")
     val linkFlairType: String?,
     val locked: Boolean?,
-    val media: Any?,
+    val media: Media?,
     @Json(name = "media_embed")
     val mediaEmbed: MediaEmbed?,
     @Json(name = "media_metadata")

@@ -6,7 +6,7 @@
     app:startDestination="@id/submissionListFragment">
     <fragment
         android:id="@+id/submissionListFragment"
-        android:name="me.cniekirk.flex.ui.main.SubmissionListFragment"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"
         android:label="submission_list_fragment"
         tools:layout="@layout/submission_list_fragment" />
 </navigation>

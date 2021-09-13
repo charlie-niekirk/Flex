@@ -20,8 +20,8 @@ class RedditDataRepositoryImpl @Inject constructor(
         emit(RedditResult.Success(redditApi.getFrontpagePosts(sort).data.children.map { it.data }))
     }
 
-    override fun getSubredditPosts(subreddit: String): Flow<RedditResult<List<T3>>> = flow {
-        emit(RedditResult.Success(redditApi.getTopPosts(subreddit).data.children.map { it.data }))
+    override fun getSubredditPosts(subreddit: String, sortType: String): Flow<RedditResult<List<T3>>> = flow {
+        emit(RedditResult.Success(redditApi.getPosts(subreddit, sortType).data.children.map { it.data }))
     }
 
     override fun getAccessToken(code: String): Flow<RedditResult<Token>> = flow {

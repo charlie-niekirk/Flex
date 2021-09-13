@@ -8,7 +8,7 @@ interface RedditDataRepository {
 
     fun getFrontpagePosts(sort: String): Flow<RedditResult<List<T3>>>
 
-    fun getSubredditPosts(subreddit: String): Flow<RedditResult<List<T3>>>
+    fun getSubredditPosts(subreddit: String, sortType: String = "top"): Flow<RedditResult<List<T3>>>
 
     fun getAccessToken(code: String): Flow<RedditResult<Token>>
 

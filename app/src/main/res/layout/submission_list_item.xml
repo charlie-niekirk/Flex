@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/surfaceColor"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingBottom="16dp"
+    android:layout_marginBottom="8dp"
+    android:elevation="4dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -42,27 +50,63 @@
         android:layout_marginTop="8dp"
         tools:text="This is a random post in this subreddit" />
 
-    <TextView
+    <include
+        android:id="@+id/selftext_preview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:id="@+id/text_submission_content_preview"
-        style="@style/Text.Label"
+        layout="@layout/submission_selftext_preview"
         app:layout_constraintStart_toStartOf="@id/text_submission_title"
         app:layout_constraintTop_toBottomOf="@id/text_submission_title"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        android:maxLines="3"
-        android:ellipsize="end"
-        tools:text="This is a random post in this subreddit and here is it's preview to see what a really long preview looks like when viewing it in the submission list oh wo this is a very long bit of text please help me I cant think of any more!" />
+        tools:visibility="gone" />
+
+    <include
+        android:id="@+id/image_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/submission_image_preview"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/video_preview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        layout="@layout/submission_video_preview"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/external_link_preview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        layout="@layout/submission_link_preview"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/spacing_l"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/preview_group"
+        app:constraint_referenced_ids="selftext_preview,image_preview,video_preview,external_link_preview"
+        app:barrierDirection="bottom" />
 
     <ImageView
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:id="@+id/image_upvote_indicator"
         style="@style/Icon"
-        app:layout_constraintTop_toBottomOf="@id/text_submission_content_preview"
-        app:layout_constraintStart_toStartOf="@id/text_submission_content_preview"
+        app:layout_constraintTop_toBottomOf="@id/preview_group"
+        app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_arrow_upward"
         android:contentDescription="@string/upvote_icon_content_description" />
@@ -123,5 +167,37 @@
         app:layout_constraintBottom_toBottomOf="@id/image_time_indicator"
         android:layout_marginStart="3dp"
         tools:text="16h" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:id="@+id/submission_pin"
+        app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
+        app:layout_constraintTop_toBottomOf="@id/image_upvote_indicator"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_pin"
+        app:tint="@color/green"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_submission_author"
+        style="@style/Text.Label"
+        app:layout_constraintStart_toEndOf="@id/submission_pin"
+        app:layout_constraintTop_toBottomOf="@id/image_upvote_indicator"
+        android:layout_marginTop="8dp"
+        tools:text="u/chertycherty" />
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/content_awards_view"
+        android:id="@+id/awards"
+        app:layout_constraintTop_toTopOf="@id/text_submission_author"
+        app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
+        app:layout_constraintStart_toEndOf="@id/text_submission_author"
+        android:layout_marginStart="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
