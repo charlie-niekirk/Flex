@@ -12,10 +12,22 @@
         <action
             android:id="@+id/action_submissionListFragment_to_submissionListSortDialogFragment"
             app:destination="@id/submissionListSortDialogFragment" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_submissionDetailFragment"
+            app:destination="@id/submissionDetailFragment" />
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
         android:name="me.cniekirk.flex.ui.submission.SubmissionListSortDialogFragment"
         android:label="SubmissionListSortDialogFragment"
         tools:layout="@layout/submission_list_sort_dialog" />
+    <fragment
+        android:id="@+id/submissionDetailFragment"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"
+        android:label="SubmissionDetailFragment"
+        tools:layout="@layout/submission_detail_fragment" >
+        <argument
+            android:name="post"
+            app:argType="me.cniekirk.flex.data.remote.model.T3" />
+    </fragment>
 </navigation>

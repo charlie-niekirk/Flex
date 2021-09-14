@@ -1,7 +1,11 @@
 package me.cniekirk.flex.data.remote.model
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class T3(
     @Json(name = "all_awardings")
@@ -17,11 +21,11 @@ data class T3(
     @Json(name = "author_flair_background_color")
     val authorFlairBackgroundColor: String?,
     @Json(name = "author_flair_css_class")
-    val authorFlairCssClass: Any?,
+    val authorFlairCssClass: @RawValue Any?,
     @Json(name = "author_flair_richtext")
-    val authorFlairRichtext: List<Any>?,
+    val authorFlairRichtext: @RawValue List<Any>?,
     @Json(name = "author_flair_template_id")
-    val authorFlairTemplateId: Any?,
+    val authorFlairTemplateId: @RawValue Any?,
     @Json(name = "author_flair_text")
     val authorFlairText: String?,
     @Json(name = "author_flair_text_color")
@@ -36,30 +40,30 @@ data class T3(
     val authorPatreonFlair: Boolean?,
     @Json(name = "author_premium")
     val authorPremium: Boolean?,
-    val awarders: List<Any>?,
+    val awarders: @RawValue List<Any>?,
     @Json(name = "banned_at_utc")
-    val bannedAtUtc: Any?,
+    val bannedAtUtc: @RawValue Any?,
     @Json(name = "banned_by")
-    val bannedBy: Any?,
+    val bannedBy: @RawValue Any?,
     @Json(name = "can_gild")
     val canGild: Boolean?,
     @Json(name = "can_mod_post")
     val canModPost: Boolean?,
-    val category: Any?,
+    val category: @RawValue Any?,
     val clicked: Boolean?,
     @Json(name = "content_categories")
-    val contentCategories: Any?,
+    val contentCategories: @RawValue Any?,
     @Json(name = "contest_mode")
     val contestMode: Boolean?,
     val created: Double?,
     @Json(name = "created_utc")
     val createdUtc: Double?,
     @Json(name = "discussion_type")
-    val discussionType: Any?,
-    val distinguished: Any?,
+    val discussionType: @RawValue Any?,
+    val distinguished: @RawValue Any?,
     val domain: String?,
     val downs: Int?,
-    val edited: Any?,
+    val edited: @RawValue Any?,
     @Json(name = "gallery_data")
     val galleryData: GalleryData?,
     val gilded: Int?,
@@ -86,13 +90,13 @@ data class T3(
     val isSelf: Boolean?,
     @Json(name = "is_video")
     val isVideo: Boolean?,
-    val likes: Any?,
+    val likes: @RawValue Any?,
     @Json(name = "link_flair_background_color")
     val linkFlairBackgroundColor: String?,
     @Json(name = "link_flair_css_class")
     val linkFlairCssClass: String?,
     @Json(name = "link_flair_richtext")
-    val linkFlairRichtext: List<Any>?,
+    val linkFlairRichtext: @RawValue List<Any>?,
     @Json(name = "link_flair_template_id")
     val linkFlairTemplateId: String?,
     @Json(name = "link_flair_text")
@@ -116,7 +120,7 @@ data class T3(
     @Json(name = "mod_reason_title")
     val modReasonTitle: String?,
     @Json(name = "mod_reports")
-    val modReports: List<Any>?,
+    val modReports: @RawValue List<Any>?,
     val name: String?,
     @Json(name = "no_follow")
     val noFollow: Boolean?,
@@ -125,7 +129,7 @@ data class T3(
     @Json(name = "num_crossposts")
     val numCrossposts: Int?,
     @Json(name = "num_reports")
-    val numReports: Any?,
+    val numReports: @RawValue Any?,
     @Json(name = "over_18")
     val over18: Boolean?,
     @Json(name = "parent_whitelist_status")
@@ -138,17 +142,17 @@ data class T3(
     val pwls: Int?,
     val quarantine: Boolean?,
     @Json(name = "removal_reason")
-    val removalReason: Any?,
+    val removalReason: @RawValue Any?,
     @Json(name = "removed_by")
-    val removedBy: Any?,
+    val removedBy: @RawValue Any?,
     @Json(name = "removed_by_category")
-    val removedByCategory: Any?,
+    val removedByCategory: @RawValue Any?,
     @Json(name = "report_reasons")
-    val reportReasons: Any?,
+    val reportReasons: @RawValue Any?,
     val saved: Boolean?,
     val score: Int?,
     @Json(name = "secure_media")
-    val secureMedia: Any?,
+    val secureMedia: @RawValue Any?,
     @Json(name = "secure_media_embed")
     val secureMediaEmbed: SecureMediaEmbed?,
     val selftext: String?,
@@ -168,7 +172,7 @@ data class T3(
     @Json(name = "subreddit_type")
     val subredditType: String?,
     @Json(name = "suggested_sort")
-    val suggestedSort: Any?,
+    val suggestedSort: @RawValue Any?,
     val thumbnail: String?,
     @Json(name = "thumbnail_height")
     val thumbnailHeight: Int?,
@@ -180,7 +184,7 @@ data class T3(
     @Json(name = "total_awards_received")
     val totalAwardsReceived: Int?,
     @Json(name = "treatment_tags")
-    val treatmentTags: List<Any>?,
+    val treatmentTags: @RawValue List<Any>?,
     val ups: Int?,
     @Json(name = "upvote_ratio")
     val upvoteRatio: Double?,
@@ -188,11 +192,11 @@ data class T3(
     @Json(name = "url_overridden_by_dest")
     val urlOverriddenByDest: String?,
     @Json(name = "user_reports")
-    val userReports: List<Any>?,
+    val userReports: @RawValue List<Any>?,
     @Json(name = "view_count")
     val viewCount: Int?,
     val visited: Boolean?,
     @Json(name = "whitelist_status")
     val whitelistStatus: String?,
     val wls: Int?
-)
+) : Parcelable

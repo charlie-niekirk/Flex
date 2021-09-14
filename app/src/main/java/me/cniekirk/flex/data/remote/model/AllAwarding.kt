@@ -1,7 +1,11 @@
 package me.cniekirk.flex.data.remote.model
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class AllAwarding(
     @Json(name = "award_sub_type")
@@ -9,7 +13,7 @@ data class AllAwarding(
     @Json(name = "award_type")
     val awardType: String?,
     @Json(name = "awardings_required_to_grant_benefits")
-    val awardingsRequiredToGrantBenefits: Any?,
+    val awardingsRequiredToGrantBenefits: @RawValue Any?,
     @Json(name = "coin_price")
     val coinPrice: Int?,
     @Json(name = "coin_reward")
@@ -21,9 +25,9 @@ data class AllAwarding(
     val daysOfPremium: Int?,
     val description: String?,
     @Json(name = "end_date")
-    val endDate: Any?,
+    val endDate: @RawValue Any?,
     @Json(name = "giver_coin_reward")
-    val giverCoinReward: Any?,
+    val giverCoinReward: @RawValue Any?,
     @Json(name = "icon_format")
     val iconFormat: String?,
     @Json(name = "icon_height")
@@ -39,15 +43,15 @@ data class AllAwarding(
     val isNew: Boolean?,
     val name: String?,
     @Json(name = "penny_donate")
-    val pennyDonate: Any?,
+    val pennyDonate: @RawValue Any?,
     @Json(name = "penny_price")
-    val pennyPrice: Any?,
+    val pennyPrice: @RawValue Any?,
     @Json(name = "resized_icons")
     val resizedIcons: List<ResizedIcon>?,
     @Json(name = "resized_static_icons")
     val resizedStaticIcons: List<ResizedStaticIcon>?,
     @Json(name = "start_date")
-    val startDate: Any?,
+    val startDate: @RawValue Any?,
     @Json(name = "static_icon_height")
     val staticIconHeight: Int?,
     @Json(name = "static_icon_url")
@@ -57,7 +61,7 @@ data class AllAwarding(
     @Json(name = "subreddit_coin_reward")
     val subredditCoinReward: Int?,
     @Json(name = "subreddit_id")
-    val subredditId: Any?,
+    val subredditId: @RawValue Any?,
     @Json(name = "tiers_by_required_awardings")
-    val tiersByRequiredAwardings: Any?
-)
+    val tiersByRequiredAwardings: @RawValue Any?
+) : Parcelable
