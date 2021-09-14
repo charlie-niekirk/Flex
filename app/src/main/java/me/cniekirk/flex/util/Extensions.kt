@@ -15,8 +15,6 @@ fun Int.condense(): String {
     return cdf.format(this)
 }
 
-fun String.toPreviewUrl(): String = this.replace("&amp;", "&")
-
 fun String.selfTextPreview(): String {
     return replace("&amp;#x200B;", "").
     replace("&#x200B;", "").

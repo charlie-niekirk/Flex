@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <View
+        android:layout_width="3dp"
+        android:layout_height="0dp"
+        android:id="@+id/comment_depth_indicator"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHeight_percent="0.8"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:background="@color/green" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/comment_author_username"
+        style="@style/Text.Bold"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/comment_depth_indicator"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        tools:text="chertycherty" />
+
+    <ImageView
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:id="@+id/comment_upvote_image"
+        app:layout_constraintTop_toTopOf="@id/comment_author_username"
+        app:layout_constraintBottom_toBottomOf="@id/comment_author_username"
+        app:layout_constraintStart_toEndOf="@id/comment_author_username"
+        android:layout_marginStart="@dimen/spacing_m"
+        app:srcCompat="@drawable/ic_arrow_upward"
+        android:alpha="0.6" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/comment_upvote_number"
+        style="@style/Text"
+        android:textSize="12sp"
+        app:layout_constraintTop_toTopOf="@id/comment_upvote_image"
+        app:layout_constraintBottom_toBottomOf="@id/comment_upvote_image"
+        app:layout_constraintStart_toEndOf="@id/comment_upvote_image"
+        android:layout_marginStart="@dimen/spacing_s"
+        tools:text="43" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/comment_content"
+        style="@style/Text"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/comment_author_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comment_author_username"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:layout_marginBottom="@dimen/spacing_l"
+        tools:text="Yo, this thing is super cool, thanks for sharing! I think I should write some more text here to show what this looks like on multiple lines :)" />
+
+    <ImageView
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:id="@+id/comment_actions_button"
+        app:layout_constraintTop_toTopOf="@id/comment_author_username"
+        app:layout_constraintBottom_toBottomOf="@id/comment_author_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="@dimen/spacing_l"
+        app:srcCompat="@drawable/ic_more_horiz" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

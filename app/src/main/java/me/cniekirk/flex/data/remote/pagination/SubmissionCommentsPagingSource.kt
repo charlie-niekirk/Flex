@@ -6,27 +6,27 @@ import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.model.RedditType
 import timber.log.Timber
 
-class SubredditSubmissionsPagingSource(
+class SubmissionCommentsPagingSource(
     private val redditApi: RedditApi,
-    private val subreddit: String,
+    private val listingId: String,
     private val sortType: String
-) : PagingSource<String, RedditType.T3>() {
+) : PagingSource<String, RedditType.T1>() {
 
     private var before: String? = null
     private var after: String? = null
     private var itemCount: Int = 0
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, RedditType.T3> {
+    override suspend fun load(params: PagingSource.LoadParams<String>): PagingSource.LoadResult<String, RedditType.T1> {
         return try {
             val response = if (params.key.equals(before, true)) {
                 if (itemCount < 10) {
                     // First page
-                    redditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10)
+                    redditApi.getCommentsForListing(listingId, sortType, count = itemCount)
                 } else {
-                    redditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10)
+                    redditApi.getCommentsForListing(listingId, sortType, count = itemCount, before = params.key)
                 }
             } else {
-                redditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10)
+                redditApi.getCommentsForListing(listingId, sortType, after = params.key, count = itemCount)
             }
 
             if (itemCount > 0 && params.key.equals(before, true)) {
@@ -38,6 +38,8 @@ class SubredditSubmissionsPagingSource(
             after = response.data.after
             before = response.data.before
 
+            //response.data.children.forEach { (it.data as RedditType.T1).replies }
+
             LoadResult.Page(
                 response.data.children.map { it.data },
                 before,
@@ -48,7 +50,7 @@ class SubredditSubmissionsPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<String, RedditType.T3>): String? {
+    override fun getRefreshKey(state: PagingState<String, RedditType.T1>): String? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestItemToPosition(anchorPosition)?.id.toString()
         }

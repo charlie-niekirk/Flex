@@ -12,7 +12,7 @@ import retrofit2.http.FormUrlEncoded
 
 interface RedditApi {
 
-    @GET("r/{subreddit}{sortType}.json")
+    @GET("r/{subreddit}{sortType}.json?raw_json=1")
     suspend fun getPosts(
         @Path("subreddit") subreddit: String,
         @Path("sortType") sortType: String,
@@ -21,8 +21,16 @@ interface RedditApi {
         @Query("count") count: Int? = null,
         @Query("limit") limit: Int = 15): RedditResponse<Listing>
 
-    @GET("/{sort}.json")
+    @GET("/{sort}.json?raw_json=1")
     suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing>
+
+    @GET("/comments/{id}{sortType}.json?raw_json=1")
+    suspend fun getCommentsForListing(
+        @Path("id") id: String,
+        @Path("sortType") sortType: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int? = null): RedditResponse<Listing>
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper

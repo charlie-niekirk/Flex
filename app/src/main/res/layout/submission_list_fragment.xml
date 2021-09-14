@@ -66,4 +66,14 @@
         tools:listitem="@layout/submission_list_item"
         tools:itemCount="12" />
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/loading_indicator"
+        app:layout_constraintStart_toStartOf="@id/list_submissions"
+        app:layout_constraintEnd_toEndOf="@id/list_submissions"
+        app:layout_constraintTop_toTopOf="@id/list_submissions"
+        app:layout_constraintBottom_toBottomOf="@id/list_submissions"
+        android:indeterminateTint="@color/black" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

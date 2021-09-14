@@ -16,4 +16,5 @@
     <string name="sort_title">Sort by...</string>
     <string name="smile_icon_content_description">Upvote ratio icon</string>
     <string name="upvote_action_content_description">Upvote action button</string>
+    <string name="percentage_format">%1$s%%</string>
 </resources>

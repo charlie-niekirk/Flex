@@ -11,6 +11,7 @@ import me.cniekirk.flex.ui.submission.SubmissionListFragment
 
 @AndroidEntryPoint
 class ContainerActivity : AppCompatActivity() {
+
     private val navController by lazy {
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment).navController
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:id="@+id/text_submission_content"
+    style="@style/Text.Label"
+    tools:text="This is a random post in this subreddit and here is it's preview to see what a really long preview looks like when viewing it in the submission list oh wo this is a very long bit of text please help me I cant think of any more!" />

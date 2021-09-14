@@ -19,7 +19,7 @@ class SubmissionListViewModel @Inject constructor(
     private val redditApi: RedditApi
 ) : ViewModel() {
 
-    private val _subredditFlow = MutableStateFlow(value = "politics")
+    private val _subredditFlow = MutableStateFlow(value = "tommyinnit")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()
@@ -27,7 +27,7 @@ class SubmissionListViewModel @Inject constructor(
     @ExperimentalCoroutinesApi
     val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
         sortFlow.flatMapLatest { sort ->
-            Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 3)) {
+            Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 1)) {
                 SubredditSubmissionsPagingSource(redditApi, subreddit, sort)
             }.flow.cachedIn(viewModelScope)
         }
