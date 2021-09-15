@@ -3,20 +3,20 @@ package me.cniekirk.flex.data.remote.pagination
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import me.cniekirk.flex.data.remote.RedditApi
-import me.cniekirk.flex.data.remote.model.RedditType
+import me.cniekirk.flex.data.remote.model.Submission
 import timber.log.Timber
 
 class SubredditSubmissionsPagingSource(
     private val redditApi: RedditApi,
     private val subreddit: String,
     private val sortType: String
-) : PagingSource<String, RedditType.T3>() {
+) : PagingSource<String, Submission>() {
 
     private var before: String? = null
     private var after: String? = null
     private var itemCount: Int = 0
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, RedditType.T3> {
+    override suspend fun load(params: LoadParams<String>): LoadResult<String, Submission> {
         return try {
             val response = if (params.key.equals(before, true)) {
                 if (itemCount < 10) {
@@ -39,7 +39,7 @@ class SubredditSubmissionsPagingSource(
             before = response.data.before
 
             LoadResult.Page(
-                response.data.children.map { it.data },
+                response.data?.children?.map { it.data },
                 before,
                 after)
         } catch (exception: Exception) {
@@ -48,7 +48,7 @@ class SubredditSubmissionsPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<String, RedditType.T3>): String? {
+    override fun getRefreshKey(state: PagingState<String, Submission>): String? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestItemToPosition(anchorPosition)?.id.toString()
         }

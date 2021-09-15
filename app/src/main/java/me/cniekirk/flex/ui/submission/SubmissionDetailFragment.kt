@@ -7,24 +7,33 @@ import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.transition.MaterialSharedAxis
+import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
+import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
+import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
+@AndroidEntryPoint
 class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
 
     private var player: SimpleExoPlayer? = null
 
     private val args by navArgs<SubmissionDetailFragmentArgs>()
     private val markwon by lazy(LazyThreadSafetyMode.NONE) { Markwon.create(requireContext()) }
+    private val viewModel by viewModels<SubmissionDetailViewModel>()
+
     private var binding: SubmissionDetailFragmentBinding? = null
+    private var adapter: CommentTreeAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +46,9 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
         binding = SubmissionDetailFragmentBinding.bind(view)
 
         binding?.apply {
+            adapter = CommentTreeAdapter(emptyList(), markwon)
+            commentsTreeList.adapter = adapter
+
             textSubmissionTitle.text = args.post.title
             textSubredditName.text = args.post.subreddit
             textUpvoteRatio.text = getString(R.string.percentage_format,
@@ -116,28 +128,45 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                 textSubmissionAuthor.setTypeface(textSubmissionAuthor.typeface, Typeface.BOLD)
                 submissionPin.visibility = View.VISIBLE
                 val cs = ConstraintSet()
-                cs.clone(root)
+                cs.clone(contentContainer)
                 cs.connect(
                     textSubmissionAuthor.id,
                     ConstraintSet.START,
                     submissionPin.id,
                     ConstraintSet.END,
                     root.context.resources.getDimension(R.dimen.spacing_s).toInt())
-                cs.applyTo(root)
+                cs.applyTo(contentContainer)
             } else {
                 textSubmissionAuthor.setTextColor(root.context.getColor(R.color.black))
                 textSubmissionAuthor.setTypeface(textSubmissionAuthor.typeface, Typeface.NORMAL)
                 submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
-                cs.clone(root)
+                cs.clone(contentContainer)
                 cs.connect(
                     textSubmissionAuthor.id,
                     ConstraintSet.START,
                     textSubredditName.id,
                     ConstraintSet.START)
-                cs.applyTo(root)
+                cs.applyTo(contentContainer)
             }
         }
+
+        observe(viewModel.commentsTree) { comments ->
+            when (comments) {
+                is RedditResult.Error -> {
+                    Timber.e(comments.errorMessage)
+                }
+                RedditResult.Loading -> {
+                    // Do nothing for now
+                }
+                is RedditResult.Success -> {
+                    adapter = CommentTreeAdapter(comments.data, markwon)
+                    binding?.commentsTreeList?.adapter = adapter
+                }
+            }
+        }
+
+        viewModel.getComments(args.post.id ?: "", "")
     }
 
     override fun onDestroyView() {

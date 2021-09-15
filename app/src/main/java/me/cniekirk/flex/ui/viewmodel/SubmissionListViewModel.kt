@@ -1,4 +1,4 @@
-package me.cniekirk.flex.ui.submission
+package me.cniekirk.flex.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
+import me.cniekirk.flex.domain.GetCommentsUseCase
+import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,7 +21,7 @@ class SubmissionListViewModel @Inject constructor(
     private val redditApi: RedditApi
 ) : ViewModel() {
 
-    private val _subredditFlow = MutableStateFlow(value = "tommyinnit")
+    private val _subredditFlow = MutableStateFlow(value = "politics")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()

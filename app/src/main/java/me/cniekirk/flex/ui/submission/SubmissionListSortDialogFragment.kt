@@ -4,12 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubmissionListSortDialogBinding
+import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 
 @AndroidEntryPoint
 class SubmissionListSortDialogFragment : BottomSheetDialogFragment() {

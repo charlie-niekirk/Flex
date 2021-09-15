@@ -4,23 +4,20 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.T3
+import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
+import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
-import timber.log.Timber
 
 /**
  * [Fragment] displaying a list of submissions from any source i.e. MultiReddit, Subreddit, Home etc.
@@ -95,7 +92,7 @@ class SubmissionListFragment
         super.onPause()
     }
 
-    override fun onPostClicked(post: T3) {
+    override fun onPostClicked(post: Submission) {
         val action = SubmissionListFragmentDirections
             .actionSubmissionListFragmentToSubmissionDetailFragment(post)
         binding?.root?.findNavController()?.navigate(action)

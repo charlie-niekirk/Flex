@@ -12,19 +12,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.RoundedCornersTransformation
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.T3
-import me.cniekirk.flex.databinding.SubmissionLinkPreviewBinding
+import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionListItemBinding
 import me.cniekirk.flex.util.*
 import timber.log.Timber
-import java.time.format.TextStyle
 
 class SubmissionListAdapter(
     private val submissionsActionListener: SubmissionActionListener)
-    : PagingDataAdapter<T3, SubmissionListAdapter.SubmissionListViewHolder>(SubmissionComparator) {
+    : PagingDataAdapter<Submission, SubmissionListAdapter.SubmissionListViewHolder>(SubmissionComparator) {
 
     private var player: SimpleExoPlayer? = null
 
@@ -43,7 +40,7 @@ class SubmissionListAdapter(
 
     inner class SubmissionListViewHolder(
         private val binding: SubmissionListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: T3) {
+        fun bind(post: Submission) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
@@ -160,12 +157,12 @@ class SubmissionListAdapter(
         super.onViewRecycled(holder)
     }
 
-    object SubmissionComparator : DiffUtil.ItemCallback<T3>() {
-        override fun areItemsTheSame(oldItem: T3, newItem: T3) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: T3, newItem: T3) = oldItem == newItem
+    object SubmissionComparator : DiffUtil.ItemCallback<Submission>() {
+        override fun areItemsTheSame(oldItem: Submission, newItem: Submission) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Submission, newItem: Submission) = oldItem == newItem
     }
 
     interface SubmissionActionListener {
-        fun onPostClicked(post: T3)
+        fun onPostClicked(post: Submission)
     }
 }

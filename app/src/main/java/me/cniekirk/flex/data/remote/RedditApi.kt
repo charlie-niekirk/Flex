@@ -1,9 +1,9 @@
 package me.cniekirk.flex.data.remote
 
-import me.cniekirk.flex.data.remote.model.Listing
-import me.cniekirk.flex.data.remote.model.RedditResponse
+import me.cniekirk.flex.data.remote.model.*
 import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
+import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
 import retrofit2.http.*
 import retrofit2.http.FieldMap
 import retrofit2.http.HeaderMap
@@ -19,18 +19,15 @@ interface RedditApi {
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int? = null,
-        @Query("limit") limit: Int = 15): RedditResponse<Listing>
+        @Query("limit") limit: Int = 15): RedditResponse<Listing<Submission>>
 
     @GET("/{sort}.json?raw_json=1")
-    suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing>
+    suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing<Submission>>
 
     @GET("/comments/{id}{sortType}.json?raw_json=1")
     suspend fun getCommentsForListing(
         @Path("id") id: String,
-        @Path("sortType") sortType: String,
-        @Query("after") after: String? = null,
-        @Query("before") before: String? = null,
-        @Query("count") count: Int? = null): RedditResponse<Listing>
+        @Path("sortType") sortType: String): List<EnvelopedContributionListing>
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper

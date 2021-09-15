@@ -66,6 +66,14 @@
         tools:listitem="@layout/submission_list_item"
         tools:itemCount="12" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/list_header"
+        android:background="@color/gray"
+        android:alpha="0.6"
+        app:layout_constraintTop_toTopOf="@id/list_submissions" />
+
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

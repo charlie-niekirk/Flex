@@ -28,6 +28,6 @@
         tools:layout="@layout/submission_detail_fragment" >
         <argument
             android:name="post"
-            app:argType="me.cniekirk.flex.data.remote.model.T3" />
+            app:argType="me.cniekirk.flex.data.remote.model.Submission" />
     </fragment>
 </navigation>

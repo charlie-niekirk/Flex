@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Data(
-    val `data`: Listing,
+data class Data<T>(
+    val data: Listing<T>,
     val kind: String
 ): Parcelable

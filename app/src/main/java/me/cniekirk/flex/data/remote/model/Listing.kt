@@ -6,10 +6,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Listing(
+data class Listing<T>(
     val after: String?,
     val before: String?,
-    val children: List<Children>,
+    val children: List<Children<T>>,
     val dist: Int,
     @Json(name = "geo_filter")
     val geoFilter: String?,
