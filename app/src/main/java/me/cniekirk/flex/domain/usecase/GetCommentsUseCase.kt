@@ -1,10 +1,12 @@
-package me.cniekirk.flex.domain
+package me.cniekirk.flex.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import me.cniekirk.flex.data.remote.model.Data
 import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.di.IoDispatcher
+import me.cniekirk.flex.domain.FlowUseCase
+import me.cniekirk.flex.domain.RedditDataRepository
+import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
 import javax.inject.Inject
 

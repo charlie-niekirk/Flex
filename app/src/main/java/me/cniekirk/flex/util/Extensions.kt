@@ -86,6 +86,9 @@ fun String.processLink(block: (Link) -> Unit) {
         videoRegex.matches(this) -> {
             block(Link.VideoLink(this))
         }
+        this.startsWith("https://www.twitter.com") -> {
+            block(Link.TwitterLink(this))
+        }
         else -> {
             block(Link.ExternalLink)
         }

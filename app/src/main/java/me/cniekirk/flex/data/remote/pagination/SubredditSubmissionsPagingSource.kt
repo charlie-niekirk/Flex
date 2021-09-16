@@ -2,14 +2,18 @@ package me.cniekirk.flex.data.remote.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.model.Submission
 import timber.log.Timber
+import javax.inject.Named
 
 class SubredditSubmissionsPagingSource(
     private val redditApi: RedditApi,
+    private val authRedditApi: RedditApi,
     private val subreddit: String,
-    private val sortType: String
+    private val sortType: String,
+    private val userDao: UserDao
 ) : PagingSource<String, Submission>() {
 
     private var before: String? = null
@@ -18,15 +22,30 @@ class SubredditSubmissionsPagingSource(
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, Submission> {
         return try {
-            val response = if (params.key.equals(before, true)) {
-                if (itemCount < 10) {
-                    // First page
-                    redditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10)
+
+            val response = if (userDao.getAll().isNullOrEmpty()) {
+                if (params.key.equals(before, true)) {
+                    if (itemCount < 10) {
+                        // First page
+                        redditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10)
+                    } else {
+                        redditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10)
+                    }
                 } else {
-                    redditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10)
+                    redditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10)
                 }
             } else {
-                redditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10)
+                val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+                if (params.key.equals(before, true)) {
+                    if (itemCount < 10) {
+                        // First page
+                        authRedditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10, authorization = accessToken)
+                    } else {
+                        authRedditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10, authorization = accessToken)
+                    }
+                } else {
+                    authRedditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10, authorization = accessToken)
+                }
             }
 
             if (itemCount > 0 && params.key.equals(before, true)) {

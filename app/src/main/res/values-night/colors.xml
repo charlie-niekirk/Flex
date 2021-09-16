@@ -5,4 +5,6 @@
     <color name="accent">#FFFFFFFF</color>
     <color name="green">#A5D6A7</color>
     <color name="gray">#FFEEEEEE</color>
+    <color name="upvote">#FF8b60</color>
+    <color name="downvote">#9494FF</color>
 </resources>

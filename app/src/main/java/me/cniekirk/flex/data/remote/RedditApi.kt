@@ -1,14 +1,12 @@
 package me.cniekirk.flex.data.remote
 
-import me.cniekirk.flex.data.remote.model.*
+import me.cniekirk.flex.data.remote.model.Listing
+import me.cniekirk.flex.data.remote.model.RedditResponse
+import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
 import retrofit2.http.*
-import retrofit2.http.FieldMap
-import retrofit2.http.HeaderMap
-import retrofit2.http.POST
-import retrofit2.http.FormUrlEncoded
 
 interface RedditApi {
 
@@ -19,7 +17,8 @@ interface RedditApi {
         @Query("after") after: String? = null,
         @Query("before") before: String? = null,
         @Query("count") count: Int? = null,
-        @Query("limit") limit: Int = 15): RedditResponse<Listing<Submission>>
+        @Query("limit") limit: Int = 15,
+        @Header("Authorization") authorization: String? = null): RedditResponse<Listing<Submission>>
 
     @GET("/{sort}.json?raw_json=1")
     suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing<Submission>>
@@ -27,7 +26,8 @@ interface RedditApi {
     @GET("/comments/{id}{sortType}.json?raw_json=1")
     suspend fun getCommentsForListing(
         @Path("id") id: String,
-        @Path("sortType") sortType: String): List<EnvelopedContributionListing>
+        @Path("sortType") sortType: String,
+        @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
@@ -39,8 +39,8 @@ interface RedditApi {
         @FieldMap params: Map<String, String>): Token
 
     @POST("api/v1/access_token")
-    suspend fun renewToken(
-        @HeaderMap header: HashMap<String, String>,
+    fun renewToken(
+        @HeaderMap header: Map<String, String>,
         @Query("grant_type") grantType: String = "refresh_token",
         @Query("refresh_token") refreshToken: String): Token
 
@@ -49,5 +49,13 @@ interface RedditApi {
         @HeaderMap header: HashMap<String, String>,
         @Query("token") token: String,
         @Query("token_type_hint") tokenTypeHint: String)
+
+    @POST("api/vote")
+    @FormUrlEncoded
+    suspend fun vote(
+        @Header("Authorization") authorization: String,
+        @Field("id") thingId: String,
+        @Field("dir") voteDir: Int
+    )
 
 }

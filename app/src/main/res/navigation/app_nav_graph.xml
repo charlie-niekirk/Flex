@@ -30,4 +30,9 @@
             android:name="post"
             app:argType="me.cniekirk.flex.data.remote.model.Submission" />
     </fragment>
+    <fragment
+        android:id="@+id/loginWebviewFragment"
+        android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"
+        android:label="LoginWebviewFragment"
+        tools:layout="@layout/login_webview_fragment" />
 </navigation>

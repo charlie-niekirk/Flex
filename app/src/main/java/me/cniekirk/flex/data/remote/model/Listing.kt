@@ -13,5 +13,5 @@ data class Listing<T>(
     val dist: Int,
     @Json(name = "geo_filter")
     val geoFilter: String?,
-    val modhash: String
+    val modhash: String?
 ) : Parcelable

@@ -19,4 +19,7 @@
     <string name="percentage_format">%1$s%%</string>
     <string name="loading_indicator_content_description">Loading indicator</string>
     <string name="comments_title">Comments (%1$s)</string>
+    <string name="auth_error">Login failed!</string>
+    <string name="action_error_aunauthenticated">You must login first!</string>
+    <string name="share_as_image">Share as image</string>
 </resources>

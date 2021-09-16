@@ -6,19 +6,24 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
-import me.cniekirk.flex.domain.GetCommentsUseCase
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class SubmissionListViewModel @Inject constructor(
-    private val redditApi: RedditApi
+    @Named("userlessApi") private val redditApi: RedditApi,
+    @Named("authApi") private val authRedditApi: RedditApi,
+    private val userDao: UserDao
 ) : ViewModel() {
     private val _subredditFlow = MutableStateFlow(value = "androidapps")
     val subredditFlow = _subredditFlow.asStateFlow()
@@ -29,7 +34,7 @@ class SubmissionListViewModel @Inject constructor(
     val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
         sortFlow.flatMapLatest { sort ->
             Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 1)) {
-                SubredditSubmissionsPagingSource(redditApi, subreddit, sort)
+                SubredditSubmissionsPagingSource(redditApi, authRedditApi, subreddit, sort, userDao)
             }.flow.cachedIn(viewModelScope)
         }
     }

@@ -2,7 +2,9 @@ package me.cniekirk.flex.data.remote.repo
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import me.cniekirk.flex.data.local.Preferences
+import me.cniekirk.flex.data.local.db.User
+import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.prefs.Preferences
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.MoreComments
@@ -15,28 +17,37 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.util.getHttpBasicAuthHeader
 import me.cniekirk.flex.util.toAuthParams
 import javax.inject.Inject
+import javax.inject.Named
 
 class RedditDataRepositoryImpl @Inject constructor(
-    private val redditApi: RedditApi,
-    private val preferences: Preferences) : RedditDataRepository {
-
-    override fun getFrontpagePosts(sort: String): Flow<RedditResult<List<Submission>>> = flow {
-        emit(RedditResult.Success(redditApi.getFrontpagePosts(sort).data.children.map { it.data as Submission }))
-    }
-
-    override fun getSubredditPosts(subreddit: String, sortType: String): Flow<RedditResult<List<Submission>>> = flow {
-        emit(RedditResult.Success(redditApi.getPosts(subreddit, sortType).data.children.map { it.data as Submission }))
-    }
+    @Named("userlessApi") private val redditApi: RedditApi,
+    @Named("authApi") private val authRedditApi: RedditApi,
+    private val userDao: UserDao
+) : RedditDataRepository {
 
     override fun getAccessToken(code: String): Flow<RedditResult<Token>> = flow {
         val response = redditApi.getAccessToken(getHttpBasicAuthHeader(), code.toAuthParams())
-        preferences.setAccessToken(response.accessToken)
+        userDao.insert(User(response.accessToken, response.refreshToken!!))
         emit(RedditResult.Success(response))
+    }
+
+    override fun upvoteThing(thingId: String): Flow<RedditResult<Boolean>> = flow {
+        userDao.getAll().firstOrNull()?.let {
+            authRedditApi.vote("Bearer ${it.accessToken}", thingId, 1)
+            emit(RedditResult.Success(true))
+        } ?: run {
+            emit(RedditResult.UnAuthenticated)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun getComments(submissionId: String, sortType: String): Flow<RedditResult<List<Comment>>> = flow {
-        val response = redditApi.getCommentsForListing(submissionId, sortType)
+        val response = if (userDao.getAll().isNullOrEmpty()) {
+            redditApi.getCommentsForListing(submissionId, sortType)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            authRedditApi.getCommentsForListing(submissionId, sortType, accessToken)
+        }
         val commentTree = response.lastOrNull()?.data as Listing<EnvelopedCommentData>
         val comments = mutableListOf<Comment>()
         buildTree(commentTree, comments)

@@ -1,4 +1,4 @@
-package me.cniekirk.flex.data.local
+package me.cniekirk.flex.data.local.prefs
 
 import android.content.Context
 import androidx.datastore.core.DataStore

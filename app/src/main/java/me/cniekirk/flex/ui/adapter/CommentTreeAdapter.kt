@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.Comment
+import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.util.getDepthColour
 import timber.log.Timber
 
 class CommentTreeAdapter(
+    private val submission: Submission,
     private val items: List<Comment>,
     private val markwon: Markwon) : RecyclerView.Adapter<CommentTreeAdapter.CommentViewHolder>() {
 
@@ -55,6 +57,11 @@ class CommentTreeAdapter(
                 }
                 markwon.setMarkdown(commentContent, item.body)
                 commentAuthorUsername.text = item.author
+                if (item.author.equals(submission.author, true)) {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.blue))
+                } else {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.accent))
+                }
                 commentUpvoteNumber.text = item.score.toString()
             }
         }

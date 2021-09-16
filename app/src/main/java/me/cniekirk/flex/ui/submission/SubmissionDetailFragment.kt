@@ -8,6 +8,7 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -58,7 +59,7 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
             })
             loading.start()
 
-            adapter = CommentTreeAdapter(emptyList(), markwon)
+            adapter = CommentTreeAdapter(args.post, emptyList(), markwon)
             commentsTreeList.adapter = adapter
 
             textSubmissionTitle.text = args.post.title
@@ -166,6 +167,34 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
             } else {
                 textAuthorFlair.visibility = View.VISIBLE
             }
+            buttonUpvoteAction.setOnClickListener {
+                // Send the upvote/removal
+                if (it.isSelected) {
+                    viewModel.onUiEvent(SubmissionDetailEvent.RemoveUpvote(args.post.fullname))
+                } else {
+                    viewModel.onUiEvent(SubmissionDetailEvent.Upvote(args.post.fullname))
+                }
+                it.isSelected = !it.isSelected
+            }
+        }
+
+        observe(viewModel.upvoteState) {
+            when (it) {
+                is RedditResult.Error -> {
+                    Timber.e(it.errorMessage)
+                }
+                RedditResult.Loading -> {}
+                is RedditResult.Success -> {
+                    binding?.textUpvoteCount?.text =
+                        binding?.textUpvoteCount?.text?.toString()?.toInt()?.inc()?.toString()
+                }
+                RedditResult.UnAuthenticated -> {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.action_error_aunauthenticated,
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         observe(viewModel.commentsTree) { comments ->
@@ -177,15 +206,21 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     // Do nothing for now
                 }
                 is RedditResult.Success -> {
-                    adapter = CommentTreeAdapter(comments.data, markwon)
+                    adapter = CommentTreeAdapter(args.post, comments.data, markwon)
                     binding?.commentsTreeList?.adapter = adapter
                     binding?.loadingIndicator?.visibility = View.GONE
                     loading.reset()
                 }
+                RedditResult.UnAuthenticated -> {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.action_error_aunauthenticated,
+                        Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
-        viewModel.getComments(args.post.id ?: "", "")
+        viewModel.getComments(args.post.id, "")
     }
 
     override fun onDestroyView() {

@@ -49,12 +49,7 @@ class SubmissionListFragment
         binding = SubmissionListFragmentBinding.bind(view)
 
         binding?.apply {
-            loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
-                override fun onAnimationEnd(drawable: Drawable?) {
-                    loadingIndicator.post { loading.start() }
-                }
-            })
-            loading.start()
+            //startLoadingAnimation()
             adapter = SubmissionListAdapter(this@SubmissionListFragment)
             listSubmissions.adapter = adapter?.withLoadStateFooter(
                 footer = SubmissionListLoadingStateAdapter()
@@ -69,10 +64,12 @@ class SubmissionListFragment
         // Collect paginated submissions and submit to adapter
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             adapter?.addLoadStateListener { loadState ->
+                if (loadState.refresh is LoadState.Loading) {
+                    startLoadingAnimation()
+                }
                 if (loadState.refresh is LoadState.NotLoading &&
                         adapter?.itemCount!! > 0) {
-                    binding?.loadingIndicator?.visibility = View.GONE
-                    loading.reset()
+                    stopLoadingAnimation()
                 }
             }
             viewModel.pagingSubmissionFlow.collectLatest {
@@ -96,6 +93,21 @@ class SubmissionListFragment
         observe(viewModel.subredditFlow) {
             binding?.textSubmissionSource?.text = it
         }
+    }
+
+    private fun startLoadingAnimation() {
+        binding?.loadingIndicator?.visibility = View.VISIBLE
+        loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+            override fun onAnimationEnd(drawable: Drawable?) {
+                binding?.loadingIndicator?.post { loading.start() }
+            }
+        })
+        loading.start()
+    }
+
+    private fun stopLoadingAnimation() {
+        binding?.loadingIndicator?.visibility = View.GONE
+        loading.reset()
     }
 
     override fun onPause() {

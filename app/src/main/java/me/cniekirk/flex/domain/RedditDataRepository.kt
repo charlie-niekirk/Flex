@@ -10,12 +10,10 @@ import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
 
 interface RedditDataRepository {
 
-    fun getFrontpagePosts(sort: String): Flow<RedditResult<List<Submission>>>
-
-    fun getSubredditPosts(subreddit: String, sortType: String = "top"): Flow<RedditResult<List<Submission>>>
-
     fun getComments(submissionId: String, sortType: String): Flow<RedditResult<List<Comment>>>
 
     fun getAccessToken(code: String): Flow<RedditResult<Token>>
+
+    fun upvoteThing(thingId: String): Flow<RedditResult<Boolean>>
 
 }

@@ -107,6 +107,9 @@ class SubmissionListAdapter(
                                 player = binding.videoPreview.videoPlayer.initialise(
                                     post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
                             }
+                            is Link.TwitterLink -> {
+
+                            }
                         }
                     }
                 }
