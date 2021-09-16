@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <View
         android:layout_width="3dp"
@@ -21,8 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/comment_author_username"
-        style="@style/Text.Bold"
-        android:textSize="12sp"
+        style="@style/Text.Bold.Label"
         app:layout_constraintStart_toEndOf="@id/comment_depth_indicator"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/spacing_l"
@@ -44,8 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/comment_upvote_number"
-        style="@style/Text"
-        android:textSize="12sp"
+        style="@style/Text.Label"
         app:layout_constraintTop_toTopOf="@id/comment_upvote_image"
         app:layout_constraintBottom_toBottomOf="@id/comment_upvote_image"
         app:layout_constraintStart_toEndOf="@id/comment_upvote_image"
@@ -56,8 +58,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/comment_content"
-        style="@style/Text"
-        android:textSize="12sp"
+        style="@style/Text.Label"
         app:layout_constraintStart_toStartOf="@id/comment_author_username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/comment_author_username"
@@ -76,5 +77,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="@dimen/spacing_l"
         app:srcCompat="@drawable/ic_more_horiz" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:id="@+id/item_divider"
+        android:background="@color/black"
+        android:alpha="0.15"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

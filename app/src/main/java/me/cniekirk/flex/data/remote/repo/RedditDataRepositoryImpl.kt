@@ -4,15 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.cniekirk.flex.data.local.Preferences
 import me.cniekirk.flex.data.remote.RedditApi
-import me.cniekirk.flex.data.remote.model.Data
 import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.base.Listing
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentDataListing
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.util.getHttpBasicAuthHeader

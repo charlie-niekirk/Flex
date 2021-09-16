@@ -10,7 +10,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/content_container"
-        android:background="@color/surfaceColor">
+        android:background="@color/surfaceColor"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_comments_title"
+            style="@style/Text.Bold.H2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="24dp"
+            tools:text="Comments (496)" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,7 +30,7 @@
             android:id="@+id/text_subreddit_name"
             style="@style/Text.Label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_comments_title"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             tools:text="tommyinnit" />
@@ -183,11 +195,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_submission_author"
-            style="@style/Text.Label"
+            style="@style/Text.Bold.Label"
             app:layout_constraintStart_toEndOf="@id/submission_pin"
             app:layout_constraintTop_toBottomOf="@id/image_upvote_indicator"
             android:layout_marginTop="8dp"
             tools:text="u/chertycherty" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_author_flair"
+            style="@style/Text.Label"
+            android:background="@drawable/flair_background"
+            app:layout_constraintStart_toEndOf="@id/text_submission_author"
+            app:layout_constraintTop_toTopOf="@id/text_submission_author"
+            app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
+            android:layout_marginStart="@dimen/spacing_m"
+            android:padding="3dp"
+            tools:text="Someone"
+            tools:textColor="@color/white" />
 
         <include
             android:layout_width="wrap_content"
@@ -196,7 +222,7 @@
             android:id="@+id/awards"
             app:layout_constraintTop_toTopOf="@id/text_submission_author"
             app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
-            app:layout_constraintStart_toEndOf="@id/text_submission_author"
+            app:layout_constraintStart_toEndOf="@id/text_author_flair"
             android:layout_marginStart="8dp" />
 
         <View
@@ -256,8 +282,8 @@
             android:focusable="true" />
 
         <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:id="@+id/button_options_action"
             style="@style/Icon"
             app:srcCompat="@drawable/ic_more_horiz"
@@ -280,11 +306,21 @@
             app:layout_constraintTop_toBottomOf="@id/button_upvote_action"
             android:layout_marginTop="@dimen/spacing_l" />
 
+        <ImageView
+            android:id="@+id/loading_indicator"
+            android:layout_width="0dp"
+            android:layout_height="16dp"
+            app:layout_constraintTop_toBottomOf="@id/post_actions_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/avd_loading_line"
+            android:contentDescription="@string/loading_indicator_content_description" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/comments_tree_list"
-            app:layout_constraintTop_toBottomOf="@id/post_actions_divider"
+            app:layout_constraintTop_toBottomOf="@id/loading_indicator"
             android:nestedScrollingEnabled="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/submission_comment_list_item"

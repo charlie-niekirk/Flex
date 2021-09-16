@@ -3,10 +3,13 @@ package me.cniekirk.flex.util
 import android.icu.text.CompactDecimalFormat
 import android.icu.util.ULocale
 import android.media.session.PlaybackState
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import me.cniekirk.flex.R
 import timber.log.Timber
 
 
@@ -109,4 +112,16 @@ fun StyledPlayerView.initialise(url: String): SimpleExoPlayer {
             })
             this.player?.prepare()
         }
+}
+
+fun Int.getDepthColour(): Int {
+    return when (this) {
+        1 -> R.color.green
+        2 -> R.color.blue
+        3 -> R.color.indigo
+        4 -> R.color.purple
+        5 -> R.color.pink
+        6 -> R.color.red
+        else -> R.color.green
+    }
 }

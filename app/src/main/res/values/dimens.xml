@@ -6,5 +6,5 @@
     <dimen name="spacing_l">16dp</dimen>
     <dimen name="spacing_xl">32dp</dimen>
 
-    <dimen name="action_button_size">32dp</dimen>
+    <dimen name="action_button_size">28dp</dimen>
 </resources>

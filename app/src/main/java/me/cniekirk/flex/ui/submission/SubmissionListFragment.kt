@@ -1,5 +1,8 @@
 package me.cniekirk.flex.ui.submission
 
+import android.graphics.drawable.Animatable2
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -31,6 +34,7 @@ class SubmissionListFragment
 
     // Shared VM with the sort dialog fragment
     private val viewModel by activityViewModels<SubmissionListViewModel>()
+    private val loading by lazy(LazyThreadSafetyMode.NONE) { binding?.loadingIndicator?.drawable as AnimatedVectorDrawable }
     private var binding: SubmissionListFragmentBinding? = null
     private var adapter: SubmissionListAdapter? = null
 
@@ -45,6 +49,12 @@ class SubmissionListFragment
         binding = SubmissionListFragmentBinding.bind(view)
 
         binding?.apply {
+            loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+                override fun onAnimationEnd(drawable: Drawable?) {
+                    loadingIndicator.post { loading.start() }
+                }
+            })
+            loading.start()
             adapter = SubmissionListAdapter(this@SubmissionListFragment)
             listSubmissions.adapter = adapter?.withLoadStateFooter(
                 footer = SubmissionListLoadingStateAdapter()
@@ -62,6 +72,7 @@ class SubmissionListFragment
                 if (loadState.refresh is LoadState.NotLoading &&
                         adapter?.itemCount!! > 0) {
                     binding?.loadingIndicator?.visibility = View.GONE
+                    loading.reset()
                 }
             }
             viewModel.pagingSubmissionFlow.collectLatest {

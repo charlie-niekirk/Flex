@@ -17,4 +17,6 @@
     <string name="smile_icon_content_description">Upvote ratio icon</string>
     <string name="upvote_action_content_description">Upvote action button</string>
     <string name="percentage_format">%1$s%%</string>
+    <string name="loading_indicator_content_description">Loading indicator</string>
+    <string name="comments_title">Comments (%1$s)</string>
 </resources>

@@ -20,8 +20,7 @@ import javax.inject.Inject
 class SubmissionListViewModel @Inject constructor(
     private val redditApi: RedditApi
 ) : ViewModel() {
-
-    private val _subredditFlow = MutableStateFlow(value = "politics")
+    private val _subredditFlow = MutableStateFlow(value = "androidapps")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()

@@ -7,7 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="accent">#FF000000</color>
     <color name="surfaceColor">#FFFFFFFF</color>
+    <color name="blue">#FF2196F3</color>
+    <color name="indigo">#FF3F51B5</color>
+    <color name="purple">#FF673AB7</color>
+    <color name="pink">#FFD81B60</color>
+    <color name="red">#FFF44336</color>
     <color name="green">#FF4CAF50</color>
     <color name="gray">#FF9E9E9E</color>
 </resources>

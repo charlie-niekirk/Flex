@@ -3,6 +3,9 @@ package me.cniekirk.flex.ui.submission
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.Animatable2
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintSet
@@ -30,6 +33,7 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
 
     private val args by navArgs<SubmissionDetailFragmentArgs>()
     private val markwon by lazy(LazyThreadSafetyMode.NONE) { Markwon.create(requireContext()) }
+    private val loading by lazy(LazyThreadSafetyMode.NONE) { binding?.loadingIndicator?.drawable as AnimatedVectorDrawable }
     private val viewModel by viewModels<SubmissionDetailViewModel>()
 
     private var binding: SubmissionDetailFragmentBinding? = null
@@ -46,6 +50,14 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
         binding = SubmissionDetailFragmentBinding.bind(view)
 
         binding?.apply {
+            textCommentsTitle.text = getString(R.string.comments_title, args.post.numComments?.condense())
+            loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+                override fun onAnimationEnd(drawable: Drawable?) {
+                    loadingIndicator.post { loading.start() }
+                }
+            })
+            loading.start()
+
             adapter = CommentTreeAdapter(emptyList(), markwon)
             commentsTreeList.adapter = adapter
 
@@ -149,6 +161,11 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     ConstraintSet.START)
                 cs.applyTo(contentContainer)
             }
+            if (args.post.authorFlairText.isNullOrEmpty()) {
+                textAuthorFlair.visibility = View.GONE
+            } else {
+                textAuthorFlair.visibility = View.VISIBLE
+            }
         }
 
         observe(viewModel.commentsTree) { comments ->
@@ -162,6 +179,8 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                 is RedditResult.Success -> {
                     adapter = CommentTreeAdapter(comments.data, markwon)
                     binding?.commentsTreeList?.adapter = adapter
+                    binding?.loadingIndicator?.visibility = View.GONE
+                    loading.reset()
                 }
             }
         }
