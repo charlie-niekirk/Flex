@@ -25,7 +25,8 @@ class SubmissionListViewModel @Inject constructor(
     @Named("authApi") private val authRedditApi: RedditApi,
     private val userDao: UserDao
 ) : ViewModel() {
-    private val _subredditFlow = MutableStateFlow(value = "androidapps")
+
+    private val _subredditFlow = MutableStateFlow(value = "politics")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()

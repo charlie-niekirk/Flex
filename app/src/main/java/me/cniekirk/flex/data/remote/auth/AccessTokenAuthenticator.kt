@@ -1,5 +1,6 @@
 package me.cniekirk.flex.data.remote.auth
 
+import kotlinx.coroutines.runBlocking
 import me.cniekirk.flex.data.local.db.User
 import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.remote.RedditApi
@@ -24,9 +25,9 @@ class AccessTokenAuthenticator @Inject constructor(
 
             val user = userDao.getAll().first()
 
-            val newToken = redditApi.renewToken(
+            val newToken = runBlocking { redditApi.renewToken(
                 getHttpBasicAuthHeader(),
-                refreshToken = user.refreshToken)
+                refreshToken = user.refreshToken) }
 
             userDao.delete(user)
             userDao.insert(User(newToken.accessToken, newToken.refreshToken!!))

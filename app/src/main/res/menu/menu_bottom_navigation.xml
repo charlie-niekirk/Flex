@@ -14,6 +14,12 @@
         android:orderInCategory="2"
         android:icon="@drawable/ic_account" />
     <item
+        android:id="@+id/searchFragment"
+        android:title="@string/text_tab_search"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="2"
+        android:icon="@drawable/ic_search" />
+    <item
         android:id="@+id/settingsFragment"
         android:title="@string/text_tab_settings"
         app:showAsAction="ifRoom"

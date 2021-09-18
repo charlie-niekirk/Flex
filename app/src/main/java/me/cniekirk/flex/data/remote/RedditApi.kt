@@ -39,7 +39,7 @@ interface RedditApi {
         @FieldMap params: Map<String, String>): Token
 
     @POST("api/v1/access_token")
-    fun renewToken(
+    suspend fun renewToken(
         @HeaderMap header: Map<String, String>,
         @Query("grant_type") grantType: String = "refresh_token",
         @Query("refresh_token") refreshToken: String): Token

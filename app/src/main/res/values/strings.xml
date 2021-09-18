@@ -22,4 +22,6 @@
     <string name="auth_error">Login failed!</string>
     <string name="action_error_aunauthenticated">You must login first!</string>
     <string name="share_as_image">Share as image</string>
+    <string name="text_tab_search">Search</string>
+    <string name="title_settings">Settings</string>
 </resources>
