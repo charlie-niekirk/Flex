@@ -28,7 +28,7 @@
         tools:layout="@layout/submission_detail_fragment" >
         <argument
             android:name="post"
-            app:argType="me.cniekirk.flex.data.remote.model.Submission" />
+            app:argType="me.cniekirk.flex.data.remote.model.AuthedSubmission" />
     </fragment>
     <fragment
         android:id="@+id/loginWebviewFragment"

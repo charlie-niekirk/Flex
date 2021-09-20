@@ -7,6 +7,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
@@ -14,7 +15,7 @@ import me.cniekirk.flex.util.getDepthColour
 import timber.log.Timber
 
 class CommentTreeAdapter(
-    private val submission: Submission,
+    private val submission: AuthedSubmission,
     private val items: List<Comment>,
     private val markwon: Markwon) : RecyclerView.Adapter<CommentTreeAdapter.CommentViewHolder>() {
 

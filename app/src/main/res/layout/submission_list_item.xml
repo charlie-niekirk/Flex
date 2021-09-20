@@ -190,6 +190,20 @@
         android:layout_marginTop="8dp"
         tools:text="u/chertycherty" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_author_flair"
+        style="@style/Text.Label"
+        android:background="@drawable/flair_background"
+        android:textColor="@color/surfaceColor"
+        app:layout_constraintStart_toEndOf="@id/text_submission_author"
+        app:layout_constraintTop_toTopOf="@id/text_submission_author"
+        app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:padding="3dp"
+        tools:text="Someone" />
+
     <include
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -197,7 +211,7 @@
         android:id="@+id/awards"
         app:layout_constraintTop_toTopOf="@id/text_submission_author"
         app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
-        app:layout_constraintStart_toEndOf="@id/text_submission_author"
+        app:layout_constraintStart_toEndOf="@id/text_author_flair"
         android:layout_marginStart="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

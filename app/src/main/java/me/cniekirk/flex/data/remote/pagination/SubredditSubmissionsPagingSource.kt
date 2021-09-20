@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.remote.RedditApi
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Submission
 import timber.log.Timber
 import javax.inject.Named
@@ -14,13 +15,13 @@ class SubredditSubmissionsPagingSource(
     private val subreddit: String,
     private val sortType: String,
     private val userDao: UserDao
-) : PagingSource<String, Submission>() {
+) : PagingSource<String, AuthedSubmission>() {
 
     private var before: String? = null
     private var after: String? = null
     private var itemCount: Int = 0
 
-    override suspend fun load(params: LoadParams<String>): LoadResult<String, Submission> {
+    override suspend fun load(params: LoadParams<String>): LoadResult<String, AuthedSubmission> {
         return try {
 
             val response = if (userDao.getAll().isNullOrEmpty()) {
@@ -67,7 +68,7 @@ class SubredditSubmissionsPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<String, Submission>): String? {
+    override fun getRefreshKey(state: PagingState<String, AuthedSubmission>): String? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestItemToPosition(anchorPosition)?.id.toString()
         }

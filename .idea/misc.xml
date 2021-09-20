@@ -7,6 +7,8 @@
         <entry key="app/src/main/res/drawable/downvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
+        <entry key="app/src/main/res/drawable/flair_background.xml" value="0.3175925925925926" />
+        <entry key="app/src/main/res/drawable/ic_arrow_downward.xml" value="0.3175925925925926" />
         <entry key="app/src/main/res/drawable/ic_arrow_upward.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/selectable_downvote.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/selectable_upvote.xml" value="0.16944444444444445" />
@@ -19,8 +21,6 @@
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.5432291666666667" />
         <entry key="app/src/main/res/layout/loading_footer.xml" value="0.275" />
         <entry key="app/src/main/res/layout/login_webview_fragment.xml" value="0.28229166666666666" />
-        <entry key="app/src/main/res/layout/search_fragment.xml" value="0.375" />
-        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_comment_list_item.xml" value="0.45" />
         <entry key="app/src/main/res/layout/submission_detail_action_dialog.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_detail_fragment.xml" value="0.1" />

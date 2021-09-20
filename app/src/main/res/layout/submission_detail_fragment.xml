@@ -207,13 +207,13 @@
             android:id="@+id/text_author_flair"
             style="@style/Text.Label"
             android:background="@drawable/flair_background"
+            android:textColor="@color/surfaceColor"
             app:layout_constraintStart_toEndOf="@id/text_submission_author"
             app:layout_constraintTop_toTopOf="@id/text_submission_author"
             app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
             android:layout_marginStart="@dimen/spacing_m"
             android:padding="3dp"
-            tools:text="Someone"
-            tools:textColor="@color/white" />
+            tools:text="Someone" />
 
         <include
             android:layout_width="wrap_content"
@@ -238,7 +238,6 @@
             android:layout_width="@dimen/action_button_size"
             android:layout_height="@dimen/action_button_size"
             android:id="@+id/button_upvote_action"
-            style="@style/Icon"
             app:srcCompat="@drawable/selectable_upvote"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toStartOf="@id/button_downvote_action"

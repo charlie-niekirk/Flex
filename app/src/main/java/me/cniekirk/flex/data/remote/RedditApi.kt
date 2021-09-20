@@ -1,5 +1,6 @@
 package me.cniekirk.flex.data.remote
 
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Listing
 import me.cniekirk.flex.data.remote.model.RedditResponse
 import me.cniekirk.flex.data.remote.model.Submission
@@ -18,7 +19,7 @@ interface RedditApi {
         @Query("before") before: String? = null,
         @Query("count") count: Int? = null,
         @Query("limit") limit: Int = 15,
-        @Header("Authorization") authorization: String? = null): RedditResponse<Listing<Submission>>
+        @Header("Authorization") authorization: String? = null): RedditResponse<Listing<AuthedSubmission>>
 
     @GET("/{sort}.json?raw_json=1")
     suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing<Submission>>

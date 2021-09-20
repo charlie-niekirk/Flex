@@ -26,7 +26,7 @@ class SubmissionListViewModel @Inject constructor(
     private val userDao: UserDao
 ) : ViewModel() {
 
-    private val _subredditFlow = MutableStateFlow(value = "politics")
+    private val _subredditFlow = MutableStateFlow(value = "tommyinnit")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()

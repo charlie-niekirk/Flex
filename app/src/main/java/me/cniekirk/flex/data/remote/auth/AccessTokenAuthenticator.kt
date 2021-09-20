@@ -25,9 +25,9 @@ class AccessTokenAuthenticator @Inject constructor(
 
             val user = userDao.getAll().first()
 
-            val newToken = runBlocking { redditApi.renewToken(
-                getHttpBasicAuthHeader(),
-                refreshToken = user.refreshToken) }
+            val newToken = runBlocking {
+                redditApi.renewToken(getHttpBasicAuthHeader(), refreshToken = user.refreshToken)
+            }
 
             userDao.delete(user)
             userDao.insert(User(newToken.accessToken, newToken.refreshToken!!))

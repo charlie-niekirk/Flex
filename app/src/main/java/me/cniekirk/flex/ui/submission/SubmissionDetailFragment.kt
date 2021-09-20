@@ -162,17 +162,23 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     ConstraintSet.START)
                 cs.applyTo(contentContainer)
             }
-            if (args.post.authorFlairText.isNullOrEmpty()) {
+            if (args.post.authorFlairText.isNullOrBlank()) {
                 textAuthorFlair.visibility = View.GONE
             } else {
                 textAuthorFlair.visibility = View.VISIBLE
+                textAuthorFlair.text = args.post.authorFlairText
+                if (args.post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(args.post.authorFlairBackgroundColor))
+                }
             }
             buttonUpvoteAction.setOnClickListener {
                 // Send the upvote/removal
                 if (it.isSelected) {
-                    viewModel.onUiEvent(SubmissionDetailEvent.RemoveUpvote(args.post.fullname))
+                    viewModel.onUiEvent(SubmissionDetailEvent.RemoveUpvote(args.post.name))
                 } else {
-                    viewModel.onUiEvent(SubmissionDetailEvent.Upvote(args.post.fullname))
+                    viewModel.onUiEvent(SubmissionDetailEvent.Upvote(args.post.name))
                 }
                 it.isSelected = !it.isSelected
             }
@@ -189,6 +195,7 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                         binding?.textUpvoteCount?.text?.toString()?.toInt()?.inc()?.toString()
                 }
                 RedditResult.UnAuthenticated -> {
+                    binding?.buttonUpvoteAction?.isSelected = !binding?.buttonUpvoteAction?.isSelected!!
                     Toast.makeText(
                         requireContext(),
                         R.string.action_error_aunauthenticated,

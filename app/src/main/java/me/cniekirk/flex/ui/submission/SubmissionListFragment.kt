@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
@@ -115,7 +116,7 @@ class SubmissionListFragment
         super.onPause()
     }
 
-    override fun onPostClicked(post: Submission) {
+    override fun onPostClicked(post: AuthedSubmission) {
         val action = SubmissionListFragmentDirections
             .actionSubmissionListFragmentToSubmissionDetailFragment(post)
         binding?.root?.findNavController()?.navigate(action)

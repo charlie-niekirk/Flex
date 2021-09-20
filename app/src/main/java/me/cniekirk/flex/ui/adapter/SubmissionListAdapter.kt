@@ -14,6 +14,7 @@ import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.google.android.exoplayer2.SimpleExoPlayer
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionListItemBinding
 import me.cniekirk.flex.util.*
@@ -21,7 +22,7 @@ import timber.log.Timber
 
 class SubmissionListAdapter(
     private val submissionsActionListener: SubmissionActionListener)
-    : PagingDataAdapter<Submission, SubmissionListAdapter.SubmissionListViewHolder>(SubmissionComparator) {
+    : PagingDataAdapter<AuthedSubmission, SubmissionListAdapter.SubmissionListViewHolder>(SubmissionComparator) {
 
     private var player: SimpleExoPlayer? = null
 
@@ -40,7 +41,7 @@ class SubmissionListAdapter(
 
     inner class SubmissionListViewHolder(
         private val binding: SubmissionListItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(post: Submission) {
+        fun bind(post: AuthedSubmission) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
@@ -63,6 +64,17 @@ class SubmissionListAdapter(
                 }
             } ?: run {
                 binding.textSubmissionFlair.visibility = View.GONE
+            }
+            if (post.authorFlairText.isNullOrBlank()) {
+                binding.textAuthorFlair.visibility = View.GONE
+            } else {
+                binding.textAuthorFlair.visibility = View.VISIBLE
+                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
             }
             if (post.isSelf!!) {
                 binding.selftextPreview.textSubmissionContentPreview.visibility = View.VISIBLE
@@ -160,12 +172,12 @@ class SubmissionListAdapter(
         super.onViewRecycled(holder)
     }
 
-    object SubmissionComparator : DiffUtil.ItemCallback<Submission>() {
-        override fun areItemsTheSame(oldItem: Submission, newItem: Submission) = oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: Submission, newItem: Submission) = oldItem == newItem
+    object SubmissionComparator : DiffUtil.ItemCallback<AuthedSubmission>() {
+        override fun areItemsTheSame(oldItem: AuthedSubmission, newItem: AuthedSubmission) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: AuthedSubmission, newItem: AuthedSubmission) = oldItem == newItem
     }
 
     interface SubmissionActionListener {
-        fun onPostClicked(post: Submission)
+        fun onPostClicked(post: AuthedSubmission)
     }
 }
