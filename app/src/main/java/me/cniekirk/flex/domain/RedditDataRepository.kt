@@ -16,4 +16,8 @@ interface RedditDataRepository {
 
     fun upvoteThing(thingId: String): Flow<RedditResult<Boolean>>
 
+    fun removeVoteThing(thingId: String): Flow<RedditResult<Boolean>>
+
+    fun downvoteThing(thingId: String): Flow<RedditResult<Boolean>>
+
 }

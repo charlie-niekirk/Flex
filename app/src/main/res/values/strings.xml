@@ -24,4 +24,6 @@
     <string name="share_as_image">Share as image</string>
     <string name="text_tab_search">Search</string>
     <string name="title_settings">Settings</string>
+    <string name="login_failed">Login failed, please try again!</string>
+    <string name="copy">Copy text</string>
 </resources>

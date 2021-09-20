@@ -11,6 +11,8 @@ import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.domain.usecase.GetCommentsUseCase
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
+import me.cniekirk.flex.domain.usecase.DownvoteThingUseCase
+import me.cniekirk.flex.domain.usecase.RemoveVoteThingUseCase
 import me.cniekirk.flex.domain.usecase.UpvoteThingUseCase
 import me.cniekirk.flex.ui.submission.SubmissionDetailEvent
 import javax.inject.Inject
@@ -18,13 +20,15 @@ import javax.inject.Inject
 @HiltViewModel
 class SubmissionDetailViewModel @Inject constructor(
     private val getCommentsUseCase: GetCommentsUseCase,
-    private val upvoteThingUseCase: UpvoteThingUseCase
+    private val upvoteThingUseCase: UpvoteThingUseCase,
+    private val removeVoteThingUseCase: RemoveVoteThingUseCase,
+    private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel() {
 
     private val _commentsTree: MutableStateFlow<RedditResult<List<Comment>>> = MutableStateFlow(RedditResult.Loading)
     val commentsTree: StateFlow<RedditResult<List<Comment>>> = _commentsTree
-    private val _upvoteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)
-    val upvoteState: StateFlow<RedditResult<Boolean>> = _upvoteState
+    private val _voteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)
+    val voteState: StateFlow<RedditResult<Boolean>> = _voteState
 
     fun getComments(submissionId: String, sortType: String) {
         viewModelScope.launch {
@@ -36,12 +40,18 @@ class SubmissionDetailViewModel @Inject constructor(
     fun onUiEvent(submissionDetailEvent: SubmissionDetailEvent) {
         viewModelScope.launch {
             when (submissionDetailEvent) {
-                is SubmissionDetailEvent.Downvote -> {}
+                is SubmissionDetailEvent.Downvote -> {
+                    downvoteThingUseCase(submissionDetailEvent.thingId)
+                        .collect { _voteState.value = it }
+                }
                 is SubmissionDetailEvent.RemoveDownvote -> {}
-                is SubmissionDetailEvent.RemoveUpvote -> {}
+                is SubmissionDetailEvent.RemoveUpvote -> {
+                    removeVoteThingUseCase(submissionDetailEvent.thingId)
+                        .collect { _voteState.value = it }
+                }
                 is SubmissionDetailEvent.Upvote -> {
                     upvoteThingUseCase(submissionDetailEvent.thingId)
-                        .collect { _upvoteState.value = it }
+                        .collect { _voteState.value = it }
                 }
             }
         }

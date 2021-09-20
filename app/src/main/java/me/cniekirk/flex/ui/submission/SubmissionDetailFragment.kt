@@ -65,7 +65,7 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
             textSubmissionTitle.text = args.post.title
             textSubredditName.text = args.post.subreddit
             textUpvoteRatio.text = getString(R.string.percentage_format,
-                (args.post.upvoteRatio?.times(100)?.toInt().toString()))
+                (args.post.upvoteRatio.times(100).toInt().toString()))
             textUpvoteCount.text = args.post.ups?.condense()
             textTimeSincePost.text = args.post.created?.toLong()?.getElapsedTime()
             textSubmissionAuthor.text = getString(R.string.author_format, args.post.author)
@@ -78,9 +78,9 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(args.post.linkFlairBackgroundColor))
                 }
                 if (args.post.linkFlairTextColor.equals("dark", true)) {
-                    textSubmissionFlair.setTextColor(root.resources.getColor(R.color.black))
+                    textSubmissionFlair.setTextColor(root.context.getColor(R.color.black))
                 } else {
-                    textSubmissionFlair.setTextColor(root.resources.getColor(R.color.white))
+                    textSubmissionFlair.setTextColor(root.context.getColor(R.color.white))
                 }
             } ?: run {
                 textSubmissionFlair.visibility = View.GONE
@@ -132,6 +132,9 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                                     args.post.media?.redditVideo?.dashUrl ?:
                                     args.post.media?.redditVideo?.fallbackUrl!!)
                             }
+                            is Link.TwitterLink -> {
+                                // TODO: Get Twitter API access
+                            }
                         }
                     }
                 }
@@ -173,6 +176,8 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(args.post.authorFlairBackgroundColor))
                 }
             }
+            buttonUpvoteAction.isSelected = args.post.likes ?: false
+            buttonDownvoteAction.isSelected = !(args.post.likes ?: true)
             buttonUpvoteAction.setOnClickListener {
                 // Send the upvote/removal
                 if (it.isSelected) {
@@ -181,18 +186,26 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     viewModel.onUiEvent(SubmissionDetailEvent.Upvote(args.post.name))
                 }
                 it.isSelected = !it.isSelected
+                if (buttonDownvoteAction.isSelected)
+                    buttonDownvoteAction.isSelected = false
+            }
+            buttonDownvoteAction.setOnClickListener {
+                // Send the upvote/removal
+                if (it.isSelected) {
+                    viewModel.onUiEvent(SubmissionDetailEvent.RemoveUpvote(args.post.name))
+                } else {
+                    viewModel.onUiEvent(SubmissionDetailEvent.Downvote(args.post.name))
+                }
+                it.isSelected = !it.isSelected
+                if (buttonUpvoteAction.isSelected)
+                    buttonUpvoteAction.isSelected = false
             }
         }
 
-        observe(viewModel.upvoteState) {
+        observe(viewModel.voteState) {
             when (it) {
                 is RedditResult.Error -> {
                     Timber.e(it.errorMessage)
-                }
-                RedditResult.Loading -> {}
-                is RedditResult.Success -> {
-                    binding?.textUpvoteCount?.text =
-                        binding?.textUpvoteCount?.text?.toString()?.toInt()?.inc()?.toString()
                 }
                 RedditResult.UnAuthenticated -> {
                     binding?.buttonUpvoteAction?.isSelected = !binding?.buttonUpvoteAction?.isSelected!!
@@ -201,6 +214,7 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                         R.string.action_error_aunauthenticated,
                         Toast.LENGTH_SHORT).show()
                 }
+                else -> {}
             }
         }
 

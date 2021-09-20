@@ -1,5 +1,6 @@
 package me.cniekirk.flex.data.remote.repo
 
+import androidx.annotation.IntRange
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.cniekirk.flex.data.local.db.User
@@ -31,9 +32,15 @@ class RedditDataRepositoryImpl @Inject constructor(
         emit(RedditResult.Success(response))
     }
 
-    override fun upvoteThing(thingId: String): Flow<RedditResult<Boolean>> = flow {
+    override fun upvoteThing(thingId: String) = vote(thingId, 1)
+
+    override fun removeVoteThing(thingId: String) = vote(thingId, 0)
+
+    override fun downvoteThing(thingId: String) = vote(thingId, -1)
+
+    private fun vote(thingId: String, @IntRange(from = -1, to = 1) direction: Int): Flow<RedditResult<Boolean>> = flow {
         userDao.getAll().firstOrNull()?.let {
-            authRedditApi.vote("Bearer ${it.accessToken}", thingId, 1)
+            authRedditApi.vote("Bearer ${it.accessToken}", thingId, direction)
             emit(RedditResult.Success(true))
         } ?: run {
             emit(RedditResult.UnAuthenticated)

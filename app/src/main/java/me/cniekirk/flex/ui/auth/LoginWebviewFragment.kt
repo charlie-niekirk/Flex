@@ -34,12 +34,12 @@ class LoginWebviewFragment : Fragment(R.layout.login_webview_fragment) {
 
         observe(viewModel.loginState) {
             when (it) {
-                is RedditResult.Error -> {
-                    Toast.makeText(requireContext(), R.string.auth_error, Toast.LENGTH_SHORT).show()
+                RedditResult.Loading -> { }
+                is RedditResult.Success -> {
                     binding?.root?.findNavController()?.popBackStack()
                 }
-                RedditResult.Loading -> {}
-                is RedditResult.Success -> {
+                else -> {
+                    Toast.makeText(requireContext(), R.string.login_failed, Toast.LENGTH_SHORT).show()
                     binding?.root?.findNavController()?.popBackStack()
                 }
             }
