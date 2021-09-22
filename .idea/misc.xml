@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
+        <entry key="app/src/main/res/drawable/dialog_fragment_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
@@ -24,10 +25,11 @@
         <entry key="app/src/main/res/layout/submission_comment_list_item.xml" value="0.45" />
         <entry key="app/src/main/res/layout/submission_detail_action_dialog.xml" value="0.375" />
         <entry key="app/src/main/res/layout/submission_detail_fragment.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/submission_gallery_preview.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_image_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_link_preview.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_list_fragment.xml" value="0.5" />
-        <entry key="app/src/main/res/layout/submission_list_item.xml" value="0.5307167235494881" />
+        <entry key="app/src/main/res/layout/submission_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_list_sort_dialog.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_selftext.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />

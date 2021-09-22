@@ -16,6 +16,7 @@
     <color name="red">#FFF44336</color>
     <color name="green">#FF4CAF50</color>
     <color name="gray">#FF9E9E9E</color>
+    <color name="off_white">#509E9E9E</color>
     <color name="upvote">#FF8b60</color>
     <color name="downvote">#9494FF</color>
 </resources>

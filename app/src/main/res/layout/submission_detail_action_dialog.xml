@@ -1,85 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/dialog_fragment_bg">
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/action_share_image"
-        style="@style/Text.Bold"
+        style="@style/SelectableTextViewItem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/spacing_l"
-        android:padding="@dimen/spacing_l"
-        android:textSize="16sp"
         android:text="@string/share_as_image"
-        android:includeFontPadding="false"
-        app:drawableStartCompat="@drawable/ic_baseline_image_24"
-        android:drawablePadding="@dimen/spacing_l"
-        app:drawableTint="@color/black"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:drawableStartCompat="@drawable/ic_baseline_image_24"/>
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/action_copy_text"
-        style="@style/Text.Bold"
+        style="@style/SelectableTextViewItem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action_share_image"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="@dimen/spacing_l"
-        android:textSize="16sp"
         android:text="@string/copy"
-        android:includeFontPadding="false"
-        app:drawableStartCompat="@drawable/ic_copy"
-        android:drawablePadding="@dimen/spacing_l"
-        app:drawableTint="@color/black"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        app:drawableStartCompat="@drawable/ic_copy"/>
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/sort_hot"
-        style="@style/Text.Bold"
+        style="@style/SelectableTextViewItem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/action_copy_text"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="@dimen/spacing_l"
-        android:textSize="16sp"
-        android:text="@string/sort_hot"
-        android:includeFontPadding="false"
-        app:drawableStartCompat="@drawable/ic_fire"
-        android:drawablePadding="@dimen/spacing_l"
-        app:drawableTint="@color/black"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        android:text="@string/action_share"
+        app:drawableStartCompat="@drawable/ic_share"/>
 
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/sort_new"
-        style="@style/Text.Bold"
+        style="@style/SelectableTextViewItem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/sort_hot"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="@dimen/spacing_l"
-        android:textSize="16sp"
-        android:text="@string/sort_new"
-        android:includeFontPadding="false"
-        app:drawableStartCompat="@drawable/ic_clock"
-        android:drawablePadding="@dimen/spacing_l"
-        app:drawableTint="@color/black"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"/>
+        android:text="@string/action_author_profile"
+        app:drawableStartCompat="@drawable/ic_account"
+        tools:text="View u/chertycherty"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

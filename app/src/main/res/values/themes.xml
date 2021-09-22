@@ -16,6 +16,19 @@
         <item name="fontFamily">@font/rubik</item>
     </style>
 
+    <style name="SelectableTextViewItem" parent="Widget.MaterialComponents.TextView">
+        <item name="android:padding">@dimen/spacing_l</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:drawablePadding">@dimen/spacing_l</item>
+        <item name="drawableTint">@color/accent</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="Text" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/accent</item>
     </style>

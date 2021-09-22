@@ -68,6 +68,8 @@ data class AuthedSubmission(
     val edited: @RawValue Any?,
     val gilded: Int,
     val gildings: Gildings,
+    @Json(name = "gallery_data")
+    val galleryData: GalleryData?,
     val hidden: Boolean,
     @Json(name = "hide_score")
     val hideScore: Boolean,
