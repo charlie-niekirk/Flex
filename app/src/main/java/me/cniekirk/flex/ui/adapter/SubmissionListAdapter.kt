@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.marginBottom
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -80,6 +81,7 @@ class SubmissionListAdapter(
                 binding.selftextPreview.textSubmissionContentPreview.visibility = View.VISIBLE
                 binding.imagePreview.submissionImage.visibility = View.GONE
                 binding.videoPreview.videoPlayer.visibility = View.GONE
+                binding.mediaGalleryPreview.root.visibility = View.GONE
                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
                 binding.selftextPreview.textSubmissionContentPreview.text = post.selftext?.selfTextPreview()
             } else {
@@ -90,6 +92,7 @@ class SubmissionListAdapter(
                             Link.ExternalLink -> {
                                 binding.videoPreview.videoPlayer.visibility = View.GONE
                                 binding.imagePreview.submissionImage.visibility = View.GONE
+                                binding.mediaGalleryPreview.root.visibility = View.GONE
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.VISIBLE
                                 binding.externalLinkPreview.linkContent.text = post.url
                                 binding.externalLinkPreview.linkImage.load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url) {
@@ -100,6 +103,7 @@ class SubmissionListAdapter(
                             is Link.ImageLink -> {
                                 binding.videoPreview.videoPlayer.visibility = View.GONE
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                binding.mediaGalleryPreview.root.visibility = View.GONE
                                 binding.imagePreview.submissionImage.visibility = View.VISIBLE
                                 binding.imagePreview.submissionImage.load(it.url) {
                                     crossfade(true)
@@ -108,12 +112,14 @@ class SubmissionListAdapter(
                             is Link.VideoLink -> {
                                 binding.imagePreview.submissionImage.visibility = View.GONE
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                binding.mediaGalleryPreview.root.visibility = View.GONE
                                 binding.videoPreview.videoPlayer.visibility = View.VISIBLE
                                 player = binding.videoPreview.videoPlayer.initialise(post.urlOverriddenByDest)
                             }
                             Link.RedditVideo -> {
                                 binding.imagePreview.submissionImage.visibility = View.GONE
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                binding.mediaGalleryPreview.root.visibility = View.GONE
                                 binding.videoPreview.videoPlayer.visibility = View.VISIBLE
                                 Timber.d(post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
                                 player = binding.videoPreview.videoPlayer.initialise(
@@ -121,6 +127,40 @@ class SubmissionListAdapter(
                             }
                             is Link.TwitterLink -> {
 
+                            }
+                            Link.RedditGallery -> {
+                                binding.imagePreview.submissionImage.visibility = View.GONE
+                                binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                binding.videoPreview.videoPlayer.visibility = View.GONE
+                                binding.mediaGalleryPreview.root.visibility = View.VISIBLE
+                                val media = post.galleryData?.items
+                                binding.mediaGalleryPreview.textGalleryCount.text =
+                                    binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
+                                if (media?.size!! > 2) {
+                                    binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
+                                    binding.mediaGalleryPreview.firstImage.load(
+                                        binding.root.context.getString(R.string.reddit_image_url, media[0].mediaId)) {
+                                        crossfade(true)
+                                    }
+                                    binding.mediaGalleryPreview.secondImage.load(
+                                        binding.root.context.getString(R.string.reddit_image_url, media[1].mediaId)) {
+                                        crossfade(true)
+                                    }
+                                    binding.mediaGalleryPreview.thirdImage.load(
+                                        binding.root.context.getString(R.string.reddit_image_url, media[2].mediaId)) {
+                                        crossfade(true)
+                                    }
+                                } else {
+                                    binding.mediaGalleryPreview.secondImage.visibility = View.GONE
+                                    binding.mediaGalleryPreview.firstImage.load(
+                                        binding.root.context.getString(R.string.reddit_image_url, media[0].mediaId)) {
+                                        crossfade(true)
+                                    }
+                                    binding.mediaGalleryPreview.thirdImage.load(
+                                        binding.root.context.getString(R.string.reddit_image_url, media[1].mediaId)) {
+                                        crossfade(true)
+                                    }
+                                }
                             }
                         }
                     }

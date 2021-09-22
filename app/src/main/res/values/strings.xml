@@ -28,4 +28,10 @@
     <string name="copy">Copy text</string>
     <string name="action_share">Share link</string>
     <string name="action_author_profile">View $1%s</string>
+    <string name="reddit_image_url">https://i.redd.it/%1$s.jpg</string>
+    <string name="image_gallery_submission_label">%1$d Images</string>
+    <string name="media_gallery_submission_label">%1$d Items</string>
+    <string name="first_gallery_image_cd">First gallery image</string>
+    <string name="second_gallery_image_cd">Second gallery item</string>
+    <string name="third_gallery_image_cd">Third gallery item</string>
 </resources>
