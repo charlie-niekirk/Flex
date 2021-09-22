@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
+        <entry key="app/src/main/res/drawable/dialog_fragment_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
