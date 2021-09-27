@@ -121,4 +121,10 @@ class SubmissionListFragment
             .actionSubmissionListFragmentToSubmissionDetailFragment(post)
         binding?.root?.findNavController()?.navigate(action)
     }
+
+    override fun onGalleryClicked(post: AuthedSubmission) {
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSlidingGalleryContainer(post)
+        binding?.root?.findNavController()?.navigate(action)
+    }
 }

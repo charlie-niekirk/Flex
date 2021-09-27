@@ -13,6 +13,7 @@ import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
 import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.prefs.Preferences
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
@@ -88,6 +89,25 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("download")
+    @Singleton
+    fun provideDownloadOkHttp(cache: Cache): OkHttpClient {
+        return if (BuildConfig.DEBUG) {
+            val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .addInterceptor(logger)
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .build()
+        }
+    }
+
+    @Provides
     @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder()
@@ -130,6 +150,16 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("downloadRetrofit")
+    @Singleton
+    fun provideDownloadRetrofit(@Named("download") okHttpClient: Lazy<OkHttpClient>): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .baseUrl("https://oauth.reddit.com/")
+            .build()
+    }
+
+    @Provides
     @Named("userlessApi")
     @Singleton
     fun provideRedditApi(@Named("userlessRetrofit") retrofit: Retrofit): RedditApi
@@ -139,6 +169,12 @@ class PreLoginModule {
     @Named("authApi")
     @Singleton
     fun provideAuthedRedditApi(@Named("authRetrofit") retrofit: Retrofit): RedditApi
+            = retrofit.create(RedditApi::class.java)
+
+    @Provides
+    @Named("downloadApi")
+    @Singleton
+    fun provideDownloadRedditApi(@Named("downloadRetrofit") retrofit: Retrofit): RedditApi
             = retrofit.create(RedditApi::class.java)
 
     @Provides
@@ -158,6 +194,10 @@ class PreLoginModule {
     @Provides
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
+
+    @Provides
+    @Singleton
+    fun providePreferences(@ApplicationContext context: Context): Preferences = Preferences(context)
 
     object NullRepliesInterceptor : Interceptor {
 

@@ -7,6 +7,8 @@ import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
+import okhttp3.ResponseBody
+import retrofit2.Response
 import retrofit2.http.*
 
 interface RedditApi {
@@ -58,5 +60,9 @@ interface RedditApi {
         @Field("id") thingId: String,
         @Field("dir") voteDir: Int
     )
+
+    @GET
+    @Streaming
+    suspend fun downloadMedia(@Url url: String): Response<ResponseBody>
 
 }

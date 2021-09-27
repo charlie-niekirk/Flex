@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/accent">
+
+    <TextView
+        android:id="@+id/page_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/surfaceColor"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pager"
+        android:layout_marginEnd="@dimen/spacing_xl"
+        tools:text="1/12" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/share_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_action_bar"
+        android:layout_marginBottom="@dimen/spacing_l" />
+
+    <ImageView
+        android:id="@+id/back_button"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        app:srcCompat="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pager"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/spacing_xl"
+        android:importantForAccessibility="no"
+        app:tint="@color/surfaceColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless" />
+
+    <ImageView
+        android:id="@+id/download_button"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        app:srcCompat="@drawable/ic_arrow_downward"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/share_button"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_xxxl"
+        android:contentDescription="@string/download_button_cd"
+        app:tint="@color/surfaceColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <ImageView
+        android:id="@+id/share_button"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        app:srcCompat="@drawable/ic_share"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/download_button"
+        app:layout_constraintEnd_toStartOf="@id/info_button"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:contentDescription="@string/share_button_cd"
+        app:tint="@color/surfaceColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless" />
+
+    <ImageView
+        android:id="@+id/info_button"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        app:srcCompat="@drawable/ic_info"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/share_button"
+        app:layout_constraintEnd_toStartOf="@id/copy_url_button"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:contentDescription="@string/share_button_cd"
+        app:tint="@color/surfaceColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless" />
+
+    <ImageView
+        android:id="@+id/copy_url_button"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        app:srcCompat="@drawable/ic_copy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/info_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_xxxl"
+        android:contentDescription="@string/share_button_cd"
+        app:tint="@color/surfaceColor"
+        android:foreground="?attr/selectableItemBackgroundBorderless" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

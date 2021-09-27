@@ -121,9 +121,15 @@ class SubmissionListAdapter(
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
                                 binding.mediaGalleryPreview.root.visibility = View.GONE
                                 binding.videoPreview.videoPlayer.visibility = View.VISIBLE
-                                Timber.d(post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
-                                player = binding.videoPreview.videoPlayer.initialise(
-                                    post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
+                                //Timber.d(post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
+                                player = if (post.crosspostParentList.isNullOrEmpty()) {
+                                    binding.videoPreview.videoPlayer.initialise(
+                                        post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!)
+                                } else {
+                                    binding.videoPreview.videoPlayer.initialise(
+                                        post.crosspostParentList[0].media?.redditVideo?.dashUrl
+                                            ?: post.crosspostParentList[0].media?.redditVideo?.fallbackUrl!!)
+                                }
                             }
                             is Link.TwitterLink -> {
 
@@ -133,33 +139,46 @@ class SubmissionListAdapter(
                                 binding.externalLinkPreview.externalLinkContainer.visibility = View.GONE
                                 binding.videoPreview.videoPlayer.visibility = View.GONE
                                 binding.mediaGalleryPreview.root.visibility = View.VISIBLE
-                                val media = post.galleryData?.items
+                                val media = post.mediaMetadata?.values?.toList()
                                 binding.mediaGalleryPreview.textGalleryCount.text =
                                     binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
                                 if (media?.size!! > 2) {
                                     binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
                                     binding.mediaGalleryPreview.firstImage.load(
-                                        binding.root.context.getString(R.string.reddit_image_url, media[0].mediaId)) {
+                                        binding.root.context.getString(R.string.reddit_image_url,
+                                            media[0].id,
+                                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
                                         crossfade(true)
                                     }
                                     binding.mediaGalleryPreview.secondImage.load(
-                                        binding.root.context.getString(R.string.reddit_image_url, media[1].mediaId)) {
+                                        binding.root.context.getString(R.string.reddit_image_url,
+                                            media[1].id,
+                                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
                                         crossfade(true)
                                     }
                                     binding.mediaGalleryPreview.thirdImage.load(
-                                        binding.root.context.getString(R.string.reddit_image_url, media[2].mediaId)) {
+                                        binding.root.context.getString(R.string.reddit_image_url,
+                                            media[2].id,
+                                            media[2].m.substring(media[2].m.indexOf('/') + 1))) {
                                         crossfade(true)
                                     }
                                 } else {
                                     binding.mediaGalleryPreview.secondImage.visibility = View.GONE
                                     binding.mediaGalleryPreview.firstImage.load(
-                                        binding.root.context.getString(R.string.reddit_image_url, media[0].mediaId)) {
+                                        binding.root.context.getString(R.string.reddit_image_url,
+                                            media[0].id,
+                                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
                                         crossfade(true)
                                     }
                                     binding.mediaGalleryPreview.thirdImage.load(
-                                        binding.root.context.getString(R.string.reddit_image_url, media[1].mediaId)) {
+                                        binding.root.context.getString(R.string.reddit_image_url,
+                                            media[1].id,
+                                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
                                         crossfade(true)
                                     }
+                                }
+                                binding.mediaGalleryPreview.root.setOnClickListener {
+                                    submissionsActionListener.onGalleryClicked(post)
                                 }
                             }
                         }
@@ -219,5 +238,6 @@ class SubmissionListAdapter(
 
     interface SubmissionActionListener {
         fun onPostClicked(post: AuthedSubmission)
+        fun onGalleryClicked(post: AuthedSubmission)
     }
 }
