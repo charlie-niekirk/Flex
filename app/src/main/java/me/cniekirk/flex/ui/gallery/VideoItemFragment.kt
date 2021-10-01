@@ -6,9 +6,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.SimpleExoPlayer
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.VideoItemFragmentBinding
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.util.initialise
 
-class VideoItemFragment(private val url: String) : Fragment(R.layout.video_item_fragment) {
+class VideoItemFragment(private val url: String) : BaseFragment(R.layout.video_item_fragment) {
 
     private var binding: VideoItemFragmentBinding? = null
     private var player: SimpleExoPlayer? = null

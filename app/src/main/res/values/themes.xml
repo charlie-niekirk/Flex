@@ -14,19 +14,32 @@
         <item name="android:statusBarColor">@color/white</item>
         <!-- Customize your theme here. -->
         <item name="fontFamily">@font/rubik</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme"
+        parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle"
+        parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/dialog_fragment_bg</item>
     </style>
 
     <style name="SelectableTextViewItem" parent="Widget.MaterialComponents.TextView">
         <item name="android:padding">@dimen/spacing_l</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:drawablePadding">@dimen/spacing_l</item>
         <item name="drawableTint">@color/accent</item>
-        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:background">@drawable/dialog_action_bg</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:textColor">@color/accent</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textAlignment">center</item>
     </style>
 
     <style name="Text" parent="TextAppearance.AppCompat">
@@ -47,6 +60,10 @@
 
     <style name="Text.Label">
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text.Small">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="Icon">

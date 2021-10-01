@@ -3,6 +3,7 @@
     <color name="surfaceColor">#000000</color>
     <color name="backgroundColor">#FAFAFA</color>
     <color name="accent">#FFFFFFFF</color>
+    <color name="offAccent">#30FFFFFF</color>
     <color name="green">#A5D6A7</color>
     <color name="gray">#FFEEEEEE</color>
     <color name="upvote">#FF8b60</color>

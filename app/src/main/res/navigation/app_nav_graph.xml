@@ -17,11 +17,15 @@
             app:destination="@id/submissionDetailFragment" />
         <action
             android:id="@+id/action_submissionListFragment_to_slidingGalleryContainer"
-            app:destination="@id/slidingGalleryContainer" />
+            app:destination="@id/slidingGalleryContainer">
+            <argument
+                android:name="post"
+                app:argType="me.cniekirk.flex.data.remote.model.AuthedSubmission" />
+        </action>
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
-        android:name="me.cniekirk.flex.ui.submission.SubmissionListSortDialogFragment"
+        android:name="me.cniekirk.flex.ui.dialog.SubmissionListSortDialogFragment"
         android:label="SubmissionListSortDialogFragment"
         tools:layout="@layout/submission_list_sort_dialog" />
     <fragment

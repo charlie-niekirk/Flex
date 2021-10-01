@@ -18,6 +18,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.GallerySliderHostFragmentBinding
 import me.cniekirk.flex.ui.adapter.MediaGalleryPagerAdapter
+import me.cniekirk.flex.ui.dialog.SubmissionCopyDialogFragment
+import me.cniekirk.flex.ui.dialog.SubmissionMediaInformationDialog
+import me.cniekirk.flex.ui.dialog.SubmissionShareDialogFragment
 import me.cniekirk.flex.ui.viewmodel.GalleryViewModel
 import me.cniekirk.flex.util.observe
 import timber.log.Timber
@@ -59,13 +62,29 @@ class SlidingGalleryContainer : AppCompatActivity() {
                 })
             }
             backButton.setOnClickListener { finish() }
-            downloadButton.setOnClickListener {
-                val item = args.post.mediaMetadata?.values?.toList()?.get(pager.currentItem)
-                val url = getString(
+
+            val allUrls = args.post.mediaMetadata?.values?.toList()?.map { item ->
+                getString(
                     R.string.reddit_image_url,
-                    item?.id,
-                    item?.m?.substring(item.m.indexOf('/') + 1))
-                viewModel.download(url)
+                    item.id,
+                    item.m.substring(item.m.indexOf('/') + 1))
+            }
+            allUrls?.let {
+                downloadButton.setOnClickListener {
+                    viewModel.download(allUrls[pager.currentItem])
+                }
+                shareButton.setOnClickListener {
+                    val dialog = SubmissionShareDialogFragment.newInstance(args.post, allUrls, pager.currentItem)
+                    dialog.show(supportFragmentManager, "Share")
+                }
+                copyUrlButton.setOnClickListener {
+                    val dialog = SubmissionCopyDialogFragment.newInstance(args.post, allUrls[pager.currentItem])
+                    dialog.show(supportFragmentManager, "Copy")
+                }
+                infoButton.setOnClickListener {
+                    val dialog = SubmissionMediaInformationDialog.newInstance(allUrls[pager.currentItem])
+                    dialog.show(supportFragmentManager, "Info")
+                }
             }
         }
     }

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_title"
+        style="@style/Text.Bold.H2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:text="@string/media_metadata_dialog_title" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_source"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="@id/dialog_title"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:text="@string/media_metadata_source"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_source_value"
+        style="@style/Text"
+        app:layout_constraintStart_toEndOf="@id/metadata_source"
+        app:layout_constraintTop_toTopOf="@id/metadata_source"
+        app:layout_constraintBottom_toBottomOf="@id/metadata_source"
+        android:layout_marginStart="@dimen/spacing_m"
+        tools:text="https://i.redd.it/fbhjsfdsuy847cb.jpg"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_dimensions"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="@id/metadata_source"
+        app:layout_constraintTop_toBottomOf="@id/metadata_source"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:text="@string/media_metadata_dimensions"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_dimensions_value"
+        style="@style/Text"
+        app:layout_constraintStart_toEndOf="@id/metadata_dimensions"
+        app:layout_constraintTop_toTopOf="@id/metadata_dimensions"
+        app:layout_constraintBottom_toBottomOf="@id/metadata_dimensions"
+        android:layout_marginStart="@dimen/spacing_m"
+        tools:text="600 X 400 pixels"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_size"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="@id/metadata_source"
+        app:layout_constraintTop_toBottomOf="@id/metadata_dimensions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:text="@string/media_metadata_size"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/metadata_size_value"
+        style="@style/Text"
+        app:layout_constraintStart_toEndOf="@id/metadata_size"
+        app:layout_constraintTop_toTopOf="@id/metadata_size"
+        app:layout_constraintBottom_toBottomOf="@id/metadata_size"
+        android:layout_marginStart="@dimen/spacing_m"
+        tools:text="612.17KB"
+        android:textSize="12sp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,8 +44,8 @@
 
     <ImageView
         android:id="@+id/download_button"
-        android:layout_width="@dimen/action_button_size"
-        android:layout_height="@dimen/action_button_size"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         app:srcCompat="@drawable/ic_arrow_downward"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

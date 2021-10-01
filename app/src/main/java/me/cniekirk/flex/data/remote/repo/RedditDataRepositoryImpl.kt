@@ -98,6 +98,8 @@ class RedditDataRepositoryImpl @Inject constructor(
                             emit(RedditResult.Error(Exception("Unknown!")))
                         }
 
+                    } ?: run {
+                        emit(RedditResult.Success(DownloadState.NoDefinedLocation))
                     }
                 } else {
                     emit(RedditResult.Error(IOException(response.message())))

@@ -133,13 +133,13 @@ data class AuthedSubmission(
     @Json(name = "over_18")
     val over18: Boolean,
     @Json(name = "parent_whitelist_status")
-    val parentWhitelistStatus: String,
+    val parentWhitelistStatus: String?,
     val permalink: String,
     val pinned: Boolean,
     @Json(name = "post_hint")
     val postHint: String?,
     val preview: Preview?,
-    val pwls: Int,
+    val pwls: Int?,
     val quarantine: Boolean,
     @Json(name = "removal_reason")
     val removalReason: String?,
@@ -197,6 +197,6 @@ data class AuthedSubmission(
     val viewCount: Int?,
     val visited: Boolean?,
     @Json(name = "whitelist_status")
-    val whitelistStatus: String,
-    val wls: Int
+    val whitelistStatus: String?,
+    val wls: Int?
 ) : Parcelable

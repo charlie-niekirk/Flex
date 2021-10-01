@@ -7,4 +7,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JsonClass(generateAdapter = true)
-data class Media(@Json(name = "reddit_video") val redditVideo: RedditVideo?) : Parcelable
+data class Media(
+    @Json(name = "reddit_video") val redditVideo: RedditVideo?,
+    @Json(name = "oembed") val oembed: OEmbed?) : Parcelable

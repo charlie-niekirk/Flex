@@ -15,6 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.LoginWebviewFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.viewmodel.AuthenticationViewModel
 import me.cniekirk.flex.util.isRedirectUri
 import me.cniekirk.flex.util.observe
@@ -22,7 +23,7 @@ import me.cniekirk.flex.util.provideAuthorizeUrl
 import timber.log.Timber
 
 @AndroidEntryPoint
-class LoginWebviewFragment : Fragment(R.layout.login_webview_fragment) {
+class LoginWebviewFragment : BaseFragment(R.layout.login_webview_fragment) {
 
     private var binding: LoginWebviewFragmentBinding? = null
     private val viewModel by viewModels<AuthenticationViewModel>()

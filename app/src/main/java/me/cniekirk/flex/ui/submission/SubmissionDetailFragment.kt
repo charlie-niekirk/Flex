@@ -22,13 +22,14 @@ import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
 @AndroidEntryPoint
-class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
+class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment) {
 
     private var player: SimpleExoPlayer? = null
 

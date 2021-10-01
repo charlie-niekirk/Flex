@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import coil.ImageLoader
+import coil.request.ImageRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,7 +25,9 @@ import javax.inject.Named
 class SubmissionListViewModel @Inject constructor(
     @Named("userlessApi") private val redditApi: RedditApi,
     @Named("authApi") private val authRedditApi: RedditApi,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val imageLoader: ImageLoader,
+    private val imageRequest: ImageRequest.Builder
 ) : ViewModel() {
 
     private val _subredditFlow = MutableStateFlow(value = "tommyinnit")
@@ -35,7 +39,7 @@ class SubmissionListViewModel @Inject constructor(
     val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
         sortFlow.flatMapLatest { sort ->
             Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 1)) {
-                SubredditSubmissionsPagingSource(redditApi, authRedditApi, subreddit, sort, userDao)
+                SubredditSubmissionsPagingSource(redditApi, authRedditApi, subreddit, sort, userDao, imageRequest, imageLoader)
             }.flow.cachedIn(viewModelScope)
         }
     }

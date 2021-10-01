@@ -1,4 +1,4 @@
-package me.cniekirk.flex.ui.submission
+package me.cniekirk.flex.ui.dialog
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,7 +8,9 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.databinding.SubmissionListSortDialogBinding
+import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
+import me.cniekirk.flex.util.setCurrentScreen
 
 @AndroidEntryPoint
 class SubmissionListSortDialogFragment : BottomSheetDialogFragment() {
@@ -47,5 +49,10 @@ class SubmissionListSortDialogFragment : BottomSheetDialogFragment() {
     private fun handleSelection(sort: String) {
         viewModel.onUiEvent(SubmissionListEvent.SortUpdated(sort))
         dismiss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setCurrentScreen()
     }
 }
