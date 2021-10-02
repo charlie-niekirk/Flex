@@ -58,4 +58,8 @@
     <string name="media_metadata_source">Source:</string>
     <string name="media_metadata_dimensions">Dimensions:</string>
     <string name="media_metadata_size">Size:</string>
+    <string name="default_empty_comments">It\'s quiet here...</string>
+    <string name="easter_egg_tommyinnit">It\'s quiet here... Wait, what\'s that I hear!?\n\n🎶 jUmP In tHe cAdIlAc 🎶</string>
+    <string name="easter_egg_ksi">Ayo, why is it so quiet?\n\nThis post deserves some juicy PPPPLLLLLLATINUM fam!</string>
+    <string name="easter_egg_spacex">It\'s quiet here...\n\nJeff who?</string>
 </resources>

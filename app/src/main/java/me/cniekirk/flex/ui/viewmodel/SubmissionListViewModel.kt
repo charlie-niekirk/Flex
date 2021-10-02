@@ -30,7 +30,7 @@ class SubmissionListViewModel @Inject constructor(
     private val imageRequest: ImageRequest.Builder
 ) : ViewModel() {
 
-    private val _subredditFlow = MutableStateFlow(value = "tommyinnit")
+    private val _subredditFlow = MutableStateFlow(value = "spacexlounge")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()

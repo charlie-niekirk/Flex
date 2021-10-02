@@ -1,6 +1,7 @@
 package me.cniekirk.flex.util
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -231,3 +232,12 @@ suspend fun Fragment.loadImage(url: String, onLoaded: suspend (Bitmap) -> Unit) 
         }
     }
 }
+
+val easterEggMap = mapOf(
+    "tommyinnit" to R.string.easter_egg_tommyinnit,
+    "ksi" to R.string.easter_egg_ksi,
+    "spacexlounge" to R.string.easter_egg_spacex
+)
+
+fun Context.getEasterEggString(subreddit: String): String =
+    getString(easterEggMap[subreddit.lowercase()] ?: R.string.default_empty_comments)

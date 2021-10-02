@@ -228,8 +228,16 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                     // Do nothing for now
                 }
                 is RedditResult.Success -> {
-                    adapter = CommentTreeAdapter(args.post, comments.data, markwon)
-                    binding?.commentsTreeList?.adapter = adapter
+                    if (comments.data.isNullOrEmpty()) {
+                        binding?.commentsTreeList?.visibility = View.GONE
+                        binding?.emptyCommentEasterEgg?.visibility = View.VISIBLE
+                        binding?.emptyCommentEasterEgg?.text = requireContext().getEasterEggString(args.post.subreddit)
+                    } else {
+                        adapter = CommentTreeAdapter(args.post, comments.data, markwon)
+                        binding?.emptyCommentEasterEgg?.visibility = View.GONE
+                        binding?.commentsTreeList?.visibility = View.VISIBLE
+                        binding?.commentsTreeList?.adapter = adapter
+                    }
                     binding?.loadingIndicator?.visibility = View.GONE
                     loading.reset()
                 }

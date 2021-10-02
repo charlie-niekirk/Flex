@@ -322,7 +322,21 @@
             android:nestedScrollingEnabled="false"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/submission_comment_list_item"
-            tools:itemCount="9" />
+            tools:itemCount="9"
+            tools:visibility="gone" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/empty_comment_easter_egg"
+            style="@style/Text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/loading_indicator"
+            android:layout_marginTop="@dimen/spacing_xxl"
+            android:textAlignment="center"
+            android:paddingBottom="@dimen/spacing_xxl"
+            tools:text="@string/easter_egg_tommyinnit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

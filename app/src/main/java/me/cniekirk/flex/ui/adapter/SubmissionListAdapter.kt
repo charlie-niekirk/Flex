@@ -2,34 +2,22 @@ package me.cniekirk.flex.ui.adapter
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.RenderEffect
-import android.graphics.Shader
 import android.graphics.Typeface
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.view.marginBottom
-import androidx.fragment.app.FragmentActivity
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.request.ImageRequest
-import coil.request.ImageResult
 import coil.transform.BlurTransformation
 import coil.transform.RoundedCornersTransformation
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.renderscript.Toolkit
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.*
 import me.cniekirk.flex.util.*
-import timber.log.Timber
 
 enum class ViewType {
     IMAGE,
@@ -446,68 +434,70 @@ class SubmissionListAdapter(
             val media = post.mediaMetadata?.values?.toList()
             binding.mediaGalleryPreview.textGalleryCount.text =
                 binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
-            if (media?.size!! > 2) {
-                binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
-                binding.mediaGalleryPreview.firstImage.load(
-                    binding.root.context.getString(R.string.reddit_image_url,
-                        media[0].id,
-                        media[0].m.substring(media[0].m.indexOf('/') + 1))) {
-                    crossfade(true)
-                    if (post.over18) {
-                        transformations(BlurTransformation(
-                            binding.root.context,
-                            25f, 8f
-                        ))
+            media?.let {
+                if (media?.size!! > 2) {
+                    binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
+                    binding.mediaGalleryPreview.firstImage.load(
+                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].id,
+                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
+                        crossfade(true)
+                        if (post.over18) {
+                            transformations(BlurTransformation(
+                                binding.root.context,
+                                25f, 8f
+                            ))
+                        }
                     }
-                }
-                binding.mediaGalleryPreview.secondImage.load(
-                    binding.root.context.getString(R.string.reddit_image_url,
-                        media[1].id,
-                        media[1].m.substring(media[1].m.indexOf('/') + 1))) {
-                    crossfade(true)
-                    if (post.over18) {
-                        transformations(BlurTransformation(
-                            binding.root.context,
-                            25f, 8f
-                        ))
+                    binding.mediaGalleryPreview.secondImage.load(
+                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[1].id,
+                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
+                        crossfade(true)
+                        if (post.over18) {
+                            transformations(BlurTransformation(
+                                binding.root.context,
+                                25f, 8f
+                            ))
+                        }
                     }
-                }
-                binding.mediaGalleryPreview.thirdImage.load(
-                    binding.root.context.getString(R.string.reddit_image_url,
-                        media[2].id,
-                        media[2].m.substring(media[2].m.indexOf('/') + 1))) {
-                    crossfade(true)
-                    if (post.over18) {
-                        transformations(BlurTransformation(
-                            binding.root.context,
-                            25f, 8f
-                        ))
+                    binding.mediaGalleryPreview.thirdImage.load(
+                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[2].id,
+                            media[2].m.substring(media[2].m.indexOf('/') + 1))) {
+                        crossfade(true)
+                        if (post.over18) {
+                            transformations(BlurTransformation(
+                                binding.root.context,
+                                25f, 8f
+                            ))
+                        }
                     }
-                }
-            } else {
-                binding.mediaGalleryPreview.secondImage.visibility = View.GONE
-                binding.mediaGalleryPreview.firstImage.load(
-                    binding.root.context.getString(R.string.reddit_image_url,
-                        media[0].id,
-                        media[0].m.substring(media[0].m.indexOf('/') + 1))) {
-                    crossfade(true)
-                    if (post.over18) {
-                        transformations(BlurTransformation(
-                            binding.root.context,
-                            25f, 8f
-                        ))
+                } else {
+                    binding.mediaGalleryPreview.secondImage.visibility = View.GONE
+                    binding.mediaGalleryPreview.firstImage.load(
+                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].id,
+                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
+                        crossfade(true)
+                        if (post.over18) {
+                            transformations(BlurTransformation(
+                                binding.root.context,
+                                25f, 8f
+                            ))
+                        }
                     }
-                }
-                binding.mediaGalleryPreview.thirdImage.load(
-                    binding.root.context.getString(R.string.reddit_image_url,
-                        media[1].id,
-                        media[1].m.substring(media[1].m.indexOf('/') + 1))) {
-                    crossfade(true)
-                    if (post.over18) {
-                        transformations(BlurTransformation(
-                            binding.root.context,
-                            25f, 8f
-                        ))
+                    binding.mediaGalleryPreview.thirdImage.load(
+                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[1].id,
+                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
+                        crossfade(true)
+                        if (post.over18) {
+                            transformations(BlurTransformation(
+                                binding.root.context,
+                                25f, 8f
+                            ))
+                        }
                     }
                 }
             }

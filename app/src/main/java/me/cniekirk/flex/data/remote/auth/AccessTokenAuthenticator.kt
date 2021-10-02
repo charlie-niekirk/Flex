@@ -32,7 +32,7 @@ class AccessTokenAuthenticator @Inject constructor(
             userDao.delete(user)
             userDao.insert(User(newToken.accessToken, newToken.refreshToken!!))
 
-             return response
+            return response
                 .request
                 .newBuilder()
                 .header("Authorization", "Bearer ${newToken.accessToken}")

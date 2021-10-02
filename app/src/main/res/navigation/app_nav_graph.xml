@@ -51,4 +51,9 @@
             android:name="post"
             app:argType="me.cniekirk.flex.data.remote.model.AuthedSubmission" />
     </activity>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="me.cniekirk.flex.ui.SettingsFragment"
+        android:label="SettingsFragment"
+        tools:layout="@layout/settings_fragment" />
 </navigation>
