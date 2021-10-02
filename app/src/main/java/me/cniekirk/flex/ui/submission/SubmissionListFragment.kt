@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,10 +19,12 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
+import java.lang.RuntimeException
 
 /**
  * [Fragment] displaying a list of submissions from any source i.e. MultiReddit, Subreddit, Home etc.
@@ -31,7 +34,7 @@ import me.cniekirk.flex.util.observe
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class SubmissionListFragment
-    : Fragment(R.layout.submission_list_fragment), SubmissionListAdapter.SubmissionActionListener {
+    : BaseFragment(R.layout.submission_list_fragment), SubmissionListAdapter.SubmissionActionListener {
 
     // Shared VM with the sort dialog fragment
     private val viewModel by activityViewModels<SubmissionListViewModel>()
@@ -50,8 +53,8 @@ class SubmissionListFragment
         binding = SubmissionListFragmentBinding.bind(view)
 
         binding?.apply {
-            //startLoadingAnimation()
             adapter = SubmissionListAdapter(this@SubmissionListFragment)
+            listSubmissions.setItemViewCacheSize(20)
             listSubmissions.adapter = adapter?.withLoadStateFooter(
                 footer = SubmissionListLoadingStateAdapter()
             )
@@ -119,6 +122,12 @@ class SubmissionListFragment
     override fun onPostClicked(post: AuthedSubmission) {
         val action = SubmissionListFragmentDirections
             .actionSubmissionListFragmentToSubmissionDetailFragment(post)
+        binding?.root?.findNavController()?.navigate(action)
+    }
+
+    override fun onGalleryClicked(post: AuthedSubmission) {
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSlidingGalleryContainer(post)
         binding?.root?.findNavController()?.navigate(action)
     }
 }

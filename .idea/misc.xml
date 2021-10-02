@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
+        <entry key="app/src/main/res/drawable/dialog_action_bg.xml" value="0.24487179487179486" />
         <entry key="app/src/main/res/drawable/dialog_fragment_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_selected.xml" value="0.2984375" />
@@ -20,9 +21,19 @@
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.5" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/image_item_fragment.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/image_list_item.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/link_list_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/loading_footer.xml" value="0.275" />
         <entry key="app/src/main/res/layout/login_webview_fragment.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/media_metadata_dialog.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/media_share_dialog.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/self_text_list_item.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.375" />
         <entry key="app/src/main/res/layout/submission_comment_list_item.xml" value="0.45" />
+        <entry key="app/src/main/res/layout/submission_copy_dialog.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_detail_action_dialog.xml" value="0.375" />
         <entry key="app/src/main/res/layout/submission_detail_fragment.xml" value="0.335" />
         <entry key="app/src/main/res/layout/submission_gallery_preview.xml" value="0.1" />
@@ -34,6 +45,8 @@
         <entry key="app/src/main/res/layout/submission_selftext.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_video_preview.xml" value="0.5348717948717949" />
+        <entry key="app/src/main/res/layout/video_item_fragment.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/video_list_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2984375" />
       </map>

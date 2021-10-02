@@ -7,6 +7,7 @@ import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.base.Listing
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
+import me.cniekirk.flex.ui.gallery.DownloadState
 
 interface RedditDataRepository {
 
@@ -19,5 +20,7 @@ interface RedditDataRepository {
     fun removeVoteThing(thingId: String): Flow<RedditResult<Boolean>>
 
     fun downvoteThing(thingId: String): Flow<RedditResult<Boolean>>
+
+    fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
 
 }

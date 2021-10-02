@@ -11,8 +11,20 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@color/black</item>        <!-- Customize your theme here. -->
+        <item name="android:statusBarColor">@color/black</item>
+        <!-- Customize your theme here. -->
         <item name="fontFamily">@font/rubik</item>
+        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme"
+        parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle"
+        parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/dialog_fragment_bg</item>
     </style>
 
     <style name="Text" parent="TextAppearance.AppCompat">

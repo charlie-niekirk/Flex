@@ -2,6 +2,8 @@ package me.cniekirk.flex.di
 
 import android.content.Context
 import androidx.room.Room
+import coil.ImageLoader
+import coil.request.ImageRequest
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dagger.Lazy
@@ -13,11 +15,15 @@ import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
 import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.prefs.Preferences
+import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
+import me.cniekirk.flex.data.remote.repo.MediaResolutionRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
+import me.cniekirk.flex.domain.MediaResolutionRepository
 import me.cniekirk.flex.domain.RedditDataRepository
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -88,6 +94,25 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("download")
+    @Singleton
+    fun provideDownloadOkHttp(cache: Cache): OkHttpClient {
+        return if (BuildConfig.DEBUG) {
+            val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .addInterceptor(logger)
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .build()
+        }
+    }
+
+    @Provides
     @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder()
@@ -119,12 +144,33 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("redGifRetrofit")
+    @Singleton
+    fun provideRedGifRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.redgifs.com/")
+            .build()
+    }
+
+    @Provides
     @Named("authRetrofit")
     @Singleton
     fun provideAuthedRetrofit(@Named("postLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .callFactory { okHttpClient.get().newCall(it) }
             .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://oauth.reddit.com/")
+            .build()
+    }
+
+    @Provides
+    @Named("downloadRetrofit")
+    @Singleton
+    fun provideDownloadRetrofit(@Named("download") okHttpClient: Lazy<OkHttpClient>): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
             .baseUrl("https://oauth.reddit.com/")
             .build()
     }
@@ -142,9 +188,25 @@ class PreLoginModule {
             = retrofit.create(RedditApi::class.java)
 
     @Provides
+    @Named("downloadApi")
+    @Singleton
+    fun provideDownloadRedditApi(@Named("downloadRetrofit") retrofit: Retrofit): RedditApi
+            = retrofit.create(RedditApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideRedGifsApi(@Named("redGifRetrofit") retrofit: Retrofit): RedGifsApi
+            = retrofit.create(RedGifsApi::class.java)
+
+    @Provides
     @Singleton
     fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
             : RedditDataRepository = redditDataRepositoryImpl
+
+    @Provides
+    @Singleton
+    fun provideMediaResolutionRepo(mediaResolutionRepositoryImpl: MediaResolutionRepositoryImpl)
+            : MediaResolutionRepository = mediaResolutionRepositoryImpl
 
     @Provides
     @Singleton
@@ -158,6 +220,10 @@ class PreLoginModule {
     @Provides
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
+
+    @Provides
+    @Singleton
+    fun providePreferences(@ApplicationContext context: Context): Preferences = Preferences(context)
 
     object NullRepliesInterceptor : Interceptor {
 
@@ -178,4 +244,17 @@ class PreLoginModule {
                 .body(rawJson.toResponseBody(response.body?.contentType())).build()
         }
     }
+
+    @Provides
+    @Singleton
+    fun provideImageLoader(@ApplicationContext context: Context): ImageLoader {
+        return ImageLoader.Builder(context).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideImageRequest(@ApplicationContext context: Context): ImageRequest.Builder {
+        return ImageRequest.Builder(context)
+    }
+
 }

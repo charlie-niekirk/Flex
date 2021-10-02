@@ -12,16 +12,17 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class Preferences @Inject constructor(@ApplicationContext private val context: Context) {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("keys")
 
-    val ACCESS_TOKEN = stringPreferencesKey("access_token")
-    val accessTokenFlow: Flow<String> = context.dataStore.data
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
+
+    private val downloadDirectory = stringPreferencesKey("media_download_directory")
+    val downloadDirFlow: Flow<String> = context.dataStore.data
         .map { preferences ->
-            preferences[ACCESS_TOKEN] ?: ""
+            preferences[downloadDirectory] ?: ""
         }
-    suspend fun setAccessToken(accessToken: String) {
+    suspend fun setDownloadDirectory(downloadDir: String) {
         context.dataStore.edit { keys ->
-            keys[ACCESS_TOKEN] = accessToken
+            keys[downloadDirectory] = downloadDir
         }
     }
 }

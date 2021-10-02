@@ -22,13 +22,14 @@ import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
 @AndroidEntryPoint
-class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
+class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment) {
 
     private var player: SimpleExoPlayer? = null
 
@@ -227,8 +228,16 @@ class SubmissionDetailFragment : Fragment(R.layout.submission_detail_fragment) {
                     // Do nothing for now
                 }
                 is RedditResult.Success -> {
-                    adapter = CommentTreeAdapter(args.post, comments.data, markwon)
-                    binding?.commentsTreeList?.adapter = adapter
+                    if (comments.data.isNullOrEmpty()) {
+                        binding?.commentsTreeList?.visibility = View.GONE
+                        binding?.emptyCommentEasterEgg?.visibility = View.VISIBLE
+                        binding?.emptyCommentEasterEgg?.text = requireContext().getEasterEggString(args.post.subreddit)
+                    } else {
+                        adapter = CommentTreeAdapter(args.post, comments.data, markwon)
+                        binding?.emptyCommentEasterEgg?.visibility = View.GONE
+                        binding?.commentsTreeList?.visibility = View.VISIBLE
+                        binding?.commentsTreeList?.adapter = adapter
+                    }
                     binding?.loadingIndicator?.visibility = View.GONE
                     loading.reset()
                 }

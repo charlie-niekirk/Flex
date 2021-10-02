@@ -60,6 +60,8 @@ data class AuthedSubmission(
     val created: Double?,
     @Json(name = "created_utc")
     val createdUtc: Double,
+    @Json(name = "crosspost_parent_list")
+    val crosspostParentList: List<AuthedSubmission>?,
     @Json(name = "discussion_type")
     val discussionType: @RawValue Any?,
     val distinguished: @RawValue Any?,
@@ -96,7 +98,7 @@ data class AuthedSubmission(
     @Json(name = "link_flair_css_class")
     val linkFlairCssClass: String?,
     @Json(name = "link_flair_richtext")
-    val linkFlairRichtext: List<String>?,
+    val linkFlairRichtext: @RawValue List<Any>?,
     @Json(name = "link_flair_text")
     val linkFlairText: String?,
     @Json(name = "link_flair_text_color")
@@ -107,6 +109,8 @@ data class AuthedSubmission(
     val media: Media?,
     @Json(name = "media_embed")
     val mediaEmbed: MediaEmbed,
+    @Json(name = "media_metadata")
+    val mediaMetadata: Map<String, MetaDataItem>?,
     @Json(name = "media_only")
     val mediaOnly: Boolean,
     @Json(name = "mod_note")
@@ -129,13 +133,13 @@ data class AuthedSubmission(
     @Json(name = "over_18")
     val over18: Boolean,
     @Json(name = "parent_whitelist_status")
-    val parentWhitelistStatus: String,
+    val parentWhitelistStatus: String?,
     val permalink: String,
     val pinned: Boolean,
     @Json(name = "post_hint")
     val postHint: String?,
     val preview: Preview?,
-    val pwls: Int,
+    val pwls: Int?,
     val quarantine: Boolean,
     @Json(name = "removal_reason")
     val removalReason: String?,
@@ -193,6 +197,6 @@ data class AuthedSubmission(
     val viewCount: Int?,
     val visited: Boolean?,
     @Json(name = "whitelist_status")
-    val whitelistStatus: String,
-    val wls: Int
+    val whitelistStatus: String?,
+    val wls: Int?
 ) : Parcelable
