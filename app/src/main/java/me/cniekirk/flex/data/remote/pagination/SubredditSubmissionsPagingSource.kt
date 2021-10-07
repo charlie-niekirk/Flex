@@ -1,26 +1,23 @@
 package me.cniekirk.flex.data.remote.pagination
 
-import android.content.Context
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import coil.ImageLoader
 import coil.request.ImageRequest
-import dagger.hilt.android.qualifiers.ApplicationContext
 import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedditApi
+import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Listing
-import me.cniekirk.flex.data.remote.model.RedditResponse
-import me.cniekirk.flex.data.remote.model.Submission
-import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.util.Link
-import me.cniekirk.flex.util.processLink
+import me.cniekirk.flex.util.processLinkInternal
 import timber.log.Timber
-import javax.inject.Named
 
 class SubredditSubmissionsPagingSource(
     private val redditApi: RedditApi,
     private val authRedditApi: RedditApi,
+    private val streamableApi: StreamableApi,
+    private val gfycatApi: GfycatApi,
     private val subreddit: String,
     private val sortType: String,
     private val userDao: UserDao,
@@ -60,22 +57,55 @@ class SubredditSubmissionsPagingSource(
                 }
             }
 
-            if (!params.key.equals(before, true)) {
-                // Pre-load any images
-                when (response) {
-                    is RedditResult.Success<*> -> {
-                        val posts = response.data.children
-                        posts.forEach {
-                            it.data.url.processLink { linkType ->
-                                when (linkType) {
-                                    is Link.ImageLink -> imageLoader.prefetch(linkType.url)
-                                    else -> {}
+            response.data.children.map {
+                it.data.url.processLinkInternal { link ->
+                    when (link) {
+                        Link.StreamableLink -> {
+                            val shortcode = it.data.url.substring(it.data.url.lastIndexOf("/") + 1)
+                            val streamableUrl = streamableApi.getStreamableDetails(shortcode)
+                            if (streamableUrl.isSuccessful) {
+                                if (streamableUrl.body()?.files?.containsKey("mp4")!!) {
+                                    it.data = it.data.copy(url = streamableUrl.body()?.files?.get("mp4")?.url ?: "")
                                 }
                             }
                         }
+                        Link.GfycatLink -> {
+                            val gfyid = it.data.url.substring(it.data.url.lastIndexOf("/") + 1)
+                            val gfycatLinks = gfycatApi.getGfycatLinks(gfyid)
+                            if (gfycatLinks.isSuccessful) {
+                                if (gfycatLinks.body()?.gfyItem?.contentUrls?.containsKey("mobile")!!) {
+                                    Timber.d("URL: ${gfycatLinks.body()?.gfyItem?.contentUrls?.get("mobile")?.url}")
+                                    it.data = it.data.copy(url = gfycatLinks.body()?.gfyItem?.contentUrls?.get("mobile")?.url ?: "")
+                                }
+                            }
+                        }
+                        is Link.ImageLink -> {
+                            if (!params.key.equals(before, true)) {
+                                imageLoader.prefetch(link.url)
+                            }
+                        }
+                        else -> {}
                     }
                 }
+
             }
+
+//            if (!params.key.equals(before, true)) {
+//                // Pre-load any images
+//                when (response) {
+//                    is RedditResult.Success<*> -> {
+//                        val posts = response.data.children
+//                        posts.map {
+//                            it.data.url.processLink { linkType ->
+//                                when (linkType) {
+//                                    is Link.ImageLink -> imageLoader.prefetch(linkType.url)
+//                                    else -> {}
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
             if (itemCount > 0 && params.key.equals(before, true)) {
                 itemCount -= response.data.dist

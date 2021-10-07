@@ -148,7 +148,7 @@ data class AuthedSubmission(
     @Json(name = "removed_by_category")
     val removedByCategory: String?,
     @Json(name = "report_reasons")
-    val reportReasons: String?,
+    val reportReasons: List<String>?,
     val saved: Boolean,
     val score: Int,
     @Json(name = "secure_media")

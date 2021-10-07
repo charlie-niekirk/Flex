@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.submission
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -11,6 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -53,7 +57,16 @@ class SubmissionListFragment
         binding = SubmissionListFragmentBinding.bind(view)
 
         binding?.apply {
-            adapter = SubmissionListAdapter(this@SubmissionListFragment)
+            val imageLoader = ImageLoader.Builder(requireContext())
+                .componentRegistry {
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        add(ImageDecoderDecoder(requireContext()))
+                    } else {
+                        add(GifDecoder())
+                    }
+                }
+                .build()
+            adapter = SubmissionListAdapter(this@SubmissionListFragment, imageLoader)
             listSubmissions.setItemViewCacheSize(20)
             listSubmissions.adapter = adapter?.withLoadStateFooter(
                 footer = SubmissionListLoadingStateAdapter()

@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -13,6 +14,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import coil.load
 import coil.transform.RoundedCornersTransformation
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -37,6 +41,15 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     private val markwon by lazy(LazyThreadSafetyMode.NONE) { Markwon.create(requireContext()) }
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding?.loadingIndicator?.drawable as AnimatedVectorDrawable }
     private val viewModel by viewModels<SubmissionDetailViewModel>()
+    private val imageLoader by lazy(LazyThreadSafetyMode.NONE) {
+        ImageLoader.Builder(requireContext()).componentRegistry {
+            if (Build.VERSION.SDK_INT >= 28) {
+                add(ImageDecoderDecoder(requireContext()))
+            } else {
+                add(GifDecoder())
+            }
+        }.build()
+    }
 
     private var binding: SubmissionDetailFragmentBinding? = null
     private var adapter: CommentTreeAdapter? = null
@@ -102,7 +115,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                 imagePreview.submissionImage.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.VISIBLE
                                 externalLinkPreview.linkContent.text = args.post.url
-                                externalLinkPreview.linkImage.load(args.post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url) {
+                                externalLinkPreview.linkImage.load(args.post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url, imageLoader = imageLoader) {
                                     crossfade(true)
                                     transformations(RoundedCornersTransformation(
                                         topLeft = root.resources.getDimension(R.dimen.spacing_m),
@@ -113,7 +126,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                 videoPreview.videoPlayer.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
                                 imagePreview.submissionImage.visibility = View.VISIBLE
-                                imagePreview.submissionImage.load(it.url) {
+                                imagePreview.submissionImage.load(it.url, imageLoader = imageLoader) {
                                     crossfade(true)
                                 }
                             }
@@ -173,6 +186,8 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 textAuthorFlair.text = args.post.authorFlairText
                 if (args.post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (args.post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(args.post.authorFlairBackgroundColor))
                 }

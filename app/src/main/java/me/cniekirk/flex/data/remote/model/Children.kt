@@ -7,6 +7,6 @@ import kotlinx.parcelize.RawValue
 @Parcelize
 @JsonClass(generateAdapter = true)
 data class Children<T>(
-    val data: @RawValue T,
+    var data: @RawValue T,
     val kind: String
 ) : Parcelable

@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.ImageLoader
 import coil.load
 import coil.transform.BlurTransformation
 import coil.transform.RoundedCornersTransformation
@@ -18,6 +19,7 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.databinding.*
 import me.cniekirk.flex.util.*
+import timber.log.Timber
 
 enum class ViewType {
     IMAGE,
@@ -28,7 +30,8 @@ enum class ViewType {
 }
 
 class SubmissionListAdapter(
-    private val submissionsActionListener: SubmissionActionListener)
+    private val submissionsActionListener: SubmissionActionListener,
+    private val imageLoader: ImageLoader)
     : PagingDataAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
 
     private var player: SimpleExoPlayer? = null
@@ -101,6 +104,8 @@ class SubmissionListAdapter(
                 Link.RedditVideo -> { ViewType.VIDEO.ordinal }
                 is Link.TwitterLink -> { ViewType.LINK.ordinal }
                 is Link.VideoLink -> { ViewType.VIDEO.ordinal }
+                Link.StreamableLink -> { ViewType.VIDEO.ordinal }
+                Link.GfycatLink -> { ViewType.VIDEO.ordinal }
             }
         }
         return viewType
@@ -115,22 +120,27 @@ class SubmissionListAdapter(
                 getItem(position)?.urlOverriddenByDest?.processLink {
                     when (it) {
                         Link.ExternalLink -> {
+                            Timber.d("External link")
                             val linkHolder = (holder as ExternalLinkSubmissionViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.ImageLink -> {
+                            Timber.d("Image link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
                             imageHolder.bind(post, it.url)
                         }
                         Link.RedGifLink -> {
+                            Timber.d("Redgif link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
                             imageHolder.bind(post, post.media?.oembed?.thumbnailUrl ?: "")
                         }
                         Link.RedditGallery -> {
+                            Timber.d("Gallery link")
                             val galleryHolder = (holder as GallerySubmissionViewHolder)
                             galleryHolder.bind(post)
                         }
                         Link.RedditVideo -> {
+                            Timber.d("Reddit V link")
                             val url = if (post.crosspostParentList.isNullOrEmpty()) {
                                 post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!
                             } else {
@@ -141,12 +151,24 @@ class SubmissionListAdapter(
                             videoHolder.bind(post, url)
                         }
                         is Link.TwitterLink -> {
+                            Timber.d("Twitter link")
                             val linkHolder = (holder as ExternalLinkSubmissionViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.VideoLink -> {
+                            Timber.d("Video link")
                             val videoHolder = (holder as VideoSubmissionViewHolder)
                             videoHolder.bind(post, it.url)
+                        }
+                        is Link.StreamableLink -> {
+                            Timber.d("Streamable link")
+                            val viewHolder = (holder as VideoSubmissionViewHolder)
+                            viewHolder.bind(post, post.url)
+                        }
+                        Link.GfycatLink -> {
+                            Timber.d("Gfycat link: ${post.url}")
+                            val viewHolder = (holder as VideoSubmissionViewHolder)
+                            viewHolder.bind(post, post.url)
                         }
                     }
                 }
@@ -188,6 +210,8 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -286,7 +310,7 @@ class SubmissionListAdapter(
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
             }
-            binding.imagePreview.submissionImage.load(imageUrl) {
+            binding.imagePreview.submissionImage.load(imageUrl, imageLoader = imageLoader) {
                 crossfade(true)
                 if (post.over18) {
                     transformations(BlurTransformation(
@@ -541,6 +565,8 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }

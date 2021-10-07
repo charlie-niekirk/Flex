@@ -16,8 +16,10 @@ import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
 import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.local.prefs.Preferences
+import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
+import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
@@ -155,6 +157,17 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("gfycatRetrofit")
+    @Singleton
+    fun provideGfycatRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.gfycat.com/")
+            .build()
+    }
+
+    @Provides
     @Named("authRetrofit")
     @Singleton
     fun provideAuthedRetrofit(@Named("postLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -172,6 +185,17 @@ class PreLoginModule {
         return Retrofit.Builder()
             .callFactory { okHttpClient.get().newCall(it) }
             .baseUrl("https://oauth.reddit.com/")
+            .build()
+    }
+
+    @Provides
+    @Named("streamableRetrofit")
+    @Singleton
+    fun provideStreamableRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.streamable.com/")
             .build()
     }
 
@@ -197,6 +221,16 @@ class PreLoginModule {
     @Singleton
     fun provideRedGifsApi(@Named("redGifRetrofit") retrofit: Retrofit): RedGifsApi
             = retrofit.create(RedGifsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideGfycatApi(@Named("gfycatRetrofit") retrofit: Retrofit): GfycatApi
+            = retrofit.create(GfycatApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideStreamableApi(@Named("streamableRetrofit") retrofit: Retrofit): StreamableApi
+            = retrofit.create(StreamableApi::class.java)
 
     @Provides
     @Singleton

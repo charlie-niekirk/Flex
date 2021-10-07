@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedditApi
+import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import javax.inject.Inject
@@ -25,12 +27,14 @@ import javax.inject.Named
 class SubmissionListViewModel @Inject constructor(
     @Named("userlessApi") private val redditApi: RedditApi,
     @Named("authApi") private val authRedditApi: RedditApi,
+    private val streamableApi: StreamableApi,
+    private val gfycatApi: GfycatApi,
     private val userDao: UserDao,
     private val imageLoader: ImageLoader,
     private val imageRequest: ImageRequest.Builder
 ) : ViewModel() {
 
-    private val _subredditFlow = MutableStateFlow(value = "spacexlounge")
+    private val _subredditFlow = MutableStateFlow(value = "flexforreddit")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()
@@ -39,7 +43,8 @@ class SubmissionListViewModel @Inject constructor(
     val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
         sortFlow.flatMapLatest { sort ->
             Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 1)) {
-                SubredditSubmissionsPagingSource(redditApi, authRedditApi, subreddit, sort, userDao, imageRequest, imageLoader)
+                SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
+                    gfycatApi, subreddit, sort, userDao, imageRequest, imageLoader)
             }.flow.cachedIn(viewModelScope)
         }
     }

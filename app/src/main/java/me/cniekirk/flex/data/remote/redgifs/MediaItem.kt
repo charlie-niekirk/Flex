@@ -5,7 +5,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class Poster(
+data class MediaItem(
     val height: Int,
     val size: Int,
     val url: String,
