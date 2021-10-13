@@ -1,14 +1,18 @@
 package me.cniekirk.flex.data.remote.pagination
 
+import android.widget.ImageView
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import coil.ImageLoader
 import coil.request.ImageRequest
 import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.remote.GfycatApi
+import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.Image
+import me.cniekirk.flex.data.remote.model.Resolution
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLinkInternal
 import timber.log.Timber
@@ -18,6 +22,7 @@ class SubredditSubmissionsPagingSource(
     private val authRedditApi: RedditApi,
     private val streamableApi: StreamableApi,
     private val gfycatApi: GfycatApi,
+    private val redGifsApi: RedGifsApi,
     private val subreddit: String,
     private val sortType: String,
     private val userDao: UserDao,
@@ -74,15 +79,21 @@ class SubredditSubmissionsPagingSource(
                             val gfycatLinks = gfycatApi.getGfycatLinks(gfyid)
                             if (gfycatLinks.isSuccessful) {
                                 if (gfycatLinks.body()?.gfyItem?.contentUrls?.containsKey("mobile")!!) {
-                                    Timber.d("URL: ${gfycatLinks.body()?.gfyItem?.contentUrls?.get("mobile")?.url}")
                                     it.data = it.data.copy(url = gfycatLinks.body()?.gfyItem?.contentUrls?.get("mobile")?.url ?: "")
                                 }
                             }
                         }
-                        is Link.ImageLink -> {
-                            if (!params.key.equals(before, true)) {
-                                imageLoader.prefetch(link.url)
+                        Link.RedGifLink -> {
+                            val gfyid = it.data.url.substring(it.data.url.lastIndexOf("/") + 1)
+                            val gfycatLinks = redGifsApi.getDirectLinks(gfyid)
+                            if (gfycatLinks.isSuccessful) {
+                                if (gfycatLinks.body()?.gfyItem?.contentUrls?.containsKey("mobile")!!) {
+                                    it.data = it.data.copy(
+                                        url = gfycatLinks.body()?.gfyItem?.contentUrls?.get("mobile")?.url ?: "")
+                                }
                             }
+                        }
+                        is Link.ImageLink -> {
                         }
                         else -> {}
                     }
@@ -124,13 +135,6 @@ class SubredditSubmissionsPagingSource(
             Timber.e(exception)
             LoadResult.Error(exception)
         }
-    }
-
-    private fun ImageLoader.prefetch(url: String) {
-        val request = imageRequest
-            .data(url)
-            .build()
-        enqueue(request)
     }
 
     override fun getRefreshKey(state: PagingState<String, AuthedSubmission>): String? {

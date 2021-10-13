@@ -1,17 +1,11 @@
 package me.cniekirk.flex.ui.gallery
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
 import androidx.navigation.navArgs
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +17,6 @@ import me.cniekirk.flex.ui.dialog.SubmissionMediaInformationDialog
 import me.cniekirk.flex.ui.dialog.SubmissionShareDialogFragment
 import me.cniekirk.flex.ui.viewmodel.GalleryViewModel
 import me.cniekirk.flex.util.observe
-import timber.log.Timber
 
 @AndroidEntryPoint
 class SlidingGalleryContainer : AppCompatActivity() {
@@ -67,7 +60,7 @@ class SlidingGalleryContainer : AppCompatActivity() {
                 getString(
                     R.string.reddit_image_url,
                     item.id,
-                    item.m.substring(item.m.indexOf('/') + 1))
+                    item.m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" })
             }
             allUrls?.let {
                 downloadButton.setOnClickListener {

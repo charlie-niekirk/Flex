@@ -20,6 +20,8 @@ class ContainerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ContainerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        NavigationUI.setupWithNavController(binding.bottomNavBar, navController)
+
+        //NavigationUI.setupWithNavController(binding.bottomAppBar, navController)
+        setSupportActionBar(binding.bottomAppBar)
     }
 }

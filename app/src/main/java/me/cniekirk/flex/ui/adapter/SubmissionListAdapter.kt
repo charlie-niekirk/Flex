@@ -3,21 +3,30 @@ package me.cniekirk.flex.ui.adapter
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import coil.ImageLoader
-import coil.load
-import coil.transform.BlurTransformation
-import coil.transform.RoundedCornersTransformation
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
+import im.ene.toro.ToroPlayer
+import im.ene.toro.ToroUtil
+import im.ene.toro.exoplayer.ExoCreator
+import im.ene.toro.exoplayer.ExoPlayerViewHelper
+import im.ene.toro.media.PlaybackInfo
+import im.ene.toro.widget.Container
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.Resolution
 import me.cniekirk.flex.databinding.*
+import me.cniekirk.flex.ui.model.UserPreferences
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
@@ -31,10 +40,9 @@ enum class ViewType {
 
 class SubmissionListAdapter(
     private val submissionsActionListener: SubmissionActionListener,
-    private val imageLoader: ImageLoader)
+    private val userPreferences: UserPreferences,
+    private val exoCreator: ExoCreator)
     : PagingDataAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
-
-    private var player: SimpleExoPlayer? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -52,7 +60,7 @@ class SubmissionListAdapter(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                    ))
+                    ), exoCreator)
             }
             ViewType.GALLERY.ordinal -> {
                 GallerySubmissionViewHolder(
@@ -181,6 +189,10 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -251,6 +263,10 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission, imageUrl: String) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -310,23 +326,38 @@ class SubmissionListAdapter(
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
             }
-            binding.imagePreview.submissionImage.load(imageUrl, imageLoader = imageLoader) {
-                crossfade(true)
-                if (post.over18) {
-                    transformations(BlurTransformation(
-                        binding.root.context,
-                        25f, 8f
-                    ))
+            post.preview?.let {
+                val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
+                resolution?.let {
+                    Glide.with(binding.imagePreview.submissionImage)
+                        .load(resolution.url)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.imagePreview.submissionImage)
                 }
+            } ?: run {
+                Glide.with(binding.imagePreview.submissionImage)
+                    .load(imageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(binding.imagePreview.submissionImage)
             }
+
         }
     }
 
     inner class VideoSubmissionViewHolder(
-        private val binding: VideoListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        private val binding: VideoListItemBinding,
+        private val exoCreator: ExoCreator): RecyclerView.ViewHolder(binding.root), ToroPlayer {
+
+        private var mediaUri: Uri? = null
+        private var exoPlayerViewHelper: ExoPlayerViewHelper? = null
 
         fun bind(post: AuthedSubmission, videoUrl: String) {
+            mediaUri = Uri.parse(videoUrl)
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -386,8 +417,53 @@ class SubmissionListAdapter(
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
             }
-            player = binding.videoPreview.videoPlayer.initialise(videoUrl)
         }
+
+        override fun getPlayerView() = binding.videoPlayer
+
+        override fun getCurrentPlaybackInfo(): PlaybackInfo {
+            return if (exoPlayerViewHelper != null && mediaUri != null) {
+                (exoPlayerViewHelper as ExoPlayerViewHelper).latestPlaybackInfo
+            } else {
+                PlaybackInfo()
+            }
+        }
+
+        override fun initialize(container: Container, playbackInfo: PlaybackInfo) {
+            mediaUri?.let {
+                if (exoPlayerViewHelper == null) {
+                    exoPlayerViewHelper = ExoPlayerViewHelper(this, mediaUri as Uri, null, exoCreator)
+                }
+                exoPlayerViewHelper?.initialize(container, playbackInfo)
+            }
+        }
+
+        override fun play() {
+            exoPlayerViewHelper?.let { helper ->
+                mediaUri?.let {
+                    helper.play()
+                }
+            }
+        }
+
+        override fun pause() {
+            exoPlayerViewHelper?.pause()
+        }
+
+        override fun isPlaying() = exoPlayerViewHelper != null &&
+                (exoPlayerViewHelper as ExoPlayerViewHelper).isPlaying
+
+        override fun release() {
+            exoPlayerViewHelper?.let { helper ->
+                helper.release()
+                exoPlayerViewHelper = null
+            }
+        }
+
+        override fun wantsToPlay() =
+            mediaUri != null && ToroUtil.visibleAreaOffset(this, binding.root.parent) >= 0.85
+
+        override fun getPlayerOrder() = bindingAdapterPosition
     }
 
     inner class GallerySubmissionViewHolder(
@@ -395,6 +471,10 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -459,70 +539,39 @@ class SubmissionListAdapter(
             binding.mediaGalleryPreview.textGalleryCount.text =
                 binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
             media?.let {
-                if (media?.size!! > 2) {
+                if (media.size > 2) {
                     binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
-                    binding.mediaGalleryPreview.firstImage.load(
-                        binding.root.context.getString(R.string.reddit_image_url,
+                    Glide.with(binding.mediaGalleryPreview.firstImage)
+                        .load(binding.root.context.getString(R.string.reddit_image_url,
                             media[0].id,
-                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
-                        crossfade(true)
-                        if (post.over18) {
-                            transformations(BlurTransformation(
-                                binding.root.context,
-                                25f, 8f
-                            ))
-                        }
-                    }
-                    binding.mediaGalleryPreview.secondImage.load(
-                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.mediaGalleryPreview.firstImage)
+                    Glide.with(binding.mediaGalleryPreview.secondImage)
+                        .load(binding.root.context.getString(R.string.reddit_image_url,
                             media[1].id,
-                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
-                        crossfade(true)
-                        if (post.over18) {
-                            transformations(BlurTransformation(
-                                binding.root.context,
-                                25f, 8f
-                            ))
-                        }
-                    }
-                    binding.mediaGalleryPreview.thirdImage.load(
-                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.mediaGalleryPreview.secondImage)
+                    Glide.with(binding.mediaGalleryPreview.thirdImage)
+                        .load(binding.root.context.getString(R.string.reddit_image_url,
                             media[2].id,
-                            media[2].m.substring(media[2].m.indexOf('/') + 1))) {
-                        crossfade(true)
-                        if (post.over18) {
-                            transformations(BlurTransformation(
-                                binding.root.context,
-                                25f, 8f
-                            ))
-                        }
-                    }
+                            media[2].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.mediaGalleryPreview.thirdImage)
                 } else {
                     binding.mediaGalleryPreview.secondImage.visibility = View.GONE
-                    binding.mediaGalleryPreview.firstImage.load(
-                        binding.root.context.getString(R.string.reddit_image_url,
+                    Glide.with(binding.mediaGalleryPreview.firstImage)
+                        .load(binding.root.context.getString(R.string.reddit_image_url,
                             media[0].id,
-                            media[0].m.substring(media[0].m.indexOf('/') + 1))) {
-                        crossfade(true)
-                        if (post.over18) {
-                            transformations(BlurTransformation(
-                                binding.root.context,
-                                25f, 8f
-                            ))
-                        }
-                    }
-                    binding.mediaGalleryPreview.thirdImage.load(
-                        binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.mediaGalleryPreview.firstImage)
+                    Glide.with(binding.mediaGalleryPreview.thirdImage)
+                        .load(binding.root.context.getString(R.string.reddit_image_url,
                             media[1].id,
-                            media[1].m.substring(media[1].m.indexOf('/') + 1))) {
-                        crossfade(true)
-                        if (post.over18) {
-                            transformations(BlurTransformation(
-                                binding.root.context,
-                                25f, 8f
-                            ))
-                        }
-                    }
+                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(binding.mediaGalleryPreview.thirdImage)
                 }
             }
             binding.mediaGalleryPreview.root.setOnClickListener {
@@ -536,6 +585,10 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission) {
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -598,28 +651,35 @@ class SubmissionListAdapter(
                 cs.applyTo(binding.root)
             }
             binding.externalLinkPreview.linkContent.text = post.url
-            binding.externalLinkPreview.linkImage.load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url) {
-                crossfade(true)
-                transformations(RoundedCornersTransformation(topLeft = binding.root.resources.getDimension(R.dimen.spacing_m), topRight = binding.root.resources.getDimension(R.dimen.spacing_m)))
+            Glide.with(binding.externalLinkPreview.linkImage)
+                .load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .transform(RoundedCorners(binding.root.resources.getDimension(R.dimen.spacing_m).toInt()))
+                .into(binding.externalLinkPreview.linkImage)
+        }
+    }
+
+    private fun ImageView.getSuitablePreview(previews: List<Resolution>): Resolution? {
+        if (previews.isNotEmpty()) {
+            var preview = previews.last()
+            if (preview.width * preview.height > 1000000) {
+                for (i in previews.size - 1 downTo 0) {
+                    preview = previews[i]
+                    if (width >= preview.width) {
+                        if (preview.width * preview.height <= 1000000) {
+                            return preview
+                        }
+                    } else {
+                        val height = width / preview.width * preview.height
+                        if (width * height <= 1000000) {
+                            return preview
+                        }
+                    }
+                }
             }
+            return preview
         }
-    }
-
-    fun dispose() {
-        player?.release()
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        if (player?.isPlaying == false) {
-            player?.play()
-        }
-    }
-
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        player?.pause()
-        player?.seekTo(0)
-        super.onViewRecycled(holder)
+        return null
     }
 
     object SubmissionComparator : DiffUtil.ItemCallback<AuthedSubmission>() {
@@ -629,6 +689,7 @@ class SubmissionListAdapter(
 
     interface SubmissionActionListener {
         fun onPostClicked(post: AuthedSubmission)
+        fun onPostLongClicked(post: AuthedSubmission)
         fun onGalleryClicked(post: AuthedSubmission)
     }
 }

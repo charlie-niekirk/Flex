@@ -23,7 +23,6 @@ import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
-import me.cniekirk.flex.data.remote.repo.MediaResolutionRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
 import me.cniekirk.flex.domain.MediaResolutionRepository
 import me.cniekirk.flex.domain.RedditDataRepository
@@ -38,6 +37,23 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+import im.ene.toro.exoplayer.ToroExo
+
+import im.ene.toro.exoplayer.MediaSourceBuilder
+
+import android.content.SharedPreferences
+
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
+
+import im.ene.toro.exoplayer.ExoCreator
+
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import im.ene.toro.exoplayer.Config
+import me.cniekirk.flex.util.video.LoopExoCreator
+import java.io.File
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -239,11 +255,6 @@ class PreLoginModule {
 
     @Provides
     @Singleton
-    fun provideMediaResolutionRepo(mediaResolutionRepositoryImpl: MediaResolutionRepositoryImpl)
-            : MediaResolutionRepository = mediaResolutionRepositoryImpl
-
-    @Provides
-    @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room
             .databaseBuilder(context, AppDatabase::class.java, "app-database")
@@ -289,6 +300,24 @@ class PreLoginModule {
     @Singleton
     fun provideImageRequest(@ApplicationContext context: Context): ImageRequest.Builder {
         return ImageRequest.Builder(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSimpleCache(@ApplicationContext context: Context): SimpleCache {
+        return SimpleCache(
+            File(context.cacheDir, "/exoplayer"),
+            LeastRecentlyUsedCacheEvictor(209715200L), ExoDatabaseProvider(context)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideExoCreator(@ApplicationContext context: Context, simpleCache: SimpleCache): ExoCreator {
+        val config = Config.Builder(context).setMediaSourceBuilder(MediaSourceBuilder.DEFAULT)
+            .setCache(simpleCache)
+            .build()
+        return LoopExoCreator(ToroExo.with(context), config)
     }
 
 }

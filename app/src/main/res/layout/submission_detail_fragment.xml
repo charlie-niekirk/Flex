@@ -13,6 +13,14 @@
         android:background="@color/surfaceColor"
         android:animateLayoutChanges="true">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:id="@+id/toolbar_shadow"
+            android:background="@drawable/shadow_down"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="@dimen/spacing_action_bar" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,8 +29,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="24dp"
+            app:layout_constraintBottom_toBottomOf="@id/toolbar_shadow"
             tools:text="Comments (496)" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:id="@+id/back_button"
+            app:srcCompat="@drawable/ic_arrow_back"
+            app:tint="@color/accent"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/text_comments_title"
+            app:layout_constraintBottom_toBottomOf="@id/text_comments_title"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:contentDescription="@string/back_button_cd" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,9 +51,9 @@
             android:id="@+id/text_subreddit_name"
             style="@style/Text.Label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_comments_title"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_shadow"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:layout_marginTop="@dimen/spacing_l"
             tools:text="tommyinnit" />
 
         <TextView

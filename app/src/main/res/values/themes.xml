@@ -69,4 +69,16 @@
     <style name="Icon">
         <item name="tint">#000000</item>
     </style>
+
+    <style name="ThemeOverlay.App.BottomAppBar" parent="">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/accent</item>
+        <item name="iconTint">@color/accent</item>
+    </style>
+
+    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/surfaceColor</item>
+    </style>
+
 </resources>
