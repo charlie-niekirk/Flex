@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/transition_root">
+
+    <ImageView
+        android:id="@+id/close_button"
+        android:layout_width="@dimen/spacing_xl"
+        android:layout_height="@dimen/spacing_xl"
+        android:src="@drawable/ic_close"
+        android:backgroundTint="@color/accent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_marginStart="@dimen/spacing_xl" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/submission_title_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/close_button"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        style="@style/TextInputStyle">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/submission_title_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/title_hint"
+            android:textAppearance="@style/Text"
+            android:textSize="22sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <View
+        android:id="@+id/flair_container"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@drawable/attribute_container"
+        android:foreground="?attr/selectableItemBackground"
+        android:outlineProvider="background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/cancel_button"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <ImageView
+        android:id="@+id/flair_label_icon"
+        android:layout_width="@dimen/spacing_xl"
+        android:layout_height="@dimen/spacing_xl"
+        app:layout_constraintTop_toTopOf="@id/flair_container"
+        app:layout_constraintBottom_toBottomOf="@id/flair_container"
+        app:layout_constraintStart_toStartOf="@id/flair_container"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:src="@drawable/ic_label"
+        android:backgroundTint="@color/accent" />
+
+    <TextView
+        android:id="@+id/flair_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text"
+        app:layout_constraintTop_toTopOf="@id/flair_container"
+        app:layout_constraintBottom_toBottomOf="@id/flair_container"
+        app:layout_constraintStart_toEndOf="@id/flair_label_icon"
+        app:layout_constraintEnd_toEndOf="@id/flair_container"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:text="@string/no_flair_text" />
+
+    <ImageView
+        android:id="@+id/flair_action_icon"
+        android:layout_width="@dimen/spacing_l"
+        android:layout_height="@dimen/spacing_l"
+        app:layout_constraintTop_toTopOf="@id/flair_container"
+        app:layout_constraintBottom_toBottomOf="@id/flair_container"
+        app:layout_constraintEnd_toEndOf="@id/flair_container"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:src="@drawable/ic_arrow_forward"
+        android:backgroundTint="@color/accent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancel_button"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/post_button"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_m"
+        android:layout_marginBottom="@dimen/spacing_xl"
+        style="@style/Widget.App.Button.Outlined"
+        android:text="@string/cancel_post" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/post_button"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/cancel_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:layout_marginBottom="@dimen/spacing_xl"
+        style="@style/Widget.App.Button"
+        android:text="@string/submit_post" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

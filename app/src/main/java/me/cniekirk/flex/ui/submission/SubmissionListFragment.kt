@@ -1,5 +1,6 @@
 package me.cniekirk.flex.ui.submission
 
+import android.content.Context
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
@@ -12,12 +13,16 @@ import androidx.navigation.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
@@ -27,6 +32,7 @@ import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
 import me.cniekirk.flex.util.viewBinding
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -62,6 +68,18 @@ class SubmissionListFragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        if (actionButton.isOrWillBeHidden) {
+            actionButton.show()
+            bottomAppBar.performShow()
+        }
+
+        bottomAppBar.setNavigationOnClickListener {
+            // Show a dialog
+
+        }
+
         observe(viewModel.userPrefsFlow) { userPrefs ->
             userPrefs?.let {
                 adapter = SubmissionListAdapter(
@@ -74,7 +92,7 @@ class SubmissionListFragment
                     footer = SubmissionListLoadingStateAdapter()
                 )
                 // Collect paginated submissions and submit to adapter
-                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                lifecycleScope.launchWhenCreated {
                     adapter?.addLoadStateListener { loadState ->
                         if (loadState.refresh is LoadState.Loading) {
                             startLoadingAnimation()
@@ -90,7 +108,6 @@ class SubmissionListFragment
                 }
             }
         }
-
         viewModel.getPreferences()
 
         binding.submissionSort.setOnClickListener {

@@ -65,4 +65,9 @@
     <string name="back_button_cd">Back button</string>
     <string name="create_post_cd">Create post</string>
     <string name="post_action_text">Post</string>
+    <string name="thumbnail_cd">Video thumbnail</string>
+    <string name="submit_post">Submit</string>
+    <string name="cancel_post">Cancel</string>
+    <string name="title_hint">Title</string>
+    <string name="no_flair_text">No flair set for post</string>
 </resources>

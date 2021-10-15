@@ -6,7 +6,6 @@ import android.graphics.Typeface
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -18,6 +17,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,9 +41,6 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     private val markwon by lazy(LazyThreadSafetyMode.NONE) { Markwon.create(requireContext()) }
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val viewModel by viewModels<SubmissionDetailViewModel>()
-//    private val simpleExoPlayer by lazy(LazyThreadSafetyMode.NONE) {
-//        SimpleExoPlayer.Builder(requireContext()).build()
-//    }
     private val binding by viewBinding(SubmissionDetailFragmentBinding::bind)
     private var adapter: CommentTreeAdapter? = null
 
@@ -61,6 +59,12 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        if (!actionButton.isOrWillBeHidden) {
+            actionButton.hide()
+            bottomAppBar.performHide()
+        }
         binding.apply {
             backButton.setOnClickListener { it.findNavController().popBackStack() }
 

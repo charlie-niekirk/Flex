@@ -20,6 +20,7 @@ import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
 import im.ene.toro.exoplayer.ExoCreator
 import im.ene.toro.exoplayer.ExoPlayerViewHelper
+import im.ene.toro.exoplayer.Playable
 import im.ene.toro.media.PlaybackInfo
 import im.ene.toro.widget.Container
 import me.cniekirk.flex.R
@@ -353,6 +354,18 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission, videoUrl: String) {
             mediaUri = Uri.parse(videoUrl)
+
+            // Load the thumbnail
+            post.preview?.let {
+                val resolution = binding.videoThumbnail.getSuitablePreview(post.preview.images[0].resolutions)
+                resolution?.let {
+                    binding.videoThumbnail.visibility = View.VISIBLE
+                    Glide.with(binding.root.context)
+                        .load(resolution.url)
+                        .into(binding.videoThumbnail)
+                }
+            }
+
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
@@ -433,6 +446,12 @@ class SubmissionListAdapter(
             mediaUri?.let {
                 if (exoPlayerViewHelper == null) {
                     exoPlayerViewHelper = ExoPlayerViewHelper(this, mediaUri as Uri, null, exoCreator)
+                    exoPlayerViewHelper?.addEventListener(object : Playable.DefaultEventListener() {
+                        override fun onRenderedFirstFrame() {
+                            Glide.with(binding.root).clear(binding.videoThumbnail)
+                            binding.videoThumbnail.visibility = View.GONE
+                        }
+                    })
                 }
                 exoPlayerViewHelper?.initialize(container, playbackInfo)
             }

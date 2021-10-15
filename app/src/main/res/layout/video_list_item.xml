@@ -54,17 +54,27 @@
     <com.google.android.exoplayer2.ui.AspectRatioFrameLayout
         android:id="@+id/video_player_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_submission_title"
         android:layout_marginTop="8dp"
-        android:background="#000000"
-        app:resize_mode="fixed_width">
+        app:resize_mode="fixed_width"
+        android:background="@color/accent">
 
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/video_player"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:minHeight="150dp"
+            app:resize_mode="fixed_width"
             app:use_controller="false" />
+
+        <ImageView
+            android:id="@+id/video_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/thumbnail_cd"
+            android:visibility="gone" />
 
     </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
 

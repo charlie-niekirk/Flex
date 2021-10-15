@@ -6,7 +6,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ContainerActivity">
+    tools:context=".ui.activity.ContainerActivity">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
@@ -15,21 +15,6 @@
         android:layout_height="match_parent"
         app:defaultNavHost="true"
         app:navGraph="@navigation/app_nav_graph" />
-
-<!--    <View-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="4dp"-->
-<!--        android:id="@+id/bottom_bar_shadow"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"-->
-<!--        android:background="@drawable/shadow_up" />-->
-
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/bottom_nav_bar"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:menu="@menu/menu_bottom_navigation"-->
-<!--        app:labelVisibilityMode="unlabeled" />-->
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottom_app_bar"
@@ -49,6 +34,7 @@
         android:theme="@style/ThemeOverlay.App.FloatingActionButton"
         app:srcCompat="@drawable/ic_create"
         app:layout_anchor="@id/bottom_app_bar"
-        android:contentDescription="@string/create_post_cd" />
+        android:contentDescription="@string/create_post_cd"
+        android:transitionName="material_motion_container" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

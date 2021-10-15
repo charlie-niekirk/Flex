@@ -14,7 +14,7 @@
         android:theme="@style/Theme.Flex"
         android:name=".FlexApp">
         <activity
-            android:name=".ContainerActivity"
+            android:name=".ui.activity.ContainerActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.gallery.SlidingGalleryContainer" />
+        <activity android:name=".ui.activity.CreatePostActivity" />
     </application>
 
 </manifest>

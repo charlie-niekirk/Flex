@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/action_sheet_bg.xml" value="0.19358108108108107" />
+        <entry key="app/src/main/res/drawable/attribute_container.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
         <entry key="app/src/main/res/drawable/dialog_action_bg.xml" value="0.24487179487179486" />
         <entry key="app/src/main/res/drawable/dialog_fragment_bg.xml" value="0.2984375" />
@@ -12,8 +13,11 @@
         <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
         <entry key="app/src/main/res/drawable/flair_background.xml" value="0.3175925925925926" />
         <entry key="app/src/main/res/drawable/ic_arrow_downward.xml" value="0.3175925925925926" />
+        <entry key="app/src/main/res/drawable/ic_arrow_forward.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/ic_arrow_upward.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_close.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/ic_gfycat_logo.xml" value="0.19358108108108107" />
+        <entry key="app/src/main/res/drawable/ic_label.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/selectable_downvote.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/selectable_upvote.xml" value="0.16944444444444445" />
@@ -24,6 +28,7 @@
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.335" />
         <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/image_item_fragment.xml" value="0.28229166666666666" />

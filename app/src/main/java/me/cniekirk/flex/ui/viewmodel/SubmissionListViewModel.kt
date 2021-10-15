@@ -21,6 +21,7 @@ import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
 import me.cniekirk.flex.ui.model.UserPreferences
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 
