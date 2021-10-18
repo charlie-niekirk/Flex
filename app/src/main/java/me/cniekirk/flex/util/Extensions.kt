@@ -7,22 +7,15 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.icu.text.CompactDecimalFormat
 import android.icu.util.ULocale
-import android.media.session.PlaybackState
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
 import androidx.fragment.app.Fragment
 import coil.ImageLoader
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -49,8 +42,8 @@ private const val DAY_MILLIS = 24 * HOUR_MILLIS
 private const val MONTH_MILLIS = 30 * DAY_MILLIS
 private const val YEAR_MILLIS = 12 * MONTH_MILLIS
 
-private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gifv?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
-private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
+private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gif?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
+private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi|gifv)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
 
 fun Long.getElapsedTime(): String {
     val now = System.currentTimeMillis()
@@ -103,6 +96,12 @@ fun String.processLink(block: (Link) -> Unit) {
         this.startsWith("https://redgifs.com") -> {
             block(Link.RedGifLink)
         }
+        this.startsWith("https://gfycat.com") -> {
+            block(Link.GfycatLink)
+        }
+        this.startsWith("https://streamable.com") -> {
+            block(Link.StreamableLink)
+        }
         videoRegex.matches(this) -> {
             block(Link.VideoLink(this))
         }
@@ -118,27 +117,58 @@ fun String.processLink(block: (Link) -> Unit) {
     }
 }
 
-fun StyledPlayerView.initialise(url: String, playWhenReady: Boolean = true): SimpleExoPlayer {
-    return SimpleExoPlayer.Builder(this.context)
-        .build()
-        .also { exoPlayer ->
-            this.player = exoPlayer
-            val mediaItem = MediaItem.fromUri(url)
-            exoPlayer.setMediaItem(mediaItem)
-            this.player?.playWhenReady = playWhenReady
-            this.player?.addListener(object : Player.Listener {
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    when (playbackState) {
-                        Player.STATE_ENDED -> {
-                            this@initialise.player?.seekTo(0)
-                            this@initialise.player?.playWhenReady = true
-                        }
-                    }
-                }
-            })
-            this.player?.prepare()
+suspend fun String.processLinkInternal(block: suspend (Link) -> Unit) {
+    when {
+        imageRegex.matches(this) -> {
+            block(Link.ImageLink(this))
         }
+        this.startsWith("https://v.redd.it") -> {
+            block(Link.RedditVideo)
+        }
+        this.startsWith("https://redgifs.com") -> {
+            block(Link.RedGifLink)
+        }
+        this.startsWith("https://gfycat.com") -> {
+            block(Link.GfycatLink)
+        }
+        this.startsWith("https://streamable.com") -> {
+            block(Link.StreamableLink)
+        }
+        videoRegex.matches(this) -> {
+            block(Link.VideoLink(this))
+        }
+        this.contains("reddit.com/gallery") -> {
+            block(Link.RedditGallery)
+        }
+        this.startsWith("https://www.twitter.com") -> {
+            block(Link.TwitterLink(this))
+        }
+        else -> {
+            block(Link.ExternalLink)
+        }
+    }
 }
+
+//fun StyledPlayerView.initialise(simpleExoPlayer: SimpleExoPlayer, url: String, playWhenReady: Boolean = true): SimpleExoPlayer {
+//    return simpleExoPlayer
+//        .also { exoPlayer ->
+//            this.player = exoPlayer
+//            val mediaItem = MediaItem.fromUri(url)
+//            exoPlayer.setMediaItem(mediaItem)
+//            this.player?.playWhenReady = playWhenReady
+//            this.player?.addListener(object : Player.Listener {
+//                override fun onPlaybackStateChanged(playbackState: Int) {
+//                    when (playbackState) {
+//                        Player.STATE_ENDED -> {
+//                            this@initialise.player?.seekTo(0)
+//                            this@initialise.player?.playWhenReady = true
+//                        }
+//                    }
+//                }
+//            })
+//            this.player?.prepare()
+//        }
+//}
 
 fun Int.getDepthColour(): Int {
     return when (this) {

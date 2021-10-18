@@ -11,4 +11,6 @@
 
     <dimen name="action_button_size">28dp</dimen>
     <dimen name="spacing_action_bar">56dp</dimen>
+
+    <dimen name="slide_distance">60dp</dimen>
 </resources>

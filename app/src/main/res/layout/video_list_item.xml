@@ -11,7 +11,8 @@
     android:focusable="true"
     android:paddingBottom="16dp"
     android:layout_marginBottom="8dp"
-    android:elevation="4dp">
+    android:elevation="4dp"
+    android:animateLayoutChanges="true">
 
     <TextView
         android:layout_width="wrap_content"
@@ -50,21 +51,39 @@
         android:layout_marginTop="8dp"
         tools:text="This is a random post in this subreddit" />
 
-    <include
-        android:id="@+id/video_preview"
+    <com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+        android:id="@+id/video_player_container"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        layout="@layout/submission_video_preview"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/text_submission_title"
         android:layout_marginTop="8dp"
-        android:visibility="gone" />
+        app:resize_mode="fixed_width"
+        android:background="@color/accent">
+
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/video_player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="150dp"
+            app:resize_mode="fixed_width"
+            app:use_controller="false" />
+
+        <ImageView
+            android:id="@+id/video_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/thumbnail_cd"
+            android:visibility="gone" />
+
+    </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
 
     <ImageView
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:id="@+id/image_upvote_indicator"
         style="@style/Icon"
-        app:layout_constraintTop_toBottomOf="@id/video_preview"
+        app:layout_constraintTop_toBottomOf="@id/video_player_container"
         app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_arrow_upward"

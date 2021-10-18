@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class MetaDataItem(
     val e: String,
     val id: String,
-    val m: String,
+    val m: String?,
     val p: List<P>,
     val s: S,
     val status: String

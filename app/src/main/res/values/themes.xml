@@ -66,7 +66,55 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="Text.Button">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="textAllCaps">true</item>
+        <item name="android:letterSpacing">0.125</item>
+    </style>
+
     <style name="Icon">
         <item name="tint">#000000</item>
     </style>
+
+    <style name="ThemeOverlay.App.BottomAppBar" parent="">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/accent</item>
+        <item name="iconTint">@color/accent</item>
+    </style>
+
+    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/surfaceColor</item>
+    </style>
+
+    <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button</item>
+        <item name="android:textAppearance">@style/Text.Button</item>
+        <item name="cornerRadius">@dimen/spacing_m</item>
+    </style>
+
+    <style name="Widget.App.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button</item>
+        <item name="android:textAppearance">@style/Text.Button</item>
+        <item name="cornerRadius">@dimen/spacing_m</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Button" parent="">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/surfaceColor</item>
+    </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundColor">@color/surfaceColor</item>
+        <item name="hintEnabled">false</item>
+    </style>
+
 </resources>

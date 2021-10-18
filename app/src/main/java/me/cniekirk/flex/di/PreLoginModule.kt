@@ -16,12 +16,13 @@ import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
 import me.cniekirk.flex.data.local.db.UserDao
 import me.cniekirk.flex.data.local.prefs.Preferences
+import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
+import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
-import me.cniekirk.flex.data.remote.repo.MediaResolutionRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
 import me.cniekirk.flex.domain.MediaResolutionRepository
 import me.cniekirk.flex.domain.RedditDataRepository
@@ -36,6 +37,20 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
+import im.ene.toro.exoplayer.ToroExo
+import im.ene.toro.exoplayer.MediaSourceBuilder
+
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
+
+import im.ene.toro.exoplayer.ExoCreator
+
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import im.ene.toro.exoplayer.Config
+import me.cniekirk.flex.util.video.LoopExoCreator
+import java.io.File
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -155,6 +170,17 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("gfycatRetrofit")
+    @Singleton
+    fun provideGfycatRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.gfycat.com/")
+            .build()
+    }
+
+    @Provides
     @Named("authRetrofit")
     @Singleton
     fun provideAuthedRetrofit(@Named("postLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -172,6 +198,17 @@ class PreLoginModule {
         return Retrofit.Builder()
             .callFactory { okHttpClient.get().newCall(it) }
             .baseUrl("https://oauth.reddit.com/")
+            .build()
+    }
+
+    @Provides
+    @Named("streamableRetrofit")
+    @Singleton
+    fun provideStreamableRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.streamable.com/")
             .build()
     }
 
@@ -200,13 +237,18 @@ class PreLoginModule {
 
     @Provides
     @Singleton
-    fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
-            : RedditDataRepository = redditDataRepositoryImpl
+    fun provideGfycatApi(@Named("gfycatRetrofit") retrofit: Retrofit): GfycatApi
+            = retrofit.create(GfycatApi::class.java)
 
     @Provides
     @Singleton
-    fun provideMediaResolutionRepo(mediaResolutionRepositoryImpl: MediaResolutionRepositoryImpl)
-            : MediaResolutionRepository = mediaResolutionRepositoryImpl
+    fun provideStreamableApi(@Named("streamableRetrofit") retrofit: Retrofit): StreamableApi
+            = retrofit.create(StreamableApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
+            : RedditDataRepository = redditDataRepositoryImpl
 
     @Provides
     @Singleton
@@ -255,6 +297,24 @@ class PreLoginModule {
     @Singleton
     fun provideImageRequest(@ApplicationContext context: Context): ImageRequest.Builder {
         return ImageRequest.Builder(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSimpleCache(@ApplicationContext context: Context): SimpleCache {
+        return SimpleCache(
+            File(context.cacheDir, "/exoplayer"),
+            LeastRecentlyUsedCacheEvictor(209715200L), ExoDatabaseProvider(context)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideExoCreator(@ApplicationContext context: Context, simpleCache: SimpleCache): ExoCreator {
+        val config = Config.Builder(context).setMediaSourceBuilder(MediaSourceBuilder.DEFAULT)
+            .setCache(simpleCache)
+            .build()
+        return LoopExoCreator(ToroExo.with(context), config)
     }
 
 }
