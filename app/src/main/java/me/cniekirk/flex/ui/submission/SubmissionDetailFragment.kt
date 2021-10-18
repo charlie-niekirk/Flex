@@ -24,6 +24,7 @@ import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
@@ -76,7 +77,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             })
             loading.start()
 
-            adapter = CommentTreeAdapter(args.post, emptyList(), markwon)
+            adapter = CommentTreeAdapter(args.post, mutableListOf(), markwon)
             commentsTreeList.adapter = adapter
 
             textSubmissionTitle.text = args.post.title
@@ -251,7 +252,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                         binding.emptyCommentEasterEgg.visibility = View.VISIBLE
                         binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post.subreddit)
                     } else {
-                        adapter = CommentTreeAdapter(args.post, comments.data, markwon)
+                        adapter = CommentTreeAdapter(args.post, comments.data.toMutableList(), markwon)
                         binding.emptyCommentEasterEgg.visibility = View.GONE
                         binding.commentsTreeList.visibility = View.VISIBLE
                         binding.commentsTreeList.adapter = adapter

@@ -4,6 +4,8 @@ import android.app.ActivityOptions
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.Window
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -28,7 +30,6 @@ class ContainerActivity : AppCompatActivity() {
         val binding = ContainerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //NavigationUI.setupWithNavController(binding.bottomAppBar, navController)
         setSupportActionBar(binding.bottomAppBar)
         binding.floatingActionButton.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
@@ -40,4 +41,5 @@ class ContainerActivity : AppCompatActivity() {
             startActivity(intent, options.toBundle())
         }
     }
+
 }

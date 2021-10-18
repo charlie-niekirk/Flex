@@ -5,6 +5,9 @@ import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -65,8 +68,28 @@ class SubmissionListFragment
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_bottom_navigation, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.search -> {
+                // Show dialog
+
+                return true
+            }
+            R.id.account -> {
+                // Show login or account options
+                return true
+            }
+        }
+        return false
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
 
         val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)

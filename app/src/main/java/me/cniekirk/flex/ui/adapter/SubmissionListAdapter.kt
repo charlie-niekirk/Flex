@@ -255,6 +255,36 @@ class SubmissionListAdapter(
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
             }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
             binding.selftextPreview.textSubmissionContentPreview.text = post.selftext?.selfTextPreview()
         }
     }
@@ -326,6 +356,36 @@ class SubmissionListAdapter(
                     binding.textSubredditName.id,
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
             }
             post.preview?.let {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
@@ -429,6 +489,36 @@ class SubmissionListAdapter(
                     binding.textSubredditName.id,
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
             }
         }
 
@@ -554,6 +644,37 @@ class SubmissionListAdapter(
                 cs.applyTo(binding.root)
             }
 
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
+
             val media = post.mediaMetadata?.values?.toList()
             binding.mediaGalleryPreview.textGalleryCount.text =
                 binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
@@ -668,6 +789,36 @@ class SubmissionListAdapter(
                     binding.textSubredditName.id,
                     ConstraintSet.START)
                 cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
             }
             binding.externalLinkPreview.linkContent.text = post.url
             Glide.with(binding.externalLinkPreview.linkImage)

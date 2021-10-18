@@ -38,10 +38,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 import im.ene.toro.exoplayer.ToroExo
-
 import im.ene.toro.exoplayer.MediaSourceBuilder
-
-import android.content.SharedPreferences
 
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 
