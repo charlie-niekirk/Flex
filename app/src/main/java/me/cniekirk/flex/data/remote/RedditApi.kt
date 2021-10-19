@@ -32,6 +32,13 @@ interface RedditApi {
         @Path("sortType") sortType: String,
         @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
 
+    @GET("/comments/{postId}/_/{id}{sortType}.json?raw_json=1")
+    suspend fun getMoreComments(
+        @Path("postId") postId: String,
+        @Path("id") id: String,
+        @Path("sortType") sortType: String,
+        @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
+
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
 

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.data.remote.model.Comment
+import me.cniekirk.flex.data.remote.model.CommentData
 import me.cniekirk.flex.domain.usecase.GetCommentsUseCase
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
@@ -25,8 +26,8 @@ class SubmissionDetailViewModel @Inject constructor(
     private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel() {
 
-    private val _commentsTree: MutableStateFlow<RedditResult<List<Comment>>> = MutableStateFlow(RedditResult.Loading)
-    val commentsTree: StateFlow<RedditResult<List<Comment>>> = _commentsTree
+    private val _commentsTree: MutableStateFlow<RedditResult<List<CommentData>>> = MutableStateFlow(RedditResult.Loading)
+    val commentsTree: StateFlow<RedditResult<List<CommentData>>> = _commentsTree
     private val _voteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)
     val voteState: StateFlow<RedditResult<Boolean>> = _voteState
 

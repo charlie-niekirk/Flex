@@ -70,4 +70,6 @@
     <string name="cancel_post">Cancel</string>
     <string name="title_hint">Title</string>
     <string name="no_flair_text">No flair set for post</string>
+    <string name="expand_comment_cd">Expand comment icon</string>
+    <string name="num_replies">%1$d more replies</string>
 </resources>

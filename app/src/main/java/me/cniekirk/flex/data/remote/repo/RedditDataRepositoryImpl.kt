@@ -37,6 +37,7 @@ import android.provider.MediaStore
 
 import android.content.ContentValues
 import android.os.Build
+import me.cniekirk.flex.data.remote.model.CommentData
 import java.io.FileOutputStream
 import java.io.InputStream
 
@@ -118,7 +119,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun getComments(submissionId: String, sortType: String): Flow<RedditResult<List<Comment>>> = flow {
+    override fun getComments(submissionId: String, sortType: String): Flow<RedditResult<List<CommentData>>> = flow {
         val response = if (userDao.getAll().isNullOrEmpty()) {
             redditApi.getCommentsForListing(submissionId, sortType)
         } else {
@@ -126,19 +127,17 @@ class RedditDataRepositoryImpl @Inject constructor(
             authRedditApi.getCommentsForListing(submissionId, sortType, accessToken)
         }
         val commentTree = response.lastOrNull()?.data as Listing<EnvelopedCommentData>
-        val comments = mutableListOf<Comment>()
+        val comments = mutableListOf<CommentData>()
         buildTree(commentTree, comments)
         emit(RedditResult.Success(comments))
     }
 
-    private fun buildTree(data: Listing<EnvelopedCommentData>, output: MutableList<Comment>) {
+    private fun buildTree(data: Listing<EnvelopedCommentData>, output: MutableList<CommentData>) {
         data.children.forEach {
             val topLevel = it.data
-            if (topLevel !is MoreComments) {
-                output.add(topLevel as Comment)
-                if (!topLevel.replies.isNullOrEmpty()) {
-                    buildTree(topLevel.repliesRaw!!.data, output)
-                }
+            output.add(topLevel)
+            if (!topLevel.replies.isNullOrEmpty() && topLevel is Comment) {
+                buildTree(topLevel.repliesRaw!!.data, output)
             }
         }
     }
