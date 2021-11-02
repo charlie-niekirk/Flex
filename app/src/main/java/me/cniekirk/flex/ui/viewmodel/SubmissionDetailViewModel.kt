@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.CommentData
+import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.domain.usecase.GetCommentsUseCase
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
@@ -36,6 +37,10 @@ class SubmissionDetailViewModel @Inject constructor(
             getCommentsUseCase(CommentRequest(submissionId, sortType))
                 .collect { comments -> _commentsTree.value = comments }
         }
+    }
+
+    fun getMoreComments(moreComments: MoreComments) {
+
     }
 
     fun onUiEvent(submissionDetailEvent: SubmissionDetailEvent) {

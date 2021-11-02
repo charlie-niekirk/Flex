@@ -27,5 +27,7 @@ data class MoreComments(
     @Transient
     override val hasReplies: Boolean = false,
     @Transient
-    override val repliesSize: Int = 0
+    override val repliesSize: Int = 0,
+    @Transient
+    override var isCollapsed: Boolean = false
 ) : CommentData, Parcelable

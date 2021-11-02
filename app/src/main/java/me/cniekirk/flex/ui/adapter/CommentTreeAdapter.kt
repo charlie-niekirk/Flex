@@ -4,11 +4,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.*
+import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.Comment
+import me.cniekirk.flex.data.remote.model.CommentData
+import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.databinding.SubmissionCommentCollapsedListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentLoadMoreListItemBinding
@@ -23,16 +28,14 @@ enum class CommentViewType {
 
 class CommentTreeAdapter(
     private val submission: AuthedSubmission,
-    private val items: MutableList<CommentData>,
-    private val markwon: Markwon) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private val currentItems = items
+    private val markwon: Markwon,
+    private val commentActionListener: CommentActionListener) : ListAdapter<CommentData, RecyclerView.ViewHolder>(CommentDiff) {
 
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (currentList[position]) {
             is MoreComments -> { CommentViewType.MORE_COMMENTS.ordinal }
             is Comment -> {
-                val comment = items[position] as Comment
+                val comment = currentList[position] as Comment
                 if (comment.isCollapsed) {
                     CommentViewType.COLLAPSED_COMMENT.ordinal
                 } else {
@@ -73,17 +76,17 @@ class CommentTreeAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             CommentViewType.COLLAPSED_COMMENT.ordinal -> {
-                (holder as CommentCollapsedViewHolder).bind(items[position] as Comment)
+                (holder as CommentCollapsedViewHolder).bind(currentList[position] as Comment)
             }
             CommentViewType.COMMENT.ordinal -> {
-                (holder as CommentViewHolder).bind(items[position] as Comment)
+                (holder as CommentViewHolder).bind(currentList[position] as Comment)
             }
             CommentViewType.MORE_COMMENTS.ordinal -> {
-                (holder as MoreCommentsViewHolder).bind(items[position] as MoreComments)
+                (holder as MoreCommentsViewHolder).bind(currentList[position] as MoreComments)
             }
         }
     }
-    override fun getItemCount() = items.size
+    override fun getItemCount() = currentList.size
 
     inner class CommentViewHolder(private val binding: SubmissionCommentListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
@@ -152,10 +155,9 @@ class CommentTreeAdapter(
                 }
                 root.setOnClickListener {
                     if (item.isCollapsed) {
-                        val newList = mutableListOf<Comment>()
+                        val newList = mutableListOf<CommentData>()
                         expandComment(item, newList, 0)
-                        items.addAll(items.indexOf(item) + 1, newList)
-                        notifyItemRangeInserted(items.indexOf(item) + 1, newList.size)
+                        currentList.addAll(currentList.indexOf(item) + 1, newList)
                     } else {
                         collapseComment(item)
                     }
@@ -164,6 +166,12 @@ class CommentTreeAdapter(
         }
     }
 
+    /**
+     * [RecyclerView.ViewHolder] that displays a collapsed comment in a comment tree, which can then
+     * be expanded by the user
+     *
+     * @param
+     */
     inner class CommentCollapsedViewHolder(private val binding: SubmissionCommentCollapsedListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
@@ -198,7 +206,7 @@ class CommentTreeAdapter(
                 } else {
                     commentAuthorUsername.setTextColor(root.context.getColor(R.color.accent))
                 }
-                val children = mutableListOf<Comment>()
+                val children = mutableListOf<CommentData>()
                 createChildList(item, children, 0)
                 if (children.size > 0) {
                     commentChildrenNumber.text = children.size.toString()
@@ -241,12 +249,11 @@ class CommentTreeAdapter(
                         // Just expand this comment if there are no children
                         if (item.replies.isNullOrEmpty()) {
                             item.isCollapsed = false
-                            notifyItemChanged(items.indexOf(item))
                         } else {
-                            val newList = mutableListOf<Comment>()
+                            val newList = mutableListOf<CommentData>()
                             expandComment(item, newList, 0)
-                            items.addAll(items.indexOf(item) + 1, newList)
-                            notifyItemRangeInserted(items.indexOf(item) + 1, newList.size)
+                            val expanded = currentList.toMutableList().apply { addAll(currentList.indexOf(item) + 1, newList) }
+                            submitList(expanded)
                         }
                     } else {
                         collapseComment(item)
@@ -256,11 +263,18 @@ class CommentTreeAdapter(
         }
     }
 
+    /**
+     * [RecyclerView.ViewHolder] that displays a more_comments object in a comment tree which can
+     * be manually expanded by the user
+     *
+     * @param binding the view binding instance for this view type
+     */
     inner class MoreCommentsViewHolder(private val binding: SubmissionCommentLoadMoreListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: MoreComments) {
-            binding.numMoreReplies.text = binding.root.context.getString(R.string.num_replies, item.count)
+        fun bind(moreComments: MoreComments) {
+            binding.numMoreReplies.text = binding.root.context.getString(R.string.num_replies, moreComments.count)
+            binding.root.setOnClickListener { commentActionListener.onLoadMore(moreComments) }
         }
 
     }
@@ -272,16 +286,16 @@ class CommentTreeAdapter(
      *
      * @param comment the comment
      */
-    private fun expandComment(comment: Comment, expandedChildren: MutableList<Comment>, position: Int) {
+    private fun expandComment(comment: CommentData, expandedChildren: MutableList<CommentData>, position: Int) {
         comment.isCollapsed = false
-        val children = comment.replies?.map { it as Comment }
+        val children = comment.replies
         expandedChildren.addAll(position, children!!)
         var pos = position
         children.forEach {
             pos = pos.inc()
             if (!it.replies.isNullOrEmpty()) {
                 expandComment(it, expandedChildren, pos)
-                val temp = mutableListOf<Comment>()
+                val temp = mutableListOf<CommentData>()
                 createChildList(it, temp, 0)
                 pos += temp.size
             }
@@ -297,15 +311,16 @@ class CommentTreeAdapter(
     private fun collapseComment(comment: CommentData) {
         comment.isCollapsed = true
         val children = getNumChildren(comment)
-        items.subList(items.indexOf(comment) + 1, items.indexOf(comment) + 1 + children).clear()
-        notifyItemRangeRemoved(items.indexOf(comment) + 1, children)
-        notifyItemChanged(items.indexOf(comment))
+        val cleared = currentList.toMutableList().apply {
+            subList(currentList.indexOf(comment) + 1, currentList.indexOf(comment) + 1 + children).apply { clear() }
+        }
+        submitList(cleared)
     }
 
     private fun getNumChildren(comment: CommentData): Int {
         var children = 0
-        for (i in (items.indexOf(comment) + 1)..items.lastIndex) {
-            if (items[i].depth > comment.depth) {
+        for (i in (currentList.indexOf(comment) + 1)..currentList.lastIndex) {
+            if (currentList[i].depth > comment.depth) {
                 children += 1
             } else {
                 break
@@ -314,7 +329,7 @@ class CommentTreeAdapter(
         return children
     }
 
-    private fun createChildList(comment: Comment, childList: MutableList<CommentData>, position: Int) {
+    private fun createChildList(comment: CommentData, childList: MutableList<CommentData>, position: Int) {
         val children = comment.replies
         children?.let { childList.addAll(children) }
         var pos = position
@@ -324,6 +339,14 @@ class CommentTreeAdapter(
                 expandComment(it, childList, pos)
             }
         }
+    }
+
+    object CommentDiff : DiffUtil.ItemCallback<CommentData>() {
+        override fun areItemsTheSame(oldItem: CommentData, newItem: CommentData) =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: CommentData, newItem: CommentData) =
+            oldItem == newItem
     }
 
     interface CommentActionListener {
