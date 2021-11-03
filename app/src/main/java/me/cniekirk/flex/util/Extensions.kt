@@ -279,7 +279,7 @@ private val urlRegex = Regex(
 fun CharSequence.getUrls(): List<CharSequence>? {
     return if (urlRegex.containsMatchIn(this)) {
         val matches = urlRegex.findAll(this, 0)
-        matches.map { this.subSequence(it.range.first, it.range.last) }.toList()
+        matches.map { this.subSequence(it.range.first, it.range.last + 1) }.toList()
     } else {
         null
     }
