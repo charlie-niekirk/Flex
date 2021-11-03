@@ -1,9 +1,7 @@
 package me.cniekirk.flex.data.remote
 
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Listing
-import me.cniekirk.flex.data.remote.model.RedditResponse
-import me.cniekirk.flex.data.remote.model.Submission
+import android.util.Base64
+import me.cniekirk.flex.data.remote.model.*
 import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
@@ -32,12 +30,12 @@ interface RedditApi {
         @Path("sortType") sortType: String,
         @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
 
-    @GET("/comments/{postId}/_/{id}{sortType}.json?raw_json=1")
+    @GET("/api/morechildren")
     suspend fun getMoreComments(
-        @Path("postId") postId: String,
-        @Path("id") id: String,
-        @Path("sortType") sortType: String,
-        @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
+        @Query("api_type") apiType: String = "json",
+        @Query("link_id") linkId: String,
+        @Query("children") children: String,
+        @Header("Authorization") authorization: String? = null): MoreChildrenResponse
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
@@ -47,6 +45,13 @@ interface RedditApi {
     suspend fun getAccessToken(
         @HeaderMap headers: Map<String, String>,
         @FieldMap params: Map<String, String>): Token
+
+    @FormUrlEncoded
+    @POST("api/v1/access_token")
+    suspend fun getUserlessAccessToken(
+        @Header("Authorization") authorization: String = "Basic ${Base64.encodeToString("14spBPt-yu7A6NJ7tdByhg:".toByteArray(), Base64.NO_WRAP)}",
+        @Field("grant_type") grantType: String = "https://oauth.reddit.com/grants/installed_client",
+        @Field("device_id") deviceId: String): Token
 
     @POST("api/v1/access_token")
     suspend fun renewToken(

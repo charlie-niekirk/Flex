@@ -29,6 +29,9 @@ data class Token(
     @Json(name = "refresh_token")
     val refreshToken: String? = null,
 
+    @Json(name = "device_id")
+    val deviceId: String? = null,
+
     /**
      * The string "bearer"
      */

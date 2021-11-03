@@ -1,4 +1,4 @@
-package me.cniekirk.flex.data.local.db
+package me.cniekirk.flex.data.local.db.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

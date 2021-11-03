@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
 import im.ene.toro.ToroPlayer
@@ -824,7 +826,12 @@ class SubmissionListAdapter(
             Glide.with(binding.externalLinkPreview.linkImage)
                 .load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .transform(RoundedCorners(binding.root.resources.getDimension(R.dimen.spacing_m).toInt()))
+                .transform(CenterCrop(), GranularRoundedCorners(
+                    binding.root.resources.getDimension(R.dimen.spacing_m),
+                    binding.root.resources.getDimension(R.dimen.spacing_m),
+                    0F,
+                    0F
+                ))
                 .into(binding.externalLinkPreview.linkImage)
         }
     }

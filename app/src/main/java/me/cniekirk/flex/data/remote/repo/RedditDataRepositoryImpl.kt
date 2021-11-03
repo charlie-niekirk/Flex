@@ -1,20 +1,17 @@
 package me.cniekirk.flex.data.remote.repo
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.IntRange
 import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import me.cniekirk.flex.data.local.db.User
-import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.db.entity.User
+import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.prefs.Preferences
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.data.remote.model.MoreComments
-import me.cniekirk.flex.data.remote.model.Submission
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.base.Listing
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
@@ -23,32 +20,30 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.gallery.DownloadState
 import me.cniekirk.flex.util.getHttpBasicAuthHeader
 import me.cniekirk.flex.util.toAuthParams
-import okio.Okio
-import okio.buffer
-import okio.sink
-import okio.source
-import timber.log.Timber
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
-import android.provider.MediaStore
 
-import android.content.ContentValues
 import android.os.Build
+import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.remote.model.CommentData
+import me.cniekirk.flex.data.remote.model.MoreComments
+import timber.log.Timber
 import java.io.FileOutputStream
-import java.io.InputStream
+import java.lang.RuntimeException
 
 
 @Suppress("BlockingMethodInNonBlockingContext")
 class RedditDataRepositoryImpl @Inject constructor(
-    @Named("userlessApi") private val redditApi: RedditApi,
-    @Named("authApi") private val authRedditApi: RedditApi,
+    @Named("preAuthApi") private val redditApi: RedditApi,
+    @Named("preLoginApi") private val preLoginRedditApi: RedditApi,
+    @Named("loginApi") private val authRedditApi: RedditApi,
     @Named("downloadApi") private val downloadRedditApi: RedditApi,
     @ApplicationContext private val context: Context,
     private val preferences: Preferences,
+    private val preLoginUserDao: PreLoginUserDao,
     private val userDao: UserDao
 ) : RedditDataRepository {
 
@@ -121,7 +116,8 @@ class RedditDataRepositoryImpl @Inject constructor(
     @Suppress("UNCHECKED_CAST")
     override fun getComments(submissionId: String, sortType: String): Flow<RedditResult<List<CommentData>>> = flow {
         val response = if (userDao.getAll().isNullOrEmpty()) {
-            redditApi.getCommentsForListing(submissionId, sortType)
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.getCommentsForListing(submissionId, sortType, authorization = accessToken)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             authRedditApi.getCommentsForListing(submissionId, sortType, accessToken)
@@ -130,6 +126,23 @@ class RedditDataRepositoryImpl @Inject constructor(
         val comments = mutableListOf<CommentData>()
         buildTree(commentTree, comments)
         emit(RedditResult.Success(comments))
+    }
+
+    override fun getMoreComments(moreComments: MoreComments, parentId: String): Flow<RedditResult<List<CommentData>>> = flow {
+        val children = moreComments.children.joinToString(",")
+        val response = if (userDao.getAll().isNullOrEmpty()) {
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.getMoreComments(linkId = parentId, children = children, authorization = accessToken)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            authRedditApi.getMoreComments(linkId = parentId, children = children, authorization = accessToken)
+        }
+        if (response.json.errors.isNullOrEmpty()) {
+            val commentTree = response.json.data.things as List<EnvelopedCommentData>
+            emit(RedditResult.Success(commentTree.map { it.data }))
+        } else {
+            emit(RedditResult.Error(RuntimeException("Unknown error!")))
+        }
     }
 
     private fun buildTree(data: Listing<EnvelopedCommentData>, output: MutableList<CommentData>) {

@@ -15,6 +15,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -123,7 +125,12 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                 Glide.with(externalLinkPreview.linkImage)
                                     .load(args.post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url)
                                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                    .transform(RoundedCorners(root.resources.getDimension(R.dimen.spacing_m).toInt()))
+                                    .transform(CenterCrop(), GranularRoundedCorners(
+                                        binding.root.resources.getDimension(R.dimen.spacing_m),
+                                        binding.root.resources.getDimension(R.dimen.spacing_m),
+                                        0F,
+                                        0F
+                                    ))
                                     .into(externalLinkPreview.linkImage)
                             }
                             is Link.ImageLink -> {
@@ -274,7 +281,8 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
 
     override fun onLoadMore(moreComments: MoreComments) {
-        viewModel.getMoreComments(moreComments)
+        Timber.d("Load more")
+        viewModel.getMoreComments(moreComments, args.post.name)
     }
 
     override fun onDestroyView() {

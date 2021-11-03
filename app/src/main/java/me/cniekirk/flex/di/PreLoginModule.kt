@@ -14,17 +14,16 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
-import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.prefs.Preferences
 import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.StreamableApi
-import me.cniekirk.flex.data.remote.auth.AccessTokenAuthenticator
+import me.cniekirk.flex.data.remote.auth.LoggedInAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
-import me.cniekirk.flex.domain.MediaResolutionRepository
 import me.cniekirk.flex.domain.RedditDataRepository
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -48,6 +47,8 @@ import com.google.android.exoplayer2.database.ExoDatabaseProvider
 
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import im.ene.toro.exoplayer.Config
+import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
+import me.cniekirk.flex.data.remote.auth.PreLoginAuthenticator
 import me.cniekirk.flex.util.video.LoopExoCreator
 import java.io.File
 
@@ -62,7 +63,7 @@ class PreLoginModule {
     }
 
     @Provides
-    @Named("preLogin")
+    @Named("preAuth")
     @Singleton
     fun provideOkHttp(cache: Cache): OkHttpClient {
         return if (BuildConfig.DEBUG) {
@@ -83,10 +84,35 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("preLogin")
+    @Singleton
+    fun providePreLoginOkHttp(cache: Cache,
+                              @Named("preAuthApi") redditApi: RedditApi,
+                              preLoginUserDao: PreLoginUserDao): OkHttpClient {
+        return if (BuildConfig.DEBUG) {
+            val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .addInterceptor(logger)
+                .addInterceptor(NullRepliesInterceptor)
+                .authenticator(PreLoginAuthenticator(redditApi, preLoginUserDao))
+                .build()
+        } else {
+            OkHttpClient.Builder()
+                .cache(cache)
+                .callTimeout(10000, TimeUnit.MILLISECONDS)
+                .addInterceptor(NullRepliesInterceptor)
+                .authenticator(PreLoginAuthenticator(redditApi, preLoginUserDao))
+                .build()
+        }
+    }
+
+    @Provides
     @Named("postLogin")
     @Singleton
     fun provideAuthedOkHttp(cache: Cache,
-                            @Named("userlessApi") redditApi: RedditApi,
+                            @Named("preAuthApi") redditApi: RedditApi,
                             userDao: UserDao
     ): OkHttpClient {
         return if (BuildConfig.DEBUG) {
@@ -96,14 +122,14 @@ class PreLoginModule {
                 .callTimeout(10000, TimeUnit.MILLISECONDS)
                 .addInterceptor(logger)
                 .addInterceptor(NullRepliesInterceptor)
-                .authenticator(AccessTokenAuthenticator(redditApi, userDao))
+                .authenticator(LoggedInAuthenticator(redditApi, userDao))
                 .build()
         } else {
             OkHttpClient.Builder()
                 .cache(cache)
                 .callTimeout(10000, TimeUnit.MILLISECONDS)
                 .addInterceptor(NullRepliesInterceptor)
-                .authenticator(AccessTokenAuthenticator(redditApi, userDao))
+                .authenticator(LoggedInAuthenticator(redditApi, userDao))
                 .build()
         }
     }
@@ -150,11 +176,22 @@ class PreLoginModule {
     @Provides
     @Named("userlessRetrofit")
     @Singleton
-    fun provideRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+    fun provideRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
         return Retrofit.Builder()
             .callFactory { okHttpClient.get().newCall(it) }
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl("https://www.reddit.com/")
+            .build()
+    }
+
+    @Provides
+    @Named("preLoginRetrofit")
+    @Singleton
+    fun providePreLoginRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://oauth.reddit.com/")
             .build()
     }
 
@@ -213,13 +250,19 @@ class PreLoginModule {
     }
 
     @Provides
-    @Named("userlessApi")
+    @Named("preAuthApi")
     @Singleton
-    fun provideRedditApi(@Named("userlessRetrofit") retrofit: Retrofit): RedditApi
+    fun providePreAuthRedditApi(@Named("userlessRetrofit") retrofit: Retrofit): RedditApi
         = retrofit.create(RedditApi::class.java)
 
     @Provides
-    @Named("authApi")
+    @Named("preLoginApi")
+    @Singleton
+    fun providePreLoginRedditApi(@Named("preLoginRetrofit") retrofit: Retrofit): RedditApi
+            = retrofit.create(RedditApi::class.java)
+
+    @Provides
+    @Named("loginApi")
     @Singleton
     fun provideAuthedRedditApi(@Named("authRetrofit") retrofit: Retrofit): RedditApi
             = retrofit.create(RedditApi::class.java)
@@ -262,6 +305,10 @@ class PreLoginModule {
     @Provides
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
+
+    @Provides
+    @Singleton
+    fun providePreLoginUserDao(appDatabase: AppDatabase): PreLoginUserDao = appDatabase.preLoginUserDao()
 
     @Provides
     @Singleton

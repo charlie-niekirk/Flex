@@ -273,8 +273,33 @@ class CommentTreeAdapter(
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(moreComments: MoreComments) {
-            binding.numMoreReplies.text = binding.root.context.getString(R.string.num_replies, moreComments.count)
-            binding.root.setOnClickListener { commentActionListener.onLoadMore(moreComments) }
+            binding.apply {
+                if (moreComments.depth == 0) {
+                    commentDepthIndicator.visibility = View.GONE
+                } else {
+                    commentDepthIndicator.visibility = View.VISIBLE
+                    commentDepthIndicator.setBackgroundColor(root.context.getColor(moreComments.depth.getDepthColour()))
+                    val constraintSet = ConstraintSet()
+                    constraintSet.clone(root)
+                    constraintSet.connect(
+                        commentDepthIndicator.id,
+                        ConstraintSet.START,
+                        ConstraintSet.PARENT_ID,
+                        ConstraintSet.START,
+                        (root.context.resources.getDimension(R.dimen.spacing_m) * moreComments.depth).toInt()
+                    )
+                    constraintSet.connect(
+                        itemDivider.id,
+                        ConstraintSet.START,
+                        commentDepthIndicator.id,
+                        ConstraintSet.END,
+                        root.context.resources.getDimension(R.dimen.spacing_m).toInt()
+                    )
+                    constraintSet.applyTo(root)
+                }
+                numMoreReplies.text = binding.root.context.getString(R.string.num_replies, moreComments.count)
+                root.setOnClickListener { commentActionListener.onLoadMore(moreComments) }
+            }
         }
 
     }
