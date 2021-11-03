@@ -13,8 +13,8 @@ class RegexTest {
     fun `test extracting urls works correctly`() {
         val urls = input.getUrls()
         Assert.assertNotNull(urls)
-        Assert.assertEquals(urls!![0].toString(), urlsToExtract[0])
-        Assert.assertEquals(urls[1].toString(), urlsToExtract[1])
+        Assert.assertEquals(urlsToExtract[0], urls!![0].toString())
+        Assert.assertEquals(urlsToExtract[1], urls[1].toString())
     }
 
 }
