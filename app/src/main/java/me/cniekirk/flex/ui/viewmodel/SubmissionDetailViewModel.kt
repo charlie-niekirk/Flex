@@ -8,25 +8,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.domain.usecase.GetCommentsUseCase
+import me.cniekirk.flex.data.remote.model.CommentData
+import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
-import me.cniekirk.flex.domain.usecase.DownvoteThingUseCase
-import me.cniekirk.flex.domain.usecase.RemoveVoteThingUseCase
-import me.cniekirk.flex.domain.usecase.UpvoteThingUseCase
+import me.cniekirk.flex.domain.model.MoreCommentsRequest
+import me.cniekirk.flex.domain.usecase.*
 import me.cniekirk.flex.ui.submission.SubmissionDetailEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class SubmissionDetailViewModel @Inject constructor(
     private val getCommentsUseCase: GetCommentsUseCase,
+    private val getMoreCommentsUseCase: GetMoreCommentsUseCase,
     private val upvoteThingUseCase: UpvoteThingUseCase,
     private val removeVoteThingUseCase: RemoveVoteThingUseCase,
     private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel() {
 
-    private val _commentsTree: MutableStateFlow<RedditResult<List<Comment>>> = MutableStateFlow(RedditResult.Loading)
-    val commentsTree: StateFlow<RedditResult<List<Comment>>> = _commentsTree
+    private val _commentsTree: MutableStateFlow<RedditResult<List<CommentData>>> = MutableStateFlow(RedditResult.Loading)
+    val commentsTree: StateFlow<RedditResult<List<CommentData>>> = _commentsTree
     private val _voteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)
     val voteState: StateFlow<RedditResult<Boolean>> = _voteState
 
@@ -34,6 +36,26 @@ class SubmissionDetailViewModel @Inject constructor(
         viewModelScope.launch {
             getCommentsUseCase(CommentRequest(submissionId, sortType))
                 .collect { comments -> _commentsTree.value = comments }
+        }
+    }
+
+    fun getMoreComments(moreComments: MoreComments, parentId: String) {
+        viewModelScope.launch {
+            getMoreCommentsUseCase(MoreCommentsRequest(moreComments, parentId))
+                .collect { commentsTree ->
+                    val existing = _commentsTree.value
+                    if (existing is RedditResult.Success && commentsTree is RedditResult.Success) {
+                        val comments = existing.data
+                        val newComments = mutableListOf<CommentData>()
+                        newComments.addAll(comments)
+                        val replaceIndex = comments.indexOf(moreComments)
+                        newComments.removeAt(replaceIndex)
+                        newComments.addAll(replaceIndex, commentsTree.data)
+                        _commentsTree.value = RedditResult.Success(newComments)
+                    } else if (commentsTree is RedditResult.Error) {
+                        Timber.e(commentsTree.errorMessage)
+                    }
+                }
         }
     }
 

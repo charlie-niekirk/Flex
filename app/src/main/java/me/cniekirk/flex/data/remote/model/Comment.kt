@@ -78,7 +78,7 @@ data class Comment(
     @Json(name = "subreddit_name_prefixed")
     val subredditNamePrefixed: String,
     @Transient
-    var isCollapsed: Boolean = false
+    override var isCollapsed: Boolean = false
 ) : CommentData, Parcelable {
 
     override val hasReplies: Boolean

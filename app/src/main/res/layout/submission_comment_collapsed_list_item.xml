@@ -75,6 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="@dimen/spacing_l"
         app:srcCompat="@drawable/ic_arrow_expand"
+        android:contentDescription="@string/expand_comment_cd"
         android:alpha="0.8" />
 
     <TextView

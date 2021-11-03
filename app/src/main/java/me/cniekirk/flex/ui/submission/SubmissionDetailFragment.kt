@@ -15,6 +15,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -25,6 +27,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.Comment
+import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
@@ -34,7 +37,7 @@ import me.cniekirk.flex.util.*
 import timber.log.Timber
 
 @AndroidEntryPoint
-class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment) {
+class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment), CommentTreeAdapter.CommentActionListener {
 
     private var player: SimpleExoPlayer? = null
 
@@ -77,7 +80,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             })
             loading.start()
 
-            adapter = CommentTreeAdapter(args.post, mutableListOf(), markwon)
+            adapter = CommentTreeAdapter(args.post, /*mutableListOf(), */markwon, this@SubmissionDetailFragment)
             commentsTreeList.adapter = adapter
 
             textSubmissionTitle.text = args.post.title
@@ -122,7 +125,12 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                 Glide.with(externalLinkPreview.linkImage)
                                     .load(args.post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url)
                                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                    .transform(RoundedCorners(root.resources.getDimension(R.dimen.spacing_m).toInt()))
+                                    .transform(CenterCrop(), GranularRoundedCorners(
+                                        binding.root.resources.getDimension(R.dimen.spacing_m),
+                                        binding.root.resources.getDimension(R.dimen.spacing_m),
+                                        0F,
+                                        0F
+                                    ))
                                     .into(externalLinkPreview.linkImage)
                             }
                             is Link.ImageLink -> {
@@ -252,7 +260,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                         binding.emptyCommentEasterEgg.visibility = View.VISIBLE
                         binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post.subreddit)
                     } else {
-                        adapter = CommentTreeAdapter(args.post, comments.data.toMutableList(), markwon)
+                        adapter?.submitList(comments.data.toMutableList())
                         binding.emptyCommentEasterEgg.visibility = View.GONE
                         binding.commentsTreeList.visibility = View.VISIBLE
                         binding.commentsTreeList.adapter = adapter
@@ -270,6 +278,11 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
         }
 
         viewModel.getComments(args.post.id, "")
+    }
+
+    override fun onLoadMore(moreComments: MoreComments) {
+        Timber.d("Load more")
+        viewModel.getMoreComments(moreComments, args.post.name)
     }
 
     override fun onDestroyView() {

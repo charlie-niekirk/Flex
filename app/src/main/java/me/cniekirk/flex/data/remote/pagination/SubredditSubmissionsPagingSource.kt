@@ -1,18 +1,16 @@
 package me.cniekirk.flex.data.remote.pagination
 
-import android.widget.ImageView
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import coil.ImageLoader
 import coil.request.ImageRequest
-import me.cniekirk.flex.data.local.db.UserDao
+import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
+import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Image
-import me.cniekirk.flex.data.remote.model.Resolution
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLinkInternal
 import timber.log.Timber
@@ -25,6 +23,7 @@ class SubredditSubmissionsPagingSource(
     private val redGifsApi: RedGifsApi,
     private val subreddit: String,
     private val sortType: String,
+    private val preLoginUserDao: PreLoginUserDao,
     private val userDao: UserDao,
     private val imageRequest: ImageRequest.Builder,
     private val imageLoader: ImageLoader
@@ -38,15 +37,16 @@ class SubredditSubmissionsPagingSource(
         return try {
 
             val response = if (userDao.getAll().isNullOrEmpty()) {
+                val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
                 if (params.key.equals(before, true)) {
                     if (itemCount < 10) {
                         // First page
-                        redditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10)
+                        redditApi.getPosts(subreddit, sortType, count = itemCount, limit = 10, authorization = accessToken)
                     } else {
-                        redditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10)
+                        redditApi.getPosts(subreddit, sortType, before = params.key, count = itemCount, limit = 10, authorization = accessToken)
                     }
                 } else {
-                    redditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10)
+                    redditApi.getPosts(subreddit, sortType, after = params.key, count = itemCount, limit = 10, authorization = accessToken)
                 }
             } else {
                 val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
