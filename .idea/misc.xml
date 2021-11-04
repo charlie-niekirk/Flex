@@ -29,7 +29,7 @@
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.5432291666666667" />
-        <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.25" />
         <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/image_item_fragment.xml" value="0.28229166666666666" />
@@ -38,7 +38,9 @@
         <entry key="app/src/main/res/layout/loading_footer.xml" value="0.275" />
         <entry key="app/src/main/res/layout/login_webview_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/media_metadata_dialog.xml" value="0.375" />
-        <entry key="app/src/main/res/layout/media_share_dialog.xml" value="0.28229166666666666" />
+        <entry key="app/src/main/res/layout/media_share_dialog.xml" value="0.10843373493975904" />
+        <entry key="app/src/main/res/layout/options_dialog.xml" value="0.2128623188405797" />
+        <entry key="app/src/main/res/layout/search_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/search_fragment.xml" value="0.5432291666666667" />
         <entry key="app/src/main/res/layout/self_text_list_item.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.375" />
@@ -56,6 +58,8 @@
         <entry key="app/src/main/res/layout/submission_selftext.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_video_preview.xml" value="0.5348717948717949" />
+        <entry key="app/src/main/res/layout/subreddit_dialog.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_result_list_item.xml" value="0.3182291666666667" />
         <entry key="app/src/main/res/layout/video_item_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/video_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />

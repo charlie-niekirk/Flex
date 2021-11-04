@@ -30,6 +30,7 @@ import android.os.Build
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.remote.model.CommentData
 import me.cniekirk.flex.data.remote.model.MoreComments
+import me.cniekirk.flex.data.remote.model.Subreddit
 import timber.log.Timber
 import java.io.FileOutputStream
 import java.lang.RuntimeException
@@ -153,5 +154,17 @@ class RedditDataRepositoryImpl @Inject constructor(
                 buildTree(topLevel.repliesRaw!!.data, output)
             }
         }
+    }
+
+    override fun searchSubreddits(query: String, sortType: String): Flow<RedditResult<List<Subreddit>>> = flow {
+        val response = if (userDao.getAll().isNullOrEmpty()) {
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
+        }
+
+        emit(RedditResult.Success(response.data.children.map { it.data }))
     }
 }

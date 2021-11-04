@@ -11,6 +11,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import coil.ImageLoader
 import coil.request.ErrorResult
@@ -18,6 +22,11 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import me.cniekirk.flex.R
 import timber.log.Timber
@@ -149,27 +158,6 @@ suspend fun String.processLinkInternal(block: suspend (Link) -> Unit) {
     }
 }
 
-//fun StyledPlayerView.initialise(simpleExoPlayer: SimpleExoPlayer, url: String, playWhenReady: Boolean = true): SimpleExoPlayer {
-//    return simpleExoPlayer
-//        .also { exoPlayer ->
-//            this.player = exoPlayer
-//            val mediaItem = MediaItem.fromUri(url)
-//            exoPlayer.setMediaItem(mediaItem)
-//            this.player?.playWhenReady = playWhenReady
-//            this.player?.addListener(object : Player.Listener {
-//                override fun onPlaybackStateChanged(playbackState: Int) {
-//                    when (playbackState) {
-//                        Player.STATE_ENDED -> {
-//                            this@initialise.player?.seekTo(0)
-//                            this@initialise.player?.playWhenReady = true
-//                        }
-//                    }
-//                }
-//            })
-//            this.player?.prepare()
-//        }
-//}
-
 fun Int.getDepthColour(): Int {
     return when (this) {
         1 -> R.color.green
@@ -283,4 +271,13 @@ fun CharSequence.getUrls(): List<CharSequence>? {
     } else {
         null
     }
+}
+
+@ExperimentalCoroutinesApi
+fun EditText.textChanges(): Flow<CharSequence?> {
+    return callbackFlow {
+        val listener = doOnTextChanged { text, _, _, _ -> trySend(text) }
+        addTextChangedListener(listener)
+        awaitClose { removeTextChangedListener(listener) }
+    }.onStart { emit(text) }
 }

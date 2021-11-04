@@ -22,6 +22,9 @@
                 android:name="post"
                 app:argType="me.cniekirk.flex.data.remote.model.AuthedSubmission" />
         </action>
+        <action
+            android:id="@+id/action_submissionListFragment_to_searchDialog"
+            app:destination="@id/searchDialog" />
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
@@ -56,4 +59,9 @@
         android:name="me.cniekirk.flex.ui.SettingsFragment"
         android:label="SettingsFragment"
         tools:layout="@layout/settings_fragment" />
+    <dialog
+        android:id="@+id/searchDialog"
+        android:name="me.cniekirk.flex.ui.dialog.SearchDialog"
+        android:label="SearchDialog"
+        tools:layout="@layout/search_dialog" />
 </navigation>

@@ -21,6 +21,8 @@ interface RedditDataRepository {
 
     fun downvoteThing(thingId: String): Flow<RedditResult<Boolean>>
 
+    fun searchSubreddits(query: String, sortType: String): Flow<RedditResult<List<Subreddit>>>
+
     fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
 
 }

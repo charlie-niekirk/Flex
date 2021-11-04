@@ -35,7 +35,7 @@ data class GfyItem(
     val mobileUrl: String?,
     val mobileWidth: Int?,
     val mp4Url: String?,
-    val nsfw: Int?,
+    val nsfw: Boolean?,
     val numFrames: Int?,
     val posterUrl: String?,
     val published: Int?,
