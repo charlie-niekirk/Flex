@@ -17,7 +17,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -25,8 +24,9 @@ import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.linkify.LinkifyPlugin
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
@@ -42,7 +42,13 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     private var player: SimpleExoPlayer? = null
 
     private val args by navArgs<SubmissionDetailFragmentArgs>()
-    private val markwon by lazy(LazyThreadSafetyMode.NONE) { Markwon.create(requireContext()) }
+    private val markwon by lazy(LazyThreadSafetyMode.NONE) {
+        Markwon
+            .builder(requireContext())
+            .usePlugin(StrikethroughPlugin())
+            .usePlugin(LinkifyPlugin.create())
+            .build()
+    }
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val viewModel by viewModels<SubmissionDetailViewModel>()
     private val binding by viewBinding(SubmissionDetailFragmentBinding::bind)
@@ -80,7 +86,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             })
             loading.start()
 
-            adapter = CommentTreeAdapter(args.post, /*mutableListOf(), */markwon, this@SubmissionDetailFragment)
+            adapter = CommentTreeAdapter(args.post, markwon, this@SubmissionDetailFragment)
             commentsTreeList.adapter = adapter
 
             textSubmissionTitle.text = args.post.title

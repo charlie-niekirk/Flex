@@ -76,7 +76,7 @@ class SubmissionListFragment
         when (item.itemId) {
             R.id.search -> {
                 // Show dialog
-
+                binding.root.findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
                 return true
             }
             R.id.account -> {
@@ -195,4 +195,5 @@ class SubmissionListFragment
             .actionSubmissionListFragmentToSlidingGalleryContainer(post)
         binding.root.findNavController().navigate(action)
     }
+
 }

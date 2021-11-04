@@ -62,6 +62,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
 
     // DI dependencies
     implementation "com.google.dagger:hilt-android:$hilt_version"

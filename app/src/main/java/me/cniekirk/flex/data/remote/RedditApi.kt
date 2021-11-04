@@ -40,6 +40,8 @@ interface RedditApi {
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
 
+    @GET("search")
+
     @FormUrlEncoded
     @POST("api/v1/access_token")
     suspend fun getAccessToken(
@@ -72,6 +74,14 @@ interface RedditApi {
         @Field("id") thingId: String,
         @Field("dir") voteDir: Int
     )
+
+    @GET("subreddits/search.json?raw_json=1")
+    suspend fun searchSubreddits(
+        @Header("Authorization") authorization: String,
+        @Query("q") query: String,
+        @Query("sort") sort: String,
+        @Query("include_over_18") nsfw: Boolean
+    ): RedditResponse<Listing<Subreddit>>
 
     @GET
     @Streaming

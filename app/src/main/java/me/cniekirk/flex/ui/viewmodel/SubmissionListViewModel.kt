@@ -18,7 +18,11 @@ import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.StreamableApi
+import me.cniekirk.flex.data.remote.model.Subreddit
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
+import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.domain.model.SubredditSearchRequest
+import me.cniekirk.flex.domain.usecase.SearchSubredditsUseCase
 import me.cniekirk.flex.ui.model.UserPreferences
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import javax.inject.Inject
@@ -35,7 +39,8 @@ class SubmissionListViewModel @Inject constructor(
     private val preLoginUserDao: PreLoginUserDao,
     private val userDao: UserDao,
     private val imageLoader: ImageLoader,
-    private val imageRequest: ImageRequest.Builder
+    private val imageRequest: ImageRequest.Builder,
+    private val searchSubredditsUseCase: SearchSubredditsUseCase
 ) : ViewModel() {
 
     private val _subredditFlow = MutableStateFlow(value = "apple")
@@ -65,6 +70,9 @@ class SubmissionListViewModel @Inject constructor(
             }
         }
     }
+
+    suspend fun searchSubreddit(query: String): Flow<RedditResult<List<Subreddit>>> =
+        searchSubredditsUseCase(SubredditSearchRequest(query))
 
     fun getPreferences() {
         viewModelScope.launch {

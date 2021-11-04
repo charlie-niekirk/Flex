@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <TextView
+        android:id="@+id/subreddit_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        tools:text="Apple" />
+
+    <TextView
+        android:id="@+id/subreddit_subscribers"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text"
+        app:layout_constraintStart_toEndOf="@id/subreddit_name"
+        app:layout_constraintTop_toTopOf="@id/subreddit_name"
+        app:layout_constraintBottom_toBottomOf="@id/subreddit_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:textStyle="italic"
+        tools:text="13K subscribers" />
+
+    <TextView
+        android:id="@+id/subreddit_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text"
+        app:layout_constraintStart_toStartOf="@id/subreddit_name"
+        app:layout_constraintTop_toBottomOf="@id/subreddit_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:maxLines="2"
+        android:ellipsize="end"
+        tools:text="An unofficial community to discuss Apple devices and software, including news, rumors, opinions and analysis pertaining to the company located at One Apple Park Way." />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

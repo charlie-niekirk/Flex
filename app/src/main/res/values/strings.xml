@@ -72,4 +72,8 @@
     <string name="no_flair_text">No flair set for post</string>
     <string name="expand_comment_cd">Expand comment icon</string>
     <string name="num_replies">%1$d more replies</string>
+    <string name="random_subreddit_text">Random</string>
+    <string name="random_nsfw_text">RandNSFW</string>
+    <string name="subreddit_subscribers_format">%1$s subscribers</string>
+    <string name="subreddit_dialog_title">%1$s info</string>
 </resources>
