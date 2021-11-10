@@ -30,8 +30,9 @@ import android.os.Build
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.remote.model.CommentData
 import me.cniekirk.flex.data.remote.model.MoreComments
-import me.cniekirk.flex.data.remote.model.Subreddit
-import timber.log.Timber
+import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.rules.Rules
+import me.cniekirk.flex.data.remote.model.subreddit.ModUser
 import java.io.FileOutputStream
 import java.lang.RuntimeException
 
@@ -162,9 +163,41 @@ class RedditDataRepositoryImpl @Inject constructor(
             preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
-            preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
+            authRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
         }
 
-        emit(RedditResult.Success(response.data.children.map { it.data }))
+        emit(RedditResult.Success(response.data.children.map { it.data }.filter { it.subscribers != null }))
+    }
+
+    override fun getSubredditRules(subreddit: String): Flow<RedditResult<Rules>> = flow {
+        val response = if (userDao.getAll().isNullOrEmpty()) {
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.getSubredditRules(accessToken, subreddit)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            authRedditApi.getSubredditRules(accessToken, subreddit)
+        }
+        emit(RedditResult.Success(response))
+    }
+
+    override fun getSubredditInfo(subreddit: String): Flow<RedditResult<Subreddit>> = flow {
+        val response = if (userDao.getAll().isNullOrEmpty()) {
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.getSubredditInfo(accessToken, subreddit)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            authRedditApi.getSubredditInfo(accessToken, subreddit)
+        }
+        emit(RedditResult.Success(response.data))
+    }
+
+    override fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>> = flow {
+        if (userDao.getAll().isNullOrEmpty()) {
+            emit(RedditResult.UnAuthenticated)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            val response = authRedditApi.getSubredditModerators(accessToken, subreddit)
+            emit(RedditResult.Success(response.data.children))
+        }
     }
 }

@@ -48,6 +48,9 @@ class LoggedInAuthenticator @Inject constructor(
     }
 }
 
+/**
+ * Application only OAUTH for pre login endpoints like /api/morechildren for comments
+ */
 class PreLoginAuthenticator @Inject constructor(
     @Named("preAuthApi") private val redditApi: RedditApi,
     private val preLoginUserDao: PreLoginUserDao

@@ -143,7 +143,7 @@ class SubmissionListAdapter(
                         Link.RedGifLink -> {
                             Timber.d("Redgif link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
-                            imageHolder.bind(post, post.media?.oembed?.thumbnailUrl ?: "")
+                            imageHolder.bind(post, post.url)
                         }
                         Link.RedditGallery -> {
                             Timber.d("Gallery link")
@@ -329,7 +329,10 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
-                } else {
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                }
+                else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
             }
@@ -389,7 +392,7 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
-            post.preview?.let {
+            if (imageUrl.isBlank() && post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
                     Glide.with(binding.imagePreview.submissionImage)
@@ -397,13 +400,12 @@ class SubmissionListAdapter(
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(binding.imagePreview.submissionImage)
                 }
-            } ?: run {
+            } else {
                 Glide.with(binding.imagePreview.submissionImage)
                     .load(imageUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(binding.imagePreview.submissionImage)
             }
-
         }
     }
 
@@ -615,6 +617,8 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }

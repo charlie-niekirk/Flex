@@ -49,6 +49,7 @@ import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvicto
 import im.ene.toro.exoplayer.Config
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.remote.auth.PreLoginAuthenticator
+import me.cniekirk.flex.data.remote.model.util.ForceToBooleanJsonAdapter
 import me.cniekirk.flex.util.video.LoopExoCreator
 import java.io.File
 
@@ -170,7 +171,8 @@ class PreLoginModule {
                 PolymorphicJsonAdapterFactory.of(EnvelopedCommentData::class.java, "kind")
                     .withSubtype(EnvelopedComment::class.java, EnvelopeKind.Comment.value)
                     .withSubtype(EnvelopedMoreComment::class.java, EnvelopeKind.More.value)
-            ).build()
+            )
+            .add(ForceToBooleanJsonAdapter).build()
     }
 
     @Provides

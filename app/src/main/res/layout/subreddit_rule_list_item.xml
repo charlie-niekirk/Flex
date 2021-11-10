@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/rule_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text.Bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        tools:text="Posts must relate to Tommy" />
+
+    <TextView
+        android:id="@+id/rule_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Text"
+        app:layout_constraintStart_toStartOf="@id/rule_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rule_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/spacing_s"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        tools:text="Posts must have some form of correlation to Tommy or his friends, please no external content unless it's relevant." />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

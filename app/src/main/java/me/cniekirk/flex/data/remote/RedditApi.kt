@@ -4,7 +4,11 @@ import android.util.Base64
 import me.cniekirk.flex.data.remote.model.*
 import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
+import me.cniekirk.flex.data.remote.model.base.UserList
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.rules.Rules
+import me.cniekirk.flex.data.remote.model.subreddit.ModUser
+import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -39,8 +43,6 @@ interface RedditApi {
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
-
-    @GET("search")
 
     @FormUrlEncoded
     @POST("api/v1/access_token")
@@ -82,6 +84,24 @@ interface RedditApi {
         @Query("sort") sort: String,
         @Query("include_over_18") nsfw: Boolean
     ): RedditResponse<Listing<Subreddit>>
+
+    @GET("r/{subreddit}/about/rules.json?raw_json=1")
+    suspend fun getSubredditRules(
+        @Header("Authorization") authorization: String,
+        @Path("subreddit") subreddit: String
+    ): Rules
+
+    @GET("r/{subreddit}/about.json?raw_json=1")
+    suspend fun getSubredditInfo(
+        @Header("Authorization") authorization: String,
+        @Path("subreddit") subreddit: String
+    ): RedditResponse<Subreddit>
+
+    @GET("r/{subreddit}/about/moderators.json?raw_json=1")
+    suspend fun getSubredditModerators(
+        @Header("Authorization") authorization: String,
+        @Path("subreddit") subreddit: String
+    ): UserList<ModUser>
 
     @GET
     @Streaming

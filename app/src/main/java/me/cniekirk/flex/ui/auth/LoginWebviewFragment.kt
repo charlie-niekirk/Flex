@@ -4,18 +4,22 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.UrlQuerySanitizer
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.LoginWebviewFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
+import me.cniekirk.flex.ui.dialog.FullscreenDialog
 import me.cniekirk.flex.ui.viewmodel.AuthenticationViewModel
 import me.cniekirk.flex.util.isRedirectUri
 import me.cniekirk.flex.util.observe
@@ -23,10 +27,19 @@ import me.cniekirk.flex.util.provideAuthorizeUrl
 import timber.log.Timber
 
 @AndroidEntryPoint
-class LoginWebviewFragment : BaseFragment(R.layout.login_webview_fragment) {
+class LoginWebviewFragment : FullscreenDialog() {
 
     private var binding: LoginWebviewFragmentBinding? = null
     private val viewModel by viewModels<AuthenticationViewModel>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = LoginWebviewFragmentBinding.inflate(inflater, container, false)
+        return binding?.root
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,11 +50,12 @@ class LoginWebviewFragment : BaseFragment(R.layout.login_webview_fragment) {
             when (it) {
                 RedditResult.Loading -> { }
                 is RedditResult.Success -> {
-                    binding?.root?.findNavController()?.popBackStack()
+                    dismiss()
                 }
-                else -> {
+                is RedditResult.Error -> {
+                    Timber.e(it.errorMessage)
                     Toast.makeText(requireContext(), R.string.login_failed, Toast.LENGTH_SHORT).show()
-                    binding?.root?.findNavController()?.popBackStack()
+                    dismiss()
                 }
             }
         }
@@ -57,6 +71,7 @@ class LoginWebviewFragment : BaseFragment(R.layout.login_webview_fragment) {
                                 parseUrl(url)
                             }
                             val code = parsed.getValue("code")
+                            Timber.d("Code: $code")
                             viewModel.onCodeIntercepted(code.substring(0, code.lastIndexOf("#")))
                         }
                     }
@@ -64,7 +79,7 @@ class LoginWebviewFragment : BaseFragment(R.layout.login_webview_fragment) {
                 loadUrl(provideAuthorizeUrl())
             }
             webviewToolbar.setNavigationOnClickListener {
-                it?.findNavController()?.popBackStack()
+                findNavController().navigateUp()
             }
         }
     }

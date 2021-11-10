@@ -11,8 +11,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -76,11 +79,12 @@ class SubmissionListFragment
         when (item.itemId) {
             R.id.search -> {
                 // Show dialog
-                binding.root.findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
+                findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
                 return true
             }
             R.id.account -> {
                 // Show login or account options
+                findNavController().navigate(R.id.action_submissionListFragment_to_loginWebviewFragment)
                 return true
             }
         }
@@ -100,7 +104,7 @@ class SubmissionListFragment
 
         bottomAppBar.setNavigationOnClickListener {
             // Show a dialog
-
+            binding.root.findNavController().navigate(R.id.action_submissionListFragment_to_subredditInformationDialog)
         }
 
         observe(viewModel.userPrefsFlow) { userPrefs ->
@@ -155,6 +159,36 @@ class SubmissionListFragment
         observe(viewModel.subredditFlow) {
             binding.textSubmissionSource.text = it
         }
+
+        val navBackStackEntry = findNavController().getBackStackEntry(R.id.submissionListFragment)
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                if (navBackStackEntry.savedStateHandle.contains("rules")) {
+                    navBackStackEntry.savedStateHandle.remove<String>("rules")
+                    val action = SubmissionListFragmentDirections
+                        .actionSubmissionListFragmentToSubredditRulesFragment(viewModel.subredditFlow.value)
+                    binding.root.findNavController().navigate(action)
+                } else if (navBackStackEntry.savedStateHandle.contains("sidebar")) {
+                    navBackStackEntry.savedStateHandle.remove<String>("sidebar")
+                    val action = SubmissionListFragmentDirections
+                        .actionSubmissionListFragmentToSubredditSidebarFragment(viewModel.subredditFlow.value)
+                    binding.root.findNavController().navigate(action)
+                } else if (navBackStackEntry.savedStateHandle.contains("moderators")) {
+                    navBackStackEntry.savedStateHandle.remove<String>("moderators")
+                    val action = SubmissionListFragmentDirections
+                        .actionSubmissionListFragmentToSubredditModeratorsFragment(viewModel.subredditFlow.value)
+                    binding.root.findNavController().navigate(action)
+                }
+            }
+        }
+
+        navBackStackEntry.lifecycle.addObserver(observer)
+
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                navBackStackEntry.lifecycle.removeObserver(observer)
+            }
+        })
     }
 
     private val callback = object : Animatable2.AnimationCallback() {

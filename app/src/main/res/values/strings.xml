@@ -75,5 +75,16 @@
     <string name="random_subreddit_text">Random</string>
     <string name="random_nsfw_text">RandNSFW</string>
     <string name="subreddit_subscribers_format">%1$s subscribers</string>
-    <string name="subreddit_dialog_title">%1$s info</string>
+    <string name="subreddit_dialog_title">r/%1$s</string>
+    <string name="show_rules">View rules</string>
+    <string name="show_sidebar">View sidebar</string>
+    <string name="show_moderators">View moderators</string>
+    <string name="set_user_flair">Set user flair</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="favourite">Favourite</string>
+    <string name="options_sub_title">options</string>
+    <string name="rules_title_format">r/%1$s rules</string>
+    <string name="sidebar_title_format">r/%1$s sidebar</string>
+    <string name="moderators_title_format">r/%1$s mods</string>
+    <string name="moderator_permissions_format">Permissions: %1$s</string>
 </resources>

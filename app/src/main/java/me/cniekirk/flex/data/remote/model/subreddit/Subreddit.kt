@@ -1,4 +1,4 @@
-package me.cniekirk.flex.data.remote.model
+package me.cniekirk.flex.data.remote.model.subreddit
 
 
 import com.squareup.moshi.Json

@@ -15,6 +15,102 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/spacing_l"
         android:layout_marginStart="@dimen/spacing_l"
-        tools:text="r/tommyinnit info" />
+        tools:text="r/tommyinnit" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_sub_title"
+        style="@style/Text"
+        app:layout_constraintStart_toStartOf="@id/dialog_title"
+        app:layout_constraintTop_toBottomOf="@id/dialog_title"
+        android:layout_marginTop="@dimen/spacing_s"
+        android:text="@string/options_sub_title" />
+
+    <TextView
+        android:id="@+id/action_favourite"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialog_sub_title"
+        app:layout_constraintEnd_toStartOf="@id/action_subscribe"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:layout_marginEnd="@dimen/spacing_s"
+        android:text="@string/favourite"
+        app:drawableTopCompat="@drawable/ic_favourite" />
+
+    <TextView
+        android:id="@+id/action_subscribe"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toEndOf="@id/action_favourite"
+        app:layout_constraintTop_toTopOf="@id/action_favourite"
+        app:layout_constraintBottom_toBottomOf="@id/action_favourite"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_s"
+        android:layout_marginEnd="@dimen/spacing_m"
+        android:text="@string/subscribe"
+        app:drawableTopCompat="@drawable/ic_subscribe" />
+
+    <TextView
+        android:id="@+id/action_set_user_flair"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_favourite"
+        app:layout_constraintEnd_toStartOf="@id/action_show_moderators"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:layout_marginEnd="@dimen/spacing_s"
+        android:text="@string/set_user_flair"
+        app:drawableTopCompat="@drawable/ic_label" />
+
+    <TextView
+        android:id="@+id/action_show_moderators"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toEndOf="@id/action_set_user_flair"
+        app:layout_constraintTop_toTopOf="@id/action_set_user_flair"
+        app:layout_constraintBottom_toBottomOf="@id/action_set_user_flair"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_s"
+        android:layout_marginEnd="@dimen/spacing_m"
+        android:text="@string/show_moderators"
+        app:drawableTopCompat="@drawable/ic_verified_user" />
+
+    <TextView
+        android:id="@+id/action_show_rules"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_set_user_flair"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/action_show_sidebar"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginStart="@dimen/spacing_m"
+        android:layout_marginEnd="@dimen/spacing_s"
+        android:layout_marginBottom="@dimen/spacing_l"
+        android:text="@string/show_rules"
+        app:drawableTopCompat="@drawable/ic_rules" />
+
+    <TextView
+        android:id="@+id/action_show_sidebar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/SelectableTextViewItem"
+        app:layout_constraintStart_toEndOf="@id/action_show_rules"
+        app:layout_constraintTop_toTopOf="@id/action_show_rules"
+        app:layout_constraintBottom_toBottomOf="@id/action_show_rules"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/spacing_s"
+        android:layout_marginEnd="@dimen/spacing_m"
+        android:text="@string/show_sidebar"
+        app:drawableTopCompat="@drawable/ic_view_sidebar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

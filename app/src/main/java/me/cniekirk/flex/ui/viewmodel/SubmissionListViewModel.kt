@@ -18,7 +18,7 @@ import me.cniekirk.flex.data.remote.GfycatApi
 import me.cniekirk.flex.data.remote.RedGifsApi
 import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.StreamableApi
-import me.cniekirk.flex.data.remote.model.Subreddit
+import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.SubredditSearchRequest

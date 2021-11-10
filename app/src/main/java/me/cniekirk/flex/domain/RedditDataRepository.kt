@@ -3,8 +3,9 @@ package me.cniekirk.flex.domain
 import kotlinx.coroutines.flow.Flow
 import me.cniekirk.flex.data.remote.model.*
 import me.cniekirk.flex.data.remote.model.auth.Token
-import me.cniekirk.flex.data.remote.model.base.Listing
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
+import me.cniekirk.flex.data.remote.model.rules.Rules
+import me.cniekirk.flex.data.remote.model.subreddit.ModUser
+import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
 import me.cniekirk.flex.ui.gallery.DownloadState
 
 interface RedditDataRepository {
@@ -23,6 +24,11 @@ interface RedditDataRepository {
 
     fun searchSubreddits(query: String, sortType: String): Flow<RedditResult<List<Subreddit>>>
 
-    fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
+    fun getSubredditRules(subreddit: String): Flow<RedditResult<Rules>>
 
+    fun getSubredditInfo(subreddit: String): Flow<RedditResult<Subreddit>>
+
+    fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>>
+
+    fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
 }

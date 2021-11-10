@@ -25,6 +25,21 @@
         <action
             android:id="@+id/action_submissionListFragment_to_searchDialog"
             app:destination="@id/searchDialog" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_subredditInformationDialog"
+            app:destination="@id/subredditInformationDialog" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_subredditRulesFragment"
+            app:destination="@id/subredditRulesFragment" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_loginWebviewFragment"
+            app:destination="@id/loginWebviewFragment" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_subredditSidebarFragment"
+            app:destination="@id/subredditSidebarFragment" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_subredditModeratorsFragment"
+            app:destination="@id/subredditModeratorsFragment" />
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
@@ -40,7 +55,7 @@
             android:name="post"
             app:argType="me.cniekirk.flex.data.remote.model.AuthedSubmission" />
     </fragment>
-    <fragment
+    <dialog
         android:id="@+id/loginWebviewFragment"
         android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"
         android:label="LoginWebviewFragment"
@@ -64,4 +79,35 @@
         android:name="me.cniekirk.flex.ui.dialog.SearchDialog"
         android:label="SearchDialog"
         tools:layout="@layout/search_dialog" />
+    <dialog
+        android:id="@+id/subredditInformationDialog"
+        android:name="me.cniekirk.flex.ui.dialog.SubredditInformationDialog"
+        android:label="SubredditInformationDialog"
+        tools:layout="@layout/subreddit_dialog" />
+    <fragment
+        android:id="@+id/subredditRulesFragment"
+        android:name="me.cniekirk.flex.ui.subreddit.SubredditRulesFragment"
+        android:label="SubredditRulesFragment"
+        tools:layout="@layout/subreddit_rules_fragment" >
+        <argument
+            android:name="subreddit"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/subredditSidebarFragment"
+        android:name="me.cniekirk.flex.ui.subreddit.SubredditSidebarFragment"
+        android:label="SubredditSidebarFragment"
+        tools:layout="@layout/subreddit_sidebar_fragment" >
+        <argument
+            android:name="subreddit"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/subredditModeratorsFragment"
+        android:name="me.cniekirk.flex.ui.subreddit.SubredditModeratorsFragment"
+        android:label="SubredditModeratorsFragment" >
+        <argument
+            android:name="subreddit"
+            app:argType="string" />
+    </fragment>
 </navigation>

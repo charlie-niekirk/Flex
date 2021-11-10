@@ -59,7 +59,12 @@
         <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_video_preview.xml" value="0.5348717948717949" />
         <entry key="app/src/main/res/layout/subreddit_dialog.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_moderator_list_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_moderators_fragment.xml" value="0.3182291666666667" />
         <entry key="app/src/main/res/layout/subreddit_result_list_item.xml" value="0.3182291666666667" />
+        <entry key="app/src/main/res/layout/subreddit_rule_list_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_rules_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_sidebar_fragment.xml" value="0.3182291666666667" />
         <entry key="app/src/main/res/layout/video_item_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/video_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />

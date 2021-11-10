@@ -3,6 +3,7 @@ package me.cniekirk.flex.data.remote.redgifs
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import me.cniekirk.flex.data.remote.model.util.ForceToBoolean
 
 @JsonClass(generateAdapter = true)
 data class GfyItem(
@@ -35,6 +36,7 @@ data class GfyItem(
     val mobileUrl: String?,
     val mobileWidth: Int?,
     val mp4Url: String?,
+    @ForceToBoolean
     val nsfw: Boolean?,
     val numFrames: Int?,
     val posterUrl: String?,
