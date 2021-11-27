@@ -6,6 +6,7 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".ui.activity.ContainerActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -21,9 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:theme="@style/ThemeOverlay.App.BottomAppBar"
         app:navigationIcon="@drawable/ic_menu"
-        app:navigationIconTint="@color/accent"
         app:menu="@menu/menu_bottom_navigation"
         app:fabAlignmentMode="end" />
 
@@ -31,7 +30,6 @@
         android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.App.FloatingActionButton"
         app:srcCompat="@drawable/ic_create"
         app:layout_anchor="@id/bottom_app_bar"
         android:contentDescription="@string/create_post_cd"

@@ -6,10 +6,12 @@ import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.auth.Token
 import me.cniekirk.flex.data.remote.model.base.UserList
 import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.flair.UserFlairItem
 import me.cniekirk.flex.data.remote.model.rules.Rules
 import me.cniekirk.flex.data.remote.model.subreddit.ModUser
 import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
 import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -102,6 +104,37 @@ interface RedditApi {
         @Header("Authorization") authorization: String,
         @Path("subreddit") subreddit: String
     ): UserList<ModUser>
+
+    @POST("api/subscribe")
+    @FormUrlEncoded
+    suspend fun subscribeAction(
+        @Header("Authorization") authorization: String,
+        @Field("action") action: String,
+        @Field("sr") subreddit: String
+    ): Response<ResponseBody>
+
+    @POST("api/favorite")
+    @FormUrlEncoded
+    suspend fun favoriteAction(
+        @Header("Authorization") authorization: String,
+        @Field("make_favorite") makeFavorite: Boolean,
+        @Field("sr_name") subreddit: String
+    ): Response<ResponseBody>
+
+    @GET("r/{subreddit}/api/user_flair_v2.json")
+    suspend fun getAvailableUserFlairs(
+        @Header("Authorization") authorization: String,
+        @Path("subreddit") subreddit: String
+    ): List<UserFlairItem>
+
+    @POST("api/comment")
+    suspend fun submitComment(
+        @Header("Authorization") authorization: String,
+        @Field("text") comment: String,
+        @Field("thing_id") thingId: String,
+        @Field("return_rtjson") returnRichText: Boolean = false,
+        @Field("api_type") apiType: String = "json"
+    ): CommentData
 
     @GET
     @Streaming

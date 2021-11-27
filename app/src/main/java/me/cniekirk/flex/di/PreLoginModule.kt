@@ -16,10 +16,6 @@ import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.AppDatabase
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.prefs.Preferences
-import me.cniekirk.flex.data.remote.GfycatApi
-import me.cniekirk.flex.data.remote.RedGifsApi
-import me.cniekirk.flex.data.remote.RedditApi
-import me.cniekirk.flex.data.remote.StreamableApi
 import me.cniekirk.flex.data.remote.auth.LoggedInAuthenticator
 import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.envelopes.*
@@ -48,8 +44,11 @@ import com.google.android.exoplayer2.database.ExoDatabaseProvider
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import im.ene.toro.exoplayer.Config
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
+import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.auth.PreLoginAuthenticator
 import me.cniekirk.flex.data.remote.model.util.ForceToBooleanJsonAdapter
+import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
+import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.util.video.LoopExoCreator
 import java.io.File
 
@@ -57,6 +56,7 @@ import java.io.File
 @Module
 @InstallIn(SingletonComponent::class)
 class PreLoginModule {
+
     @Provides
     @Singleton
     fun provideCache(@ApplicationContext context: Context): Cache {
@@ -176,6 +176,17 @@ class PreLoginModule {
     }
 
     @Provides
+    @Named("imgurRetrofit")
+    @Singleton
+    fun provideImgurRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.imgur.com/")
+            .build()
+    }
+
+    @Provides
     @Named("userlessRetrofit")
     @Singleton
     fun provideRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -292,8 +303,18 @@ class PreLoginModule {
 
     @Provides
     @Singleton
+    fun provideImgurApi(@Named("imgurRetrofit") retrofit: Retrofit): ImgurApi
+            = retrofit.create(ImgurApi::class.java)
+
+    @Provides
+    @Singleton
     fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
             : RedditDataRepository = redditDataRepositoryImpl
+
+    @Provides
+    @Singleton
+    fun provideImgurDataRepo(imgurDataRepositoryImpl: ImgurDataRepositoryImpl)
+            : ImgurDataRepository = imgurDataRepositoryImpl
 
     @Provides
     @Singleton

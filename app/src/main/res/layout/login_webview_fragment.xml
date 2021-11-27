@@ -13,7 +13,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:title="Login"
-        app:titleTextAppearance="@style/Text.Bold.H2"
+        app:titleTextAppearance="@style/Bold.H2"
         app:titleCentered="true"
         app:navigationIcon="@drawable/ic_close"
         app:navigationIconTint="@color/accent" />

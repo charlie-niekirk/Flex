@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/text_gallery_count"
-        style="@style/Text.Label"
+        style="?attr/textAppearanceBodyMedium"
         android:background="@drawable/flair_background"
         app:layout_constraintEnd_toEndOf="@id/gallery_grid"
         app:layout_constraintBottom_toBottomOf="@id/gallery_grid"

@@ -10,19 +10,18 @@
         android:id="@+id/mod_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Text.Bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/spacing_l"
         android:layout_marginStart="@dimen/spacing_l"
         android:layout_marginBottom="@dimen/spacing_l"
-        tools:text="DrawThatRedstone" />
+        tools:text="DrawThatRedstone"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_mod_perms"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Text"
         app:layout_constraintStart_toStartOf="@id/mod_name"
         app:layout_constraintTop_toBottomOf="@id/mod_name"
         app:layout_constraintBottom_toBottomOf="parent"

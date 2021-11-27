@@ -1,33 +1,55 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.Flex" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+    <style name="Theme.Flex" parent="Theme.Material3.Light.NoActionBar">
+        <item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.Light</item>
+
+        <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/md_theme_light_secondary</item>
+        <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/md_theme_light_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/md_theme_light_tertiary</item>
+        <item name="colorOnTertiary">@color/md_theme_light_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/md_theme_light_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/md_theme_light_onTertiaryContainer</item>
+        <item name="colorError">@color/md_theme_light_error</item>
+        <item name="colorErrorContainer">@color/md_theme_light_errorContainer</item>
+        <item name="colorOnError">@color/md_theme_light_onError</item>
+        <item name="colorOnErrorContainer">@color/md_theme_light_onErrorContainer</item>
+        <item name="android:colorBackground">@color/md_theme_light_background</item>
+        <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
+        <item name="colorSurface">@color/md_theme_light_surface</item>
+        <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
+        <item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="colorOutline">@color/md_theme_light_outline</item>
+        <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
+        <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
+        <item name="colorPrimaryInverse">@color/md_theme_light_primaryInverse</item>
+
         <!-- Status bar color. -->
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@color/white</item>
         <!-- Customize your theme here. -->
         <item name="fontFamily">@font/rubik</item>
-        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+<!--        <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>-->
     </style>
 
-    <style name="AppBottomSheetDialogTheme"
-        parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/AppModalStyle</item>
-    </style>
+<!--    <style name="AppBottomSheetDialogTheme"-->
+<!--        parent="Theme.Design.Light.BottomSheetDialog">-->
+<!--        <item name="bottomSheetStyle">@style/AppModalStyle</item>-->
+<!--    </style>-->
 
-    <style name="AppModalStyle"
-        parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/dialog_fragment_bg</item>
-    </style>
+<!--    <style name="AppModalStyle"-->
+<!--        parent="Widget.Design.BottomSheet.Modal">-->
+<!--        <item name="android:topLeftRadius">@dimen/spacing_m</item>-->
+<!--        <item name="android:topRightRadius">@dimen/spacing_m</item>-->
+<!--    </style>-->
 
-    <style name="SelectableTextViewItem" parent="Widget.MaterialComponents.TextView">
+    <style name="SelectableTextViewItem">
         <item name="android:padding">@dimen/spacing_l</item>
         <item name="android:textSize">14sp</item>
         <item name="android:includeFontPadding">false</item>
@@ -42,31 +64,19 @@
         <item name="android:textAlignment">center</item>
     </style>
 
-    <style name="Text" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">@color/accent</item>
-    </style>
-
-    <style name="Text.Bold">
+    <style name="Bold">
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Text.Bold.H2">
+    <style name="Bold.H2">
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="Text.Bold.Label">
+    <style name="Bold.Label">
         <item name="android:textSize">14sp</item>
     </style>
 
-    <style name="Text.Label">
-        <item name="android:textSize">14sp</item>
-    </style>
-
-    <style name="Text.Small">
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="Text.Button">
+    <style name="ButtonText">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">14sp</item>
         <item name="textAllCaps">true</item>
@@ -77,32 +87,14 @@
         <item name="tint">#000000</item>
     </style>
 
-    <style name="ThemeOverlay.App.BottomAppBar" parent="">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorOnPrimary">@color/accent</item>
-        <item name="iconTint">@color/accent</item>
-    </style>
-
-    <style name="ThemeOverlay.App.FloatingActionButton" parent="">
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorOnSecondary">@color/surfaceColor</item>
-    </style>
-
-    <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button</item>
-        <item name="android:textAppearance">@style/Text.Button</item>
+    <style name="Widget.App.Button" parent="Widget.Material3.Button">
+        <item name="android:textAppearance">@style/ButtonText</item>
         <item name="cornerRadius">@dimen/spacing_m</item>
     </style>
 
-    <style name="Widget.App.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Button</item>
-        <item name="android:textAppearance">@style/Text.Button</item>
+    <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAppearance">@style/ButtonText</item>
         <item name="cornerRadius">@dimen/spacing_m</item>
-    </style>
-
-    <style name="ThemeOverlay.App.Button" parent="">
-        <item name="colorPrimary">@color/accent</item>
-        <item name="colorOnPrimary">@color/surfaceColor</item>
     </style>
 
     <style name="DialogAnimation">
@@ -110,10 +102,16 @@
         <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
-    <style name="TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+    <style name="TextInputStyle" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxStrokeColor">@android:color/transparent</item>
+    </style>
+
+    <style name="CommentTextInputStyle" parent="Widget.Material3.TextInputLayout.FilledBox">
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
-        <item name="boxBackgroundColor">@color/surfaceColor</item>
+        <item name="boxStrokeColor">@android:color/transparent</item>
         <item name="hintEnabled">false</item>
     </style>
 

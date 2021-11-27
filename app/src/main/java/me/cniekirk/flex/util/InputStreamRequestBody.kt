@@ -9,6 +9,10 @@ import okio.BufferedSink
 import okio.IOException
 import okio.source
 
+/**
+ * [RequestBody] implementation that opens a [Uri] and writes the
+ * stream to the [BufferedSink]
+ */
 class InputStreamRequestBody(
     private val contentResolver: ContentResolver,
     private val uri: Uri) : RequestBody() {

@@ -14,7 +14,7 @@ data class GfyItem(
     val createDate: Int?,
     val dislikes: Int?,
     val domainWhitelist: List<Any>?,
-    val duration: Int?,
+    val duration: Double?,
     val encoding: Boolean?,
     val finished: Boolean?,
     val frameRate: Double?,

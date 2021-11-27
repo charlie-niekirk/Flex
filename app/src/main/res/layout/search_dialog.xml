@@ -9,12 +9,12 @@
         android:id="@+id/search_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Text.Bold"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="@dimen/spacing_xl"
         android:layout_marginStart="@dimen/spacing_l"
-        android:text="Search for anything" />
+        android:text="Search for anything"
+        android:textStyle="bold" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
@@ -42,12 +42,12 @@
         android:id="@+id/random_subreddit_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Text.Bold"
         app:layout_constraintTop_toBottomOf="@id/input_layout_search"
         app:layout_constraintStart_toStartOf="@id/input_layout_search"
         android:layout_marginTop="@dimen/spacing_l"
         android:textSize="12sp"
-        android:text="Random subreddits" />
+        android:text="Random subreddits"
+        android:textStyle="bold" />
 
     <View
         android:id="@+id/random_sub_container"
@@ -78,7 +78,6 @@
         android:id="@+id/random_sub_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Text"
         app:layout_constraintTop_toTopOf="@id/random_sub_container"
         app:layout_constraintBottom_toBottomOf="@id/random_sub_container"
         app:layout_constraintStart_toEndOf="@id/random_sub_label_icon"
@@ -127,7 +126,6 @@
         android:id="@+id/random_nsfw_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Text"
         app:layout_constraintTop_toTopOf="@id/random_nsfw_container"
         app:layout_constraintBottom_toBottomOf="@id/random_nsfw_container"
         app:layout_constraintStart_toEndOf="@id/random_nsfw_label_icon"
@@ -151,12 +149,12 @@
         android:id="@+id/subreddit_results_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Text.Bold"
         app:layout_constraintTop_toBottomOf="@id/random_nsfw_container"
         app:layout_constraintStart_toStartOf="@id/input_layout_search"
         android:layout_marginTop="@dimen/spacing_l"
         android:textSize="12sp"
-        android:text="Search results" />
+        android:text="Search results"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/subreddit_result_list"

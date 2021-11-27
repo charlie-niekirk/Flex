@@ -17,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -32,6 +34,7 @@ import kotlinx.coroutines.flow.onEach
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
+import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
@@ -104,7 +107,7 @@ class SubmissionListFragment
 
         bottomAppBar.setNavigationOnClickListener {
             // Show a dialog
-            binding.root.findNavController().navigate(R.id.action_submissionListFragment_to_subredditInformationDialog)
+            viewModel.onUiEvent(SubmissionListEvent.SubredditOptions)
         }
 
         observe(viewModel.userPrefsFlow) { userPrefs ->
@@ -115,6 +118,7 @@ class SubmissionListFragment
                     exoCreator)
                 adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 binding.listSubmissions.setItemViewCacheSize(20)
+                binding.listSubmissions.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
                 binding.listSubmissions.adapter = adapter?.withLoadStateFooter(
                     footer = SubmissionListLoadingStateAdapter()
                 )
@@ -160,35 +164,22 @@ class SubmissionListFragment
             binding.textSubmissionSource.text = it
         }
 
-        val navBackStackEntry = findNavController().getBackStackEntry(R.id.submissionListFragment)
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                if (navBackStackEntry.savedStateHandle.contains("rules")) {
-                    navBackStackEntry.savedStateHandle.remove<String>("rules")
+        observe(viewModel.subredditInfo) {
+            when (it) {
+                is RedditResult.Error -> {
+                    Timber.e(it.errorMessage)
+                }
+                RedditResult.Loading -> { }
+                is RedditResult.Success -> {
                     val action = SubmissionListFragmentDirections
-                        .actionSubmissionListFragmentToSubredditRulesFragment(viewModel.subredditFlow.value)
-                    binding.root.findNavController().navigate(action)
-                } else if (navBackStackEntry.savedStateHandle.contains("sidebar")) {
-                    navBackStackEntry.savedStateHandle.remove<String>("sidebar")
-                    val action = SubmissionListFragmentDirections
-                        .actionSubmissionListFragmentToSubredditSidebarFragment(viewModel.subredditFlow.value)
-                    binding.root.findNavController().navigate(action)
-                } else if (navBackStackEntry.savedStateHandle.contains("moderators")) {
-                    navBackStackEntry.savedStateHandle.remove<String>("moderators")
-                    val action = SubmissionListFragmentDirections
-                        .actionSubmissionListFragmentToSubredditModeratorsFragment(viewModel.subredditFlow.value)
-                    binding.root.findNavController().navigate(action)
+                        .actionSubmissionListFragmentToSubredditInformationDialog(it.data)
+                    findNavController().navigate(action)
+                }
+                RedditResult.UnAuthenticated -> {
+                    Timber.e("Unauthenticated!")
                 }
             }
         }
-
-        navBackStackEntry.lifecycle.addObserver(observer)
-
-        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_PAUSE) {
-                navBackStackEntry.lifecycle.removeObserver(observer)
-            }
-        })
     }
 
     private val callback = object : Animatable2.AnimationCallback() {
@@ -230,4 +221,8 @@ class SubmissionListFragment
         binding.root.findNavController().navigate(action)
     }
 
+    override fun onPause() {
+        viewModel.resetSubredditInfo()
+        super.onPause()
+    }
 }

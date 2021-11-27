@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/text_submission_source"
-        style="@style/Text.Bold.H2"
+        style="@style/Bold.H2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/text_submission_sort_label"
-            style="@style/Text.Label"
+            style="?attr/textAppearanceBodyMedium"
             android:includeFontPadding="false"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
@@ -119,14 +119,14 @@
             android:id="@+id/submission_action_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Text.Bold"
             android:textColor="@color/surfaceColor"
             android:textSize="16sp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="@dimen/spacing_l"
             android:layout_marginStart="@dimen/spacing_l"
-            android:text="Post options" />
+            android:text="Post options"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/download_button"

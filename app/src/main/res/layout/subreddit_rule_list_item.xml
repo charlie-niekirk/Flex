@@ -10,20 +10,19 @@
         android:id="@+id/rule_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Text.Bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="@dimen/spacing_l"
         android:layout_marginStart="@dimen/spacing_l"
         android:layout_marginEnd="@dimen/spacing_l"
+        android:textStyle="bold"
         tools:text="Posts must relate to Tommy" />
 
     <TextView
         android:id="@+id/rule_description"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        style="@style/Text"
         app:layout_constraintStart_toStartOf="@id/rule_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/rule_name"
