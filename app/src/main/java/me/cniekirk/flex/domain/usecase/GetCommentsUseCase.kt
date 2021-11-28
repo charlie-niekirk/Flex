@@ -1,5 +1,6 @@
 package me.cniekirk.flex.domain.usecase
 
+import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -12,6 +13,7 @@ import me.cniekirk.flex.domain.FlowUseCase
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
+import timber.log.Timber
 import javax.inject.Inject
 
 /**

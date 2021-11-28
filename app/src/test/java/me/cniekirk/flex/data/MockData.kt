@@ -1,12 +1,20 @@
 package me.cniekirk.flex.data
 
 import me.cniekirk.flex.data.remote.model.Comment
+import me.cniekirk.flex.data.remote.model.CommentData
 import me.cniekirk.flex.data.remote.model.Gildings
+import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
+import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedComment
+import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
+import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentDataListing
+import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.listings.CommentDataListing
+import me.cniekirk.flex.data.remote.model.listings.ContributionListing
 
 private val any = Any()
 private val gildings = Gildings(1, 2)
 
-fun provideComment(): Comment {
+fun provideComment(depth: Int = 0): Comment {
     return Comment(
         "1",
         "hello",
@@ -18,7 +26,7 @@ fun provideComment(): Comment {
         123456L,
         123456L,
         any,
-        0,
+        depth,
         null,
         false,
         false,
@@ -45,8 +53,35 @@ fun provideComment(): Comment {
     )
 }
 
-fun provideComments(num: Int = 3): List<Comment> {
-    val comments = mutableListOf<Comment>()
-    repeat(num) { comments.add(provideComment()) }
+private val commentData by lazy(LazyThreadSafetyMode.NONE) {
+    val reply = provideComment(depth = 1)
+    val repliesRaw = EnvelopedCommentDataListing(EnvelopeKind.Listing, CommentDataListing("", 1, listOf(
+        EnvelopedCommentData(EnvelopeKind.Comment, reply)
+    ), "", ""))
+    provideComment().copy(replies = listOf(reply), repliesRaw = repliesRaw)
+}
+
+fun provideUnmappedComments(): List<EnvelopedContributionListing> {
+    val comment = commentData
+
+    val envelopedContributionListing = mutableListOf<EnvelopedContributionListing>().apply {
+        add(EnvelopedContributionListing(
+            EnvelopeKind.Listing,
+            ContributionListing(
+                "fhdsjkfhjkds",
+                0,
+                listOf(EnvelopedComment(EnvelopeKind.Comment, comment as Comment)),
+                "dasda",
+                "dsads")
+            )
+        )
+    }
+    return envelopedContributionListing
+}
+
+fun provideMappedComments(): List<CommentData> {
+    val comments = mutableListOf<CommentData>()
+    val comment = commentData
+    comments.addAll(listOf(comment, comment.replies?.get(0)!!))
     return comments
 }
