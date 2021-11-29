@@ -12,7 +12,10 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -27,6 +30,7 @@ import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.remote.model.Comment
 import me.cniekirk.flex.data.remote.model.MoreComments
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
@@ -61,6 +65,14 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
         }
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
+                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
+        }
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
+                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
+        }
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
             (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
                 requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
         }
@@ -158,8 +170,6 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                 imagePreview.submissionImage.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
                                 videoPreview.videoPlayer.visibility = View.VISIBLE
-                                Timber.d(args.post.media?.redditVideo?.dashUrl ?:
-                                    args.post.media?.redditVideo?.fallbackUrl!!)
 //                                player = videoPreview.videoPlayer.initialise(simpleExoPlayer,
 //                                    args.post.media?.redditVideo?.dashUrl ?:
 //                                    args.post.media?.redditVideo?.fallbackUrl!!)
@@ -185,7 +195,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                     root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(contentContainer)
             } else {
-                textSubmissionAuthor.setTextColor(root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 textSubmissionAuthor.setTypeface(textSubmissionAuthor.typeface, Typeface.NORMAL)
                 submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
@@ -201,7 +211,11 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 textAuthorFlair.visibility = View.GONE
             } else {
                 textAuthorFlair.visibility = View.VISIBLE
-                textAuthorFlair.text = args.post.authorFlairText
+                if (args.post.author.equals("tommyinnit", true)) {
+                    textAuthorFlair.text = args.post.authorFlairText + " 5'10\""
+                } else {
+                    textAuthorFlair.text = args.post.authorFlairText
+                }
                 if (args.post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (args.post.authorFlairBackgroundColor.equals("transparent", true)) {
@@ -266,10 +280,9 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                         binding.emptyCommentEasterEgg.visibility = View.VISIBLE
                         binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post.subreddit)
                     } else {
-                        adapter?.submitList(comments.data.toMutableList())
                         binding.emptyCommentEasterEgg.visibility = View.GONE
                         binding.commentsTreeList.visibility = View.VISIBLE
-                        binding.commentsTreeList.adapter = adapter
+                        adapter?.submitList(comments.data.toMutableList())
                     }
                     binding.loadingIndicator.visibility = View.GONE
                     loading.reset()
@@ -287,8 +300,13 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
 
     override fun onLoadMore(moreComments: MoreComments) {
-        Timber.d("Load more")
         viewModel.getMoreComments(moreComments, args.post.name)
+    }
+
+    override fun onReply(comment: Comment) {
+        val action = SubmissionDetailFragmentDirections
+            .actionSubmissionDetailFragmentToComposeCommentFragment(comment.copy(replies = emptyList(), repliesRaw = null))
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

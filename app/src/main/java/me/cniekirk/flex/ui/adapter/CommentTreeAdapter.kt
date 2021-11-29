@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ import me.cniekirk.flex.databinding.SubmissionCommentCollapsedListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentLoadMoreListItemBinding
 import me.cniekirk.flex.util.getDepthColour
+import me.cniekirk.flex.util.resolveColorAttr
 import timber.log.Timber
 
 enum class CommentViewType {
@@ -110,7 +112,7 @@ class CommentTreeAdapter(
                         itemDivider.id,
                         ConstraintSet.START,
                         commentDepthIndicator.id,
-                        ConstraintSet.END,
+                        ConstraintSet.START,
                         root.context.resources.getDimension(R.dimen.spacing_m).toInt()
                     )
                     constraintSet.applyTo(root)
@@ -119,9 +121,15 @@ class CommentTreeAdapter(
                 commentAuthorUsername.text = item.author
                 if (item.author.equals(submission.author, true)) {
                     commentAuthorUsername.setTextColor(root.context.getColor(R.color.blue))
+                } else if (item.distinguishedRaw.equals("moderator", true)) {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.green))
+                } else if (item.distinguishedRaw.equals("admin", true)) {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.red))
                 } else {
-                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.accent))
+                    commentAuthorUsername.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 }
+                commentLocked.isGone = !item.isLocked
+                commentPinned.isGone = !item.isStickied
                 commentUpvoteNumber.text = item.score.toString()
                 val topAwards = item.allAwarding?.sortedByDescending { it.coinPrice }?.take(3)
                 if (!topAwards.isNullOrEmpty()) {
@@ -157,9 +165,16 @@ class CommentTreeAdapter(
                     if (item.isCollapsed) {
                         val newList = mutableListOf<CommentData>()
                         expandComment(item, newList, 0)
-                        currentList.addAll(currentList.indexOf(item) + 1, newList)
+                        val expanded = currentList.toMutableList().apply { addAll(currentList.indexOf(item) + 1, newList) }
+                        expanded[expanded.indexOf(item)] = (expanded[expanded.indexOf(item)] as Comment).copy(isCollapsed = false)
+                        submitList(expanded)
                     } else {
                         collapseComment(item)
+                    }
+                }
+                commentReplyButton.setOnClickListener {
+                    if (!item.isCollapsed) {
+                        commentActionListener.onReply(item)
                     }
                 }
             }
@@ -203,9 +218,15 @@ class CommentTreeAdapter(
                 commentAuthorUsername.text = item.author
                 if (item.author.equals(submission.author, true)) {
                     commentAuthorUsername.setTextColor(root.context.getColor(R.color.blue))
+                } else if (item.distinguishedRaw.equals("moderator", true)) {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.green))
+                } else if (item.distinguishedRaw.equals("admin", true)) {
+                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.red))
                 } else {
-                    commentAuthorUsername.setTextColor(root.context.getColor(R.color.accent))
+                    commentAuthorUsername.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 }
+                commentLocked.isGone = !item.isLocked
+                commentPinned.isGone = !item.isStickied
                 val children = mutableListOf<CommentData>()
                 createChildList(item, children, 0)
                 if (children.size > 0) {
@@ -247,14 +268,11 @@ class CommentTreeAdapter(
                 root.setOnClickListener {
                     if (item.isCollapsed) {
                         // Just expand this comment if there are no children
-                        if (item.replies.isNullOrEmpty()) {
-                            item.isCollapsed = false
-                        } else {
-                            val newList = mutableListOf<CommentData>()
-                            expandComment(item, newList, 0)
-                            val expanded = currentList.toMutableList().apply { addAll(currentList.indexOf(item) + 1, newList) }
-                            submitList(expanded)
-                        }
+                        val newList = mutableListOf<CommentData>()
+                        expandComment(item, newList, 0)
+                        val expanded = currentList.toMutableList().apply { addAll(currentList.indexOf(item) + 1, newList) }
+                        expanded[expanded.indexOf(item)] = (expanded[expanded.indexOf(item)] as Comment).copy(isCollapsed = false)
+                        submitList(expanded)
                     } else {
                         collapseComment(item)
                     }
@@ -312,11 +330,10 @@ class CommentTreeAdapter(
      * @param comment the comment
      */
     private fun expandComment(comment: CommentData, expandedChildren: MutableList<CommentData>, position: Int) {
-        comment.isCollapsed = false
         val children = comment.replies
-        expandedChildren.addAll(position, children!!)
+        expandedChildren.addAll(position, children ?: emptyList())
         var pos = position
-        children.forEach {
+        children?.forEach {
             pos = pos.inc()
             if (!it.replies.isNullOrEmpty()) {
                 expandComment(it, expandedChildren, pos)
@@ -334,9 +351,10 @@ class CommentTreeAdapter(
      * @param comment the top level comment, the children of which will all be collapsed
      */
     private fun collapseComment(comment: CommentData) {
-        comment.isCollapsed = true
         val children = getNumChildren(comment)
+        val idx = currentList.indexOf(comment)
         val cleared = currentList.toMutableList().apply {
+            set(idx, (get(idx) as Comment).copy(isCollapsed = true))
             subList(currentList.indexOf(comment) + 1, currentList.indexOf(comment) + 1 + children).apply { clear() }
         }
         submitList(cleared)
@@ -370,11 +388,14 @@ class CommentTreeAdapter(
         override fun areItemsTheSame(oldItem: CommentData, newItem: CommentData) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: CommentData, newItem: CommentData) =
-            oldItem == newItem
+        override fun areContentsTheSame(oldItem: CommentData, newItem: CommentData): Boolean {
+            Timber.d("Contents: ${oldItem.id} ${oldItem.isCollapsed} ${newItem.isCollapsed} ${oldItem.isCollapsed == newItem.isCollapsed}")
+            return oldItem.isCollapsed == newItem.isCollapsed
+        }
     }
 
     interface CommentActionListener {
         fun onLoadMore(moreComments: MoreComments)
+        fun onReply(comment: Comment)
     }
 }

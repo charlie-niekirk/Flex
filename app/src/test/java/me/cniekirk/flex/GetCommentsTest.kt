@@ -2,10 +2,10 @@ package me.cniekirk.flex
 
 import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
-import me.cniekirk.flex.data.provideComments
+import me.cniekirk.flex.data.provideMappedComments
+import me.cniekirk.flex.data.provideUnmappedComments
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
@@ -26,10 +26,12 @@ class GetCommentsTest {
     private lateinit var underTest: GetCommentsUseCase
 
     private val request = CommentRequest("123", "top")
+    private val repositoryResponse = provideUnmappedComments()
+    private val useCaseResponse = provideMappedComments()
 
     private val repository = mock<RedditDataRepository> {
         onBlocking { getComments("123", "top") }
-            .thenReturn(flowOf(RedditResult.Success(provideComments())))
+            .thenReturn(repositoryResponse)
     }
 
     @Before
@@ -42,7 +44,7 @@ class GetCommentsTest {
     fun `get comments data and state emitted correctly`() = coroutineDispatcher.runBlockingTest {
         underTest(request).test {
             assertEquals(RedditResult.Loading, awaitItem())
-            assertEquals(RedditResult.Success(provideComments()), awaitItem())
+            assertEquals(RedditResult.Success(useCaseResponse), awaitItem())
             awaitComplete()
         }
     }

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -17,6 +18,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.exoplayer2.SimpleExoPlayer
 import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
@@ -25,6 +27,7 @@ import im.ene.toro.exoplayer.ExoPlayerViewHelper
 import im.ene.toro.exoplayer.Playable
 import im.ene.toro.media.PlaybackInfo
 import im.ene.toro.widget.Container
+import jp.wasabeef.glide.transformations.BlurTransformation
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.Resolution
@@ -143,7 +146,7 @@ class SubmissionListAdapter(
                         Link.RedGifLink -> {
                             Timber.d("Redgif link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
-                            imageHolder.bind(post, post.media?.oembed?.thumbnailUrl ?: "")
+                            imageHolder.bind(post, post.url)
                         }
                         Link.RedditGallery -> {
                             Timber.d("Gallery link")
@@ -222,7 +225,11 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.author.equals("tommyinnit", true)) {
+                    binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                } else {
+                    binding.textAuthorFlair.text = post.authorFlairText
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
@@ -245,7 +252,7 @@ class SubmissionListAdapter(
                     binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(binding.root)
             } else {
-                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
                 binding.submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
@@ -329,7 +336,10 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
-                } else {
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                }
+                else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
             }
@@ -347,7 +357,7 @@ class SubmissionListAdapter(
                     binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(binding.root)
             } else {
-                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
                 binding.submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
@@ -389,21 +399,14 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
-            post.preview?.let {
+            if (imageUrl.isBlank() && post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
-                    Glide.with(binding.imagePreview.submissionImage)
-                        .load(resolution.url)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.imagePreview.submissionImage)
+                    binding.imagePreview.submissionImage.loadImage(resolution.url, post.over18)
                 }
-            } ?: run {
-                Glide.with(binding.imagePreview.submissionImage)
-                    .load(imageUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(binding.imagePreview.submissionImage)
+            } else {
+                binding.imagePreview.submissionImage.loadImage(imageUrl, post.over18)
             }
-
         }
     }
 
@@ -480,7 +483,7 @@ class SubmissionListAdapter(
                     binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(binding.root)
             } else {
-                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
                 binding.submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
@@ -615,6 +618,8 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -633,7 +638,7 @@ class SubmissionListAdapter(
                     binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(binding.root)
             } else {
-                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
                 binding.submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()
@@ -683,37 +688,23 @@ class SubmissionListAdapter(
             media?.let {
                 if (media.size > 2) {
                     binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
-                    Glide.with(binding.mediaGalleryPreview.firstImage)
-                        .load(binding.root.context.getString(R.string.reddit_image_url,
-                            media[0].id,
-                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.mediaGalleryPreview.firstImage)
-                    Glide.with(binding.mediaGalleryPreview.secondImage)
-                        .load(binding.root.context.getString(R.string.reddit_image_url,
-                            media[1].id,
-                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.mediaGalleryPreview.secondImage)
-                    Glide.with(binding.mediaGalleryPreview.thirdImage)
-                        .load(binding.root.context.getString(R.string.reddit_image_url,
-                            media[2].id,
-                            media[2].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.mediaGalleryPreview.thirdImage)
+                    binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                        media[0].id,
+                        media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    binding.mediaGalleryPreview.secondImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                        media[1].id,
+                        media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                        media[2].id,
+                        media[2].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
                 } else {
                     binding.mediaGalleryPreview.secondImage.visibility = View.GONE
-                    Glide.with(binding.mediaGalleryPreview.firstImage)
-                        .load(binding.root.context.getString(R.string.reddit_image_url,
-                            media[0].id,
-                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.mediaGalleryPreview.firstImage)
-                    Glide.with(binding.mediaGalleryPreview.thirdImage)
-                        .load(binding.root.context.getString(R.string.reddit_image_url,
-                            media[1].id,
-                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }))                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .into(binding.mediaGalleryPreview.thirdImage)
+                    binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                        media[0].id,
+                        media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                        media[1].id,
+                        media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
                 }
             }
             binding.mediaGalleryPreview.root.setOnClickListener {
@@ -780,7 +771,7 @@ class SubmissionListAdapter(
                     binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
                 cs.applyTo(binding.root)
             } else {
-                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.black))
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
                 binding.submissionPin.visibility = View.GONE
                 val cs = ConstraintSet()

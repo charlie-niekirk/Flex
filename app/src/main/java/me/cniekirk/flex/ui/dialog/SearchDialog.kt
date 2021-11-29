@@ -49,8 +49,14 @@ class SearchDialog : FullscreenDialog(), SubredditResultAdapter.SubredditResultL
             randomNsfwContainer.clipToOutline = true
             randomSubContainer.clipToOutline = true
 
-            randomSubContainer.setOnClickListener { onSubredditSelected("random") }
-            randomNsfwContainer.setOnClickListener { onSubredditSelected("randnsfw") }
+            randomSubContainer.setOnClickListener {
+                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("random"))
+                dismiss()
+            }
+            randomNsfwContainer.setOnClickListener {
+                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("randnsfw"))
+                dismiss()
+            }
 
             inputSearch.textChanges()
                 .filterNot { it.isNullOrBlank() }

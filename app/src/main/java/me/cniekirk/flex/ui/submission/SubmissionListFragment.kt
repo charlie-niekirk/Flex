@@ -11,9 +11,14 @@ import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
@@ -29,6 +34,7 @@ import kotlinx.coroutines.flow.onEach
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
+import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
@@ -76,11 +82,12 @@ class SubmissionListFragment
         when (item.itemId) {
             R.id.search -> {
                 // Show dialog
-                binding.root.findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
+                findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
                 return true
             }
             R.id.account -> {
                 // Show login or account options
+                findNavController().navigate(R.id.action_submissionListFragment_to_loginWebviewFragment)
                 return true
             }
         }
@@ -100,7 +107,7 @@ class SubmissionListFragment
 
         bottomAppBar.setNavigationOnClickListener {
             // Show a dialog
-
+            viewModel.onUiEvent(SubmissionListEvent.SubredditOptions)
         }
 
         observe(viewModel.userPrefsFlow) { userPrefs ->
@@ -111,6 +118,7 @@ class SubmissionListFragment
                     exoCreator)
                 adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 binding.listSubmissions.setItemViewCacheSize(20)
+                binding.listSubmissions.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
                 binding.listSubmissions.adapter = adapter?.withLoadStateFooter(
                     footer = SubmissionListLoadingStateAdapter()
                 )
@@ -155,6 +163,23 @@ class SubmissionListFragment
         observe(viewModel.subredditFlow) {
             binding.textSubmissionSource.text = it
         }
+
+        observe(viewModel.subredditInfo) {
+            when (it) {
+                is RedditResult.Error -> {
+                    Timber.e(it.errorMessage)
+                }
+                RedditResult.Loading -> { }
+                is RedditResult.Success -> {
+                    val action = SubmissionListFragmentDirections
+                        .actionSubmissionListFragmentToSubredditInformationDialog(it.data)
+                    findNavController().navigate(action)
+                }
+                RedditResult.UnAuthenticated -> {
+                    Timber.e("Unauthenticated!")
+                }
+            }
+        }
     }
 
     private val callback = object : Animatable2.AnimationCallback() {
@@ -196,4 +221,8 @@ class SubmissionListFragment
         binding.root.findNavController().navigate(action)
     }
 
+    override fun onPause() {
+        viewModel.resetSubredditInfo()
+        super.onPause()
+    }
 }

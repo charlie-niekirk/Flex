@@ -119,9 +119,9 @@ class SubredditSubmissionsPagingSource(
 //            }
 
             if (itemCount > 0 && params.key.equals(before, true)) {
-                itemCount -= response.data.dist
+                itemCount -= response.data.dist!!
             } else {
-                itemCount += response.data.dist
+                itemCount += response.data.dist!!
             }
 
             after = response.data.after

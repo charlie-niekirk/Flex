@@ -12,8 +12,8 @@
             <path
                 android:name="pathShape"
                 android:pathData="M 0 0 L 0 0 z"
-                android:fillColor="@color/accent"
-                android:strokeColor="@color/accent"
+                android:fillColor="?attr/colorOnSurface"
+                android:strokeColor="?attr/colorOnSurface"
                 android:strokeWidth="8"/>
         </vector>
     </aapt:attr>

@@ -1,23 +1,27 @@
-package me.cniekirk.flex.data.remote.model
+package me.cniekirk.flex.data.remote.model.subreddit
 
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 data class Subreddit(
     @Json(name = "accept_followers")
     val acceptFollowers: Boolean?,
     @Json(name = "accounts_active")
-    val accountsActive: Any?,
+    val accountsActive: @RawValue Any?,
     @Json(name = "accounts_active_is_fuzzed")
     val accountsActiveIsFuzzed: Boolean?,
     @Json(name = "active_user_count")
     val activeUserCount: Int?,
     @Json(name = "advertiser_category")
-    val advertiserCategory: Any?,
+    val advertiserCategory: @RawValue Any?,
     @Json(name = "all_original_content")
-    val allOriginalContent: Any?,
+    val allOriginalContent: @RawValue Any?,
     @Json(name = "allow_discovery")
     val allowDiscovery: Boolean?,
     @Json(name = "allow_galleries")
@@ -37,21 +41,21 @@ data class Subreddit(
     @Json(name = "allow_videos")
     val allowVideos: Boolean?,
     @Json(name = "banner_background_color")
-    val bannerBackgroundColor: Any?,
+    val bannerBackgroundColor: @RawValue Any?,
     @Json(name = "banner_background_image")
     val bannerBackgroundImage: String?,
     @Json(name = "banner_img")
-    val bannerImg: Any?,
+    val bannerImg: @RawValue Any?,
     @Json(name = "banner_size")
-    val bannerSize: Any?,
+    val bannerSize: @RawValue Any?,
     @Json(name = "can_assign_link_flair")
     val canAssignLinkFlair: Boolean?,
     @Json(name = "can_assign_user_flair")
     val canAssignUserFlair: Boolean?,
     @Json(name = "collapse_deleted_comments")
-    val collapseDeletedComments: Any?,
+    val collapseDeletedComments: @RawValue Any?,
     @Json(name = "comment_score_hide_mins")
-    val commentScoreHideMins: Any?,
+    val commentScoreHideMins: @RawValue Any?,
     @Json(name = "community_icon")
     val communityIcon: String?,
     @Json(name = "community_reviewed")
@@ -63,84 +67,84 @@ data class Subreddit(
     @Json(name = "description_html")
     val descriptionHtml: String?,
     @Json(name = "disable_contributor_requests")
-    val disableContributorRequests: Any?,
+    val disableContributorRequests: @RawValue Any?,
     @Json(name = "display_name")
     val displayName: String?,
     @Json(name = "display_name_prefixed")
     val displayNamePrefixed: String?,
     @Json(name = "emojis_custom_size")
-    val emojisCustomSize: Any?,
+    val emojisCustomSize: @RawValue Any?,
     @Json(name = "emojis_enabled")
     val emojisEnabled: Boolean?,
     @Json(name = "free_form_reports")
-    val freeFormReports: Any?,
+    val freeFormReports: @RawValue Any?,
     @Json(name = "has_menu_widget")
     val hasMenuWidget: Boolean?,
     @Json(name = "header_img")
-    val headerImg: Any?,
+    val headerImg: @RawValue Any?,
     @Json(name = "header_size")
-    val headerSize: Any?,
+    val headerSize: @RawValue Any?,
     @Json(name = "header_title")
-    val headerTitle: Any?,
+    val headerTitle: @RawValue Any?,
     @Json(name = "hide_ads")
-    val hideAds: Any?,
+    val hideAds: @RawValue Any?,
     @Json(name = "icon_img")
     val iconImg: String?,
     @Json(name = "icon_size")
-    val iconSize: Any?,
+    val iconSize: @RawValue Any?,
     val id: String?,
     @Json(name = "is_crosspostable_subreddit")
     val isCrosspostableSubreddit: Boolean?,
     @Json(name = "is_enrolled_in_new_modmail")
-    val isEnrolledInNewModmail: Any?,
+    val isEnrolledInNewModmail: @RawValue Any?,
     @Json(name = "key_color")
-    val keyColor: Any?,
-    val lang: Any?,
+    val keyColor: @RawValue Any?,
+    val lang: @RawValue Any?,
     @Json(name = "link_flair_enabled")
-    val linkFlairEnabled: Any?,
+    val linkFlairEnabled: @RawValue Any?,
     @Json(name = "link_flair_position")
-    val linkFlairPosition: Any?,
+    val linkFlairPosition: @RawValue Any?,
     @Json(name = "mobile_banner_image")
-    val mobileBannerImage: Any?,
+    val mobileBannerImage: @RawValue Any?,
     val name: String?,
     @Json(name = "notification_level")
-    val notificationLevel: Any?,
+    val notificationLevel: @RawValue Any?,
     @Json(name = "original_content_tag_enabled")
-    val originalContentTagEnabled: Any?,
+    val originalContentTagEnabled: @RawValue Any?,
     val over18: Boolean?,
     @Json(name = "prediction_leaderboard_entry_type")
     val predictionLeaderboardEntryType: String?,
     @Json(name = "primary_color")
-    val primaryColor: Any?,
+    val primaryColor: @RawValue Any?,
     @Json(name = "public_description")
     val publicDescription: String?,
     @Json(name = "public_description_html")
-    val publicDescriptionHtml: Any?,
+    val publicDescriptionHtml: @RawValue Any?,
     @Json(name = "public_traffic")
-    val publicTraffic: Any?,
-    val quarantine: Any?,
+    val publicTraffic: @RawValue Any?,
+    val quarantine: @RawValue Any?,
     @Json(name = "restrict_commenting")
-    val restrictCommenting: Any?,
+    val restrictCommenting: @RawValue Any?,
     @Json(name = "restrict_posting")
-    val restrictPosting: Any?,
+    val restrictPosting: @RawValue Any?,
     @Json(name = "should_archive_posts")
-    val shouldArchivePosts: Any?,
+    val shouldArchivePosts: @RawValue Any?,
     @Json(name = "show_media")
-    val showMedia: Any?,
+    val showMedia: @RawValue Any?,
     @Json(name = "show_media_preview")
-    val showMediaPreview: Any?,
+    val showMediaPreview: @RawValue Any?,
     @Json(name = "spoilers_enabled")
-    val spoilersEnabled: Any?,
+    val spoilersEnabled: @RawValue Any?,
     @Json(name = "submission_type")
-    val submissionType: Any?,
+    val submissionType: @RawValue Any?,
     @Json(name = "submit_link_label")
-    val submitLinkLabel: Any?,
+    val submitLinkLabel: @RawValue Any?,
     @Json(name = "submit_text")
-    val submitText: Any?,
+    val submitText: @RawValue Any?,
     @Json(name = "submit_text_html")
-    val submitTextHtml: Any?,
+    val submitTextHtml: @RawValue Any?,
     @Json(name = "submit_text_label")
-    val submitTextLabel: Any?,
+    val submitTextLabel: @RawValue Any?,
     @Json(name = "subreddit_type")
     val subredditType: String?,
     val subscribers: Int?,
@@ -149,44 +153,44 @@ data class Subreddit(
     val title: String?,
     val url: String?,
     @Json(name = "user_can_flair_in_sr")
-    val userCanFlairInSr: Any?,
+    val userCanFlairInSr: @RawValue Any?,
     @Json(name = "user_flair_background_color")
-    val userFlairBackgroundColor: Any?,
+    val userFlairBackgroundColor: @RawValue Any?,
     @Json(name = "user_flair_css_class")
-    val userFlairCssClass: Any?,
+    val userFlairCssClass: @RawValue Any?,
     @Json(name = "user_flair_enabled_in_sr")
-    val userFlairEnabledInSr: Any?,
+    val userFlairEnabledInSr: @RawValue Any?,
     @Json(name = "user_flair_position")
-    val userFlairPosition: Any?,
+    val userFlairPosition: @RawValue Any?,
     @Json(name = "user_flair_richtext")
-    val userFlairRichtext: List<Any>?,
+    val userFlairRichtext: @RawValue List<Any>?,
     @Json(name = "user_flair_template_id")
-    val userFlairTemplateId: Any?,
+    val userFlairTemplateId: @RawValue Any?,
     @Json(name = "user_flair_text")
-    val userFlairText: Any?,
+    val userFlairText: @RawValue Any?,
     @Json(name = "user_flair_text_color")
-    val userFlairTextColor: Any?,
+    val userFlairTextColor: @RawValue Any?,
     @Json(name = "user_flair_type")
     val userFlairType: String?,
     @Json(name = "user_has_favorited")
-    val userHasFavorited: Any?,
+    val userHasFavorited: Boolean?,
     @Json(name = "user_is_banned")
-    val userIsBanned: Any?,
+    val userIsBanned: Boolean?,
     @Json(name = "user_is_contributor")
-    val userIsContributor: Any?,
+    val userIsContributor: Boolean?,
     @Json(name = "user_is_moderator")
-    val userIsModerator: Any?,
+    val userIsModerator: Boolean?,
     @Json(name = "user_is_muted")
-    val userIsMuted: Any?,
+    val userIsMuted: Boolean?,
     @Json(name = "user_is_subscriber")
-    val userIsSubscriber: Any?,
+    val userIsSubscriber: Boolean?,
     @Json(name = "user_sr_flair_enabled")
-    val userSrFlairEnabled: Any?,
+    val userSrFlairEnabled: @RawValue Any?,
     @Json(name = "user_sr_theme_enabled")
-    val userSrThemeEnabled: Any?,
+    val userSrThemeEnabled: @RawValue Any?,
     @Json(name = "whitelist_status")
-    val whitelistStatus: Any?,
+    val whitelistStatus: @RawValue Any?,
     @Json(name = "wiki_enabled")
     val wikiEnabled: Boolean?,
-    val wls: Any?
-)
+    val wls: @RawValue Any?
+): Parcelable
