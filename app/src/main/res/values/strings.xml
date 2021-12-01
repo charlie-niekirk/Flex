@@ -105,4 +105,8 @@
     <string name="uploading_image">Uploading image...</string>
     <string name="upload_image_success">Successfully uploaded image!</string>
     <string name="set_image_name_title">Set image name</string>
+    <string name="submit_button_cd">Submit comment button</string>
+    <string name="submit_comment_success">Comment posted!</string>
+    <string name="submit_comment_error">Failed to post comment!</string>
+    <string name="submit_comment_no_content_error">Comment must contain some content.</string>
 </resources>

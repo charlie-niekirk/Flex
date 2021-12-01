@@ -46,11 +46,14 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import me.cniekirk.flex.R
 import timber.log.Timber
+
+import io.noties.markwon.core.spans.*
 import androidx.annotation.NonNull
 
-import android.text.style.ClickableSpan
-import android.view.View
-import io.noties.markwon.core.spans.*
+import io.noties.markwon.core.spans.HeadingSpan
+
+
+
 
 
 fun Int.condense(): String {
@@ -473,6 +476,60 @@ fun Context.createMarkdownEditor(markwon: Markwon? = null, linkOnClick: LinkSpan
                 return CodeBlockSpan::class.java
             }
 
+        })
+        .useEditHandler(object : AbstractEditHandler<HeadingSpan>() {
+            override fun configurePersistedSpans(builder: PersistedSpans.Builder) {
+                builder.persistSpan(Head1::class.java) {
+                    Head1(MarkwonTheme.create(this@createMarkdownEditor))
+                }.persistSpan(Head2::class.java) {
+                    Head2(MarkwonTheme.create(this@createMarkdownEditor))
+                }
+            }
+
+            override fun handleMarkdownSpan(
+                persistedSpans: PersistedSpans,
+                editable: Editable,
+                input: String,
+                span: HeadingSpan,
+                spanStart: Int,
+                spanTextLength: Int
+            ) {
+                val headingMatch = MarkwonEditorUtils.findDelimited(input, spanStart, "##")
+                if (headingMatch != null) {
+                    editable.setSpan(
+                        persistedSpans[HeadingSpan::class.java],
+                        headingMatch.start(),
+                        headingMatch.end(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+                val type = when (span.level) {
+                    1 -> Head1::class.java
+                    2 -> Head2::class.java
+                    else -> null
+                }
+
+                type?.let {
+                    val index = input.indexOf('\n', spanStart + spanTextLength)
+                    val end = if (index < 0) input.length else index
+                    editable.setSpan(
+                        persistedSpans.get(type),
+                        spanStart,
+                        end,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
+            }
+
+            override fun markdownSpanType(): Class<HeadingSpan> {
+                return HeadingSpan::class.java
+            }
+
+            inner class Head1(theme: MarkwonTheme) :
+                HeadingSpan(theme, 1) {}
+
+            inner class Head2(theme: MarkwonTheme) :
+                HeadingSpan(theme, 2) {}
         })
         .useEditHandler(LinkSpanHandler(linkOnClick))
         .build()

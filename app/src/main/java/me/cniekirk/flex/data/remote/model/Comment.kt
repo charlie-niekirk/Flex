@@ -14,41 +14,41 @@ import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentDataListing
 @Parcelize
 data class Comment(
     @Json(name = "id")
-    override val id: String,
+    override val id: String?,
     @Json(name = "name")
-    override val fullname: String,
+    override val fullname: String?,
     @Json(name = "all_awardings")
     val allAwarding: List<AllAwarding>?,
     @Json(name = "author")
-    val author: String,
+    val author: String?,
     @Json(name = "body")
-    val body: String,
+    val body: String?,
     @Json(name = "body_html")
-    val bodyHtml: String,
+    val bodyHtml: String?,
     @Json(name = "can_gild")
-    val canGild: Boolean,
+    val canGild: Boolean?,
     @Json(name = "created")
-    val created: Long,
+    val created: Long?,
     @Json(name = "created_utc")
-    val createdUtc: Long,
+    val createdUtc: Long?,
     @Json(name = "edited")
-    val editedRaw: @RawValue Any,
+    val editedRaw: @RawValue Any?,
     @Json(name = "depth")
     override val depth: Int = 0,
     @Json(name = "distinguished")
     val distinguishedRaw: String?,
     @Json(name = "archived")
-    val isArchived: Boolean,
+    val isArchived: Boolean?,
     @Json(name = "locked")
-    val isLocked: Boolean,
+    val isLocked: Boolean?,
     @Json(name = "saved")
-    val isSaved: Boolean,
+    val isSaved: Boolean?,
     @Json(name = "score_hidden")
-    val isScoreHidden: Boolean,
+    val isScoreHidden: Boolean?,
     @Json(name = "stickied")
-    val isStickied: Boolean,
+    val isStickied: Boolean?,
     @Json(name = "is_submitter")
-    val isSubmitter: Boolean,
+    val isSubmitter: Boolean?,
     val likes: Boolean?,
     @Json(name = "link_title")
     val linkTitle: String?,
@@ -60,23 +60,23 @@ data class Comment(
     val linkUrl: String?,
     @Json(name = "link_permalink")
     val linkPermalink: String?,
-    val gildings: Gildings,
+    val gildings: Gildings?,
     @Json(name = "parent_id")
-    val parentId: String,
-    val permalink: String,
+    val parentId: String?,
+    val permalink: String?,
     @Json(name = "replies")
     val repliesRaw: EnvelopedCommentDataListing?,
     @Transient
     override var replies: List<CommentData>? =
         repliesRaw?.data?.children?.map { it.data }?.toList(),
     @Transient
-    override val parentFullname: String = parentId,
-    val score: Int,
-    val subreddit: String,
+    override val parentFullname: String? = parentId,
+    val score: Int?,
+    val subreddit: String?,
     @Json(name = "subreddit_id")
-    val subredditId: String,
+    val subredditId: String?,
     @Json(name = "subreddit_name_prefixed")
-    val subredditNamePrefixed: String,
+    val subredditNamePrefixed: String?,
     @Transient
     override var isCollapsed: Boolean = false
 ) : CommentData, Parcelable {

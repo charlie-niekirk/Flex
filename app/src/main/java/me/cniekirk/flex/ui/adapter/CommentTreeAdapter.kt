@@ -117,7 +117,7 @@ class CommentTreeAdapter(
                     )
                     constraintSet.applyTo(root)
                 }
-                markwon.setMarkdown(commentContent, item.body)
+                markwon.setMarkdown(commentContent, item.body ?: "")
                 commentAuthorUsername.text = item.author
                 if (item.author.equals(submission.author, true)) {
                     commentAuthorUsername.setTextColor(root.context.getColor(R.color.blue))
@@ -128,8 +128,8 @@ class CommentTreeAdapter(
                 } else {
                     commentAuthorUsername.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 }
-                commentLocked.isGone = !item.isLocked
-                commentPinned.isGone = !item.isStickied
+                commentLocked.isGone = !item.isLocked!!
+                commentPinned.isGone = !item.isStickied!!
                 commentUpvoteNumber.text = item.score.toString()
                 val topAwards = item.allAwarding?.sortedByDescending { it.coinPrice }?.take(3)
                 if (!topAwards.isNullOrEmpty()) {
@@ -225,8 +225,8 @@ class CommentTreeAdapter(
                 } else {
                     commentAuthorUsername.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
                 }
-                commentLocked.isGone = !item.isLocked
-                commentPinned.isGone = !item.isStickied
+                commentLocked.isGone = !item.isLocked!!
+                commentPinned.isGone = !item.isStickied!!
                 val children = mutableListOf<CommentData>()
                 createChildList(item, children, 0)
                 if (children.size > 0) {
