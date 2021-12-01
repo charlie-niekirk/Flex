@@ -41,8 +41,6 @@ class SubmissionListViewModel @Inject constructor(
     private val preferences: Preferences,
     private val preLoginUserDao: PreLoginUserDao,
     private val userDao: UserDao,
-    private val imageLoader: ImageLoader,
-    private val imageRequest: ImageRequest.Builder,
     private val searchSubredditsUseCase: SearchSubredditsUseCase,
     private val getSubredditInfoUseCase: GetSubredditInfoUseCase
 ) : ViewModel() {
@@ -64,10 +62,10 @@ class SubmissionListViewModel @Inject constructor(
         sortFlow.flatMapLatest { sort ->
             Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
                 SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
-                    gfycatApi, redGifsApi, subreddit, sort, preLoginUserDao, userDao, imageRequest, imageLoader)
-            }.flow.cachedIn(viewModelScope)
+                    gfycatApi, redGifsApi, subreddit, sort, preLoginUserDao, userDao)
+            }.flow
         }
-    }
+    }.cachedIn(viewModelScope)
 
     fun onUiEvent(submissionListEvent: SubmissionListEvent) {
         when (submissionListEvent) {

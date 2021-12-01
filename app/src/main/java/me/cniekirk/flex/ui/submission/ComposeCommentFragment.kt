@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -73,7 +74,7 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            markwon.setMarkdown(commentContent, args.comment.body)
+            markwon.setMarkdown(commentContent, args.comment.body ?: "")
             commentAuthorUsername.text = args.comment.author
             if (args.comment.distinguishedRaw.equals("moderator", true)) {
                 commentAuthorUsername.setTextColor(root.context.getColor(R.color.green))
@@ -82,8 +83,8 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
             } else {
                 commentAuthorUsername.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
             }
-            commentLocked.isGone = !args.comment.isLocked
-            commentPinned.isGone = !args.comment.isStickied
+            commentLocked.isGone = !args.comment.isLocked!!
+            commentPinned.isGone = !args.comment.isStickied!!
             commentUpvoteNumber.text = args.comment.score.toString()
             val topAwards = args.comment.allAwarding?.sortedByDescending { it.coinPrice }?.take(3)
             if (!topAwards.isNullOrEmpty()) {
@@ -132,6 +133,10 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                 composeCommentField.applyMarkdown("```", true)
             }
 
+            buttonHeading.setOnClickListener {
+                composeCommentField.applyMarkdown("#", shouldWrap = false)
+            }
+
             buttonImage.setOnClickListener {
                 val items = arrayOf("Camera", "Gallery")
                 MaterialAlertDialogBuilder(requireContext())
@@ -162,6 +167,15 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                 findNavController().navigateUp()
             }
 
+            submitButton.setOnClickListener {
+                if (!composeCommentField.text?.trim().isNullOrEmpty()) {
+                    viewModel.submitComment(composeCommentField.text.toString(), args.comment.fullname ?: "")
+                } else {
+                    // Display error toast
+                    Toast.makeText(requireContext(), R.string.submit_comment_no_content_error, Toast.LENGTH_SHORT).show()
+                }
+            }
+
             composeCommentField.requestFocus()
 
             observe(viewModel.imageResponse) {
@@ -172,10 +186,7 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                         Snackbar.make(binding.root, R.string.unknown_error, Snackbar.LENGTH_SHORT).show()
                     }
                     RedditResult.Loading -> {
-                        uploadingSnackbar = Snackbar.make(binding.root, R.string.uploading_image, Snackbar.LENGTH_INDEFINITE)
-                        uploadingSnackbar?.anchorView = binding.buttonImage
-                        uploadingSnackbar?.view?.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.teal))
-                        uploadingSnackbar?.show()
+                       Toast.makeText(requireContext(), R.string.uploading_image, Toast.LENGTH_SHORT).show()
                     }
                     is RedditResult.Success -> {
                         //Toast.makeText(requireContext(), R.string.upload_image_success, Toast.LENGTH_SHORT).show()
@@ -204,6 +215,29 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                     }
                     else -> {
                         uploadingSnackbar?.dismiss()
+                        Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            observe(viewModel.submitCommentResponse) {
+                when (it) {
+                    RedditResult.Loading -> {
+                        binding.submitButton.isVisible = false
+                        binding.submitLoadingIndicator.isVisible = true
+                    }
+                    is RedditResult.Success -> {
+                        Toast.makeText(requireContext(), R.string.submit_comment_success, Toast.LENGTH_SHORT).show()
+                        findNavController().navigateUp()
+                    }
+                    is RedditResult.Error -> {
+                        Timber.e(it.errorMessage)
+                        binding.submitLoadingIndicator.isVisible = false
+                        binding.submitButton.isVisible = true
+                        Toast.makeText(requireContext(), R.string.submit_comment_error, Toast.LENGTH_SHORT).show()
+                    }
+                    RedditResult.UnAuthenticated -> {
+                        // Should never happen as you shouldn't be able to get to this screen
                         Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -246,29 +280,41 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
         }
     }
 
-    private fun EditText.applyMarkdown(punctuation: String, requiresLineBreak: Boolean = false) {
+    private fun EditText.applyMarkdown(punctuation: String,
+                                       requiresLineBreak: Boolean = false,
+                                       shouldWrap: Boolean = true) {
         val start = selectionStart
         val end = selectionEnd
 
-        if (start == end) {
-            // Cursor position
-            val wrapped = if (requiresLineBreak) {
-                "${punctuation}\nEdit me\n${punctuation}"
+        if (shouldWrap) {
+            if (start == end) {
+                // Cursor position
+                val wrapped = if (requiresLineBreak) {
+                    "${punctuation}\nEdit me\n${punctuation}"
+                } else {
+                    "${punctuation}Edit me${punctuation}"
+                }
+                text?.insert(start, wrapped)
+                if (requiresLineBreak) {
+                    setSelection(start + punctuation.length + 1, start + 7 + punctuation.length + 1)
+                } else {
+                    setSelection(start + punctuation.length, start + 7 + punctuation.length)
+                }
             } else {
-                "${punctuation}Edit me${punctuation}"
-            }
-            text?.insert(start, wrapped)
-            if (requiresLineBreak) {
-                setSelection(start + punctuation.length + 1, start + 7 + punctuation.length + 1)
-            } else {
-                setSelection(start + punctuation.length, start + 7 + punctuation.length)
+                val selectionSize = end - start
+                // Apply span to selected text
+                text?.insert(start, punctuation)
+                text?.insert(end + punctuation.length, punctuation)
+                setSelection(start + punctuation.length, start + punctuation.length + selectionSize)
             }
         } else {
-            val selectionSize = end - start
-            // Apply span to selected text
-            text?.insert(start, punctuation)
-            text?.insert(end + punctuation.length, punctuation)
-            setSelection(start + punctuation.length, start + punctuation.length + selectionSize)
+            if (start == end) {
+                val newText = "$punctuation Edit me"
+                text?.insert(start, newText)
+                setSelection(start + punctuation.length + 1, start + 7 + punctuation.length + 1)
+            } else {
+                text?.insert(start, "$punctuation ")
+            }
         }
     }
 }

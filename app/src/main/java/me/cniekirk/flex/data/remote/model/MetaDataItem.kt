@@ -9,7 +9,7 @@ data class MetaDataItem(
     val e: String,
     val id: String,
     val m: String?,
-    val p: List<P>,
-    val s: S,
+    val p: List<P>?,
+    val s: S?,
     val status: String
 ) : Parcelable

@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -112,6 +113,7 @@ class SubmissionListFragment
 
         observe(viewModel.userPrefsFlow) { userPrefs ->
             userPrefs?.let {
+
                 adapter = SubmissionListAdapter(
                     this@SubmissionListFragment,
                     userPrefs,
@@ -134,7 +136,7 @@ class SubmissionListFragment
                         }
                     }
                     viewModel.pagingSubmissionFlow.collectLatest {
-                        adapter?.submitData(viewLifecycleOwner.lifecycle, it)
+                        adapter?.submitData(it)
                     }
                 }
             }

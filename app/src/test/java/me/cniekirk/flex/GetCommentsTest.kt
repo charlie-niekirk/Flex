@@ -17,7 +17,8 @@ import org.mockito.kotlin.mock
 import kotlin.time.ExperimentalTime
 
 /**
- * Tests for getting submissions
+ * Tests for getting comments from a submission and mapping the returned comment
+ * tree appropriately
  */
 @ExperimentalCoroutinesApi
 class GetCommentsTest {
@@ -26,7 +27,9 @@ class GetCommentsTest {
     private lateinit var underTest: GetCommentsUseCase
 
     private val request = CommentRequest("123", "top")
+    // Model class created by Moshi deserializing the JSON
     private val repositoryResponse = provideUnmappedComments()
+    // The data structure the Use Case should emit for UI consumption
     private val useCaseResponse = provideMappedComments()
 
     private val repository = mock<RedditDataRepository> {
@@ -41,7 +44,7 @@ class GetCommentsTest {
 
     @ExperimentalTime
     @Test
-    fun `get comments data and state emitted correctly`() = coroutineDispatcher.runBlockingTest {
+    fun `get comments mapped data and state emitted correctly`() = coroutineDispatcher.runBlockingTest {
         underTest(request).test {
             assertEquals(RedditResult.Loading, awaitItem())
             assertEquals(RedditResult.Success(useCaseResponse), awaitItem())

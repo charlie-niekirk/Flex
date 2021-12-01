@@ -2,8 +2,6 @@ package me.cniekirk.flex.data.remote.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import coil.ImageLoader
-import coil.request.ImageRequest
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.remote.GfycatApi
@@ -24,9 +22,7 @@ class SubredditSubmissionsPagingSource(
     private val subreddit: String,
     private val sortType: String,
     private val preLoginUserDao: PreLoginUserDao,
-    private val userDao: UserDao,
-    private val imageRequest: ImageRequest.Builder,
-    private val imageLoader: ImageLoader
+    private val userDao: UserDao
 ) : PagingSource<String, AuthedSubmission>() {
 
     private var before: String? = null
@@ -98,25 +94,7 @@ class SubredditSubmissionsPagingSource(
                         else -> {}
                     }
                 }
-
             }
-
-//            if (!params.key.equals(before, true)) {
-//                // Pre-load any images
-//                when (response) {
-//                    is RedditResult.Success<*> -> {
-//                        val posts = response.data.children
-//                        posts.map {
-//                            it.data.url.processLink { linkType ->
-//                                when (linkType) {
-//                                    is Link.ImageLink -> imageLoader.prefetch(linkType.url)
-//                                    else -> {}
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
 
             if (itemCount > 0 && params.key.equals(before, true)) {
                 itemCount -= response.data.dist!!
@@ -139,6 +117,7 @@ class SubredditSubmissionsPagingSource(
 
     override fun getRefreshKey(state: PagingState<String, AuthedSubmission>): String? {
         return state.anchorPosition?.let { anchorPosition ->
+            Timber.d("Refresh key: ${state.closestItemToPosition(anchorPosition)?.id.toString()}")
             state.closestItemToPosition(anchorPosition)?.id.toString()
         }
     }

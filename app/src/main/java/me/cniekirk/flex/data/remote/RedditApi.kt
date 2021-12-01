@@ -127,6 +127,7 @@ interface RedditApi {
         @Path("subreddit") subreddit: String
     ): List<UserFlairItem>
 
+    @FormUrlEncoded
     @POST("api/comment")
     suspend fun submitComment(
         @Header("Authorization") authorization: String,
@@ -134,7 +135,7 @@ interface RedditApi {
         @Field("thing_id") thingId: String,
         @Field("return_rtjson") returnRichText: Boolean = false,
         @Field("api_type") apiType: String = "json"
-    ): CommentData
+    ): Comment
 
     @GET
     @Streaming
