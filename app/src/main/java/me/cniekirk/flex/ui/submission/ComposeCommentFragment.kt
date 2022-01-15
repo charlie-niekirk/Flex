@@ -1,8 +1,13 @@
 package me.cniekirk.flex.ui.submission
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -32,6 +37,8 @@ import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.viewmodel.ComposeCommentViewModel
 import me.cniekirk.flex.util.*
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.Executors
 
 @AndroidEntryPoint
@@ -57,6 +64,7 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
     }
 
     private var uploadingSnackbar: Snackbar? = null
+    private var cameraUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,12 +147,12 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
 
             buttonImage.setOnClickListener {
                 val items = arrayOf("Camera", "Gallery")
-                MaterialAlertDialogBuilder(requireContext())
+                MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Material3_MaterialAlertDialog_Centered)
                     .setItems(items) { dialog, which ->
                         if (items[which].equals("Gallery", true)) {
                             chooseFromPhotos()
                         } else {
-
+                            takePhoto()
                         }
                         dialog.dismiss()
                     }
@@ -197,7 +205,7 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                             text.insert(0, it.data.data?.link)
                         }
                         val name = dialogView.findViewById<EditText>(R.id.name_input_edit_text)
-                        MaterialAlertDialogBuilder(requireContext())
+                        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Material3_MaterialAlertDialog_Centered)
                             .setTitle(R.string.set_image_name_title)
                             .setIcon(R.drawable.ic_image)
                             .setView(dialogView)
@@ -278,6 +286,66 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
             val requestBody = InputStreamRequestBody(requireContext().contentResolver, it)
             viewModel.uploadImage(requestBody)
         }
+    }
+
+    //Result launcher for getting permissions to take a photo
+    private val photoPermissionResultLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        if(it == true)
+        {
+            takePhoto()
+        }
+    }
+
+    //Result launcher for taking a photo
+    private val takePhotoResultLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { created ->
+        if (created)
+        {
+            // Upload the image
+            cameraUri?.let {
+                val reqBody = InputStreamRequestBody(requireContext().contentResolver, it)
+                viewModel.uploadImage(reqBody)
+            }
+        }
+    }
+
+    /**
+     * Checks the user's permissions for taking a photo, before allowing them to take a photo to upload into a comment
+     *
+     * @return true
+     */
+    private fun takePhoto() : Boolean
+    {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+        {
+            photoPermissionResultLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        else
+        {
+            val currentDate = Calendar.getInstance().time
+            val timeFormatted = SimpleDateFormat("yyyyMMddHHmmssSSSZ", Locale.getDefault()).format(currentDate)
+            val uriStr = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            {
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            }
+            else
+            {
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            }
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, "camera_$timeFormatted")
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                {
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/flexApp/")
+                }
+            }
+            val uri = context?.contentResolver?.insert(uriStr, contentValues)
+            uri?.let {
+                cameraUri = it
+                takePhotoResultLauncher.launch(cameraUri)
+            }
+        }
+        return true
     }
 
     private fun EditText.applyMarkdown(punctuation: String,

@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.databinding.MediaShareDialogBinding
 import me.cniekirk.flex.util.*
 
@@ -34,8 +34,6 @@ class SubmissionShareDialogFragment(
         binding = MediaShareDialogBinding.inflate(inflater, container, false)
         return binding?.root
     }
-
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -67,6 +65,11 @@ class SubmissionShareDialogFragment(
     override fun onResume() {
         super.onResume()
         setCurrentScreen()
+    }
+
+    override fun onDestroyView() {
+        binding = null
+        super.onDestroyView()
     }
 
 }

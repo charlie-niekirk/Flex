@@ -1,26 +1,35 @@
 package me.cniekirk.flex.ui.adapter
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.get
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import io.noties.markwon.Markwon
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.data.remote.model.CommentData
-import me.cniekirk.flex.data.remote.model.MoreComments
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.reddit.Comment
+import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.databinding.SubmissionCommentCollapsedListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentLoadMoreListItemBinding
+import me.cniekirk.flex.ui.gallery.SlidingGalleryContainer
+import me.cniekirk.flex.util.ContentLink
 import me.cniekirk.flex.util.getDepthColour
 import me.cniekirk.flex.util.resolveColorAttr
-import timber.log.Timber
+import me.cniekirk.flex.util.toYtThumb
 
 enum class CommentViewType {
     COMMENT,
@@ -88,7 +97,6 @@ class CommentTreeAdapter(
             }
         }
     }
-    override fun getItemCount() = currentList.size
 
     inner class CommentViewHolder(private val binding: SubmissionCommentListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
@@ -176,6 +184,87 @@ class CommentTreeAdapter(
                     if (!item.isCollapsed) {
                         commentActionListener.onReply(item)
                     }
+                }
+                parsedLinksLayout.isVisible = !item.contentLinks.isNullOrEmpty()
+                if (item.contentLinks?.size != parsedLinksLayout.childCount) {
+                    item.contentLinks?.forEachIndexed { index, link ->
+                        val view = when (link) {
+                            is ContentLink.ImageLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.image_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp
+                            }
+                            is ContentLink.ImgurGalleryLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.image_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp.setOnClickListener {
+                                    commentActionListener.onImgurGalleryClicked(link.url)
+                                }
+                                temp
+                            }
+                            is ContentLink.ImgurImageLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.image_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp
+                            }
+                            is ContentLink.VideoLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.image_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp
+                            }
+                            is ContentLink.WebLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.web_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp
+                            }
+                            is ContentLink.WikipediaLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.wikipedia_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<TextView>(R.id.title_text).text = link.title
+                                temp[index].findViewById<TextView>(R.id.summary_text).text = link.summary
+                                temp
+                            }
+                            is ContentLink.YoutubeLink -> {
+                                val temp = LayoutInflater.from(parsedLinksLayout.context).inflate(
+                                    R.layout.youtube_link_preview_view, parsedLinksLayout, true)
+                                (temp as LinearLayout)[index].findViewById<ImageView>(R.id.image_preview).apply {
+                                    val thumb = if (link.url.contains("youtu.be")) {
+                                        link.url.substringAfterLast("/").toYtThumb()
+                                    } else {
+                                        link.url.substringAfter("=").toYtThumb()
+                                    }
+                                    Glide.with(this).load(thumb).into(this)
+                                }
+                                (temp)[index].findViewById<TextView>(R.id.link_text).text = link.url
+                                temp
+                            }
+                        }
+                        if (!view.hasOnClickListeners()) {
+                            view.setOnClickListener {
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    data = Uri.parse(link.url)
+                                }
+                                root.context.startActivity(intent)
+                            }
+                        }
+                    }
+                }
+                if (item.contentLinks.isNullOrEmpty()) {
+                    val cs = ConstraintSet()
+                    cs.clone(root)
+                    cs.connect(commentContent.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM,
+                        root.context.resources.getDimensionPixelSize(R.dimen.spacing_l))
+                    cs.applyTo(root)
+                } else {
+                    val cs = ConstraintSet()
+                    cs.clone(root)
+                    cs.connect(commentContent.id, ConstraintSet.BOTTOM, parsedLinksLayout.id, ConstraintSet.TOP, 0)
+                    cs.applyTo(root)
                 }
             }
         }
@@ -315,14 +404,13 @@ class CommentTreeAdapter(
                     )
                     constraintSet.applyTo(root)
                 }
-                numMoreReplies.text = binding.root.context.getString(R.string.num_replies, moreComments.count)
+                numMoreReplies.text =
+                    binding.root.context.getString(R.string.num_replies, moreComments.count)
                 root.setOnClickListener { commentActionListener.onLoadMore(moreComments) }
             }
         }
 
     }
-
-
 
     /**
      * Gets all child comments recursively and sets them to be expanded
@@ -389,7 +477,6 @@ class CommentTreeAdapter(
             oldItem.id == newItem.id
 
         override fun areContentsTheSame(oldItem: CommentData, newItem: CommentData): Boolean {
-            Timber.d("Contents: ${oldItem.id} ${oldItem.isCollapsed} ${newItem.isCollapsed} ${oldItem.isCollapsed == newItem.isCollapsed}")
             return oldItem.isCollapsed == newItem.isCollapsed
         }
     }
@@ -397,5 +484,6 @@ class CommentTreeAdapter(
     interface CommentActionListener {
         fun onLoadMore(moreComments: MoreComments)
         fun onReply(comment: Comment)
+        fun onImgurGalleryClicked(albumId: String)
     }
 }

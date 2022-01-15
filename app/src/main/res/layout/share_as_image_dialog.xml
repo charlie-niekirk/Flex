@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:background="?attr/colorPrimaryContainer">
+
+        <TextView
+            android:id="@+id/image_preview_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:text="@string/share_as_image_title"
+            android:textStyle="bold" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/preview_image_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/image_preview_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_l"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:layout_marginEnd="@dimen/spacing_l"
+            android:background="@drawable/share_as_image_shape">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_subreddit_name"
+                style="?attr/textAppearanceBodyMedium"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="@dimen/spacing_l"
+                android:layout_marginStart="@dimen/spacing_l"
+                tools:text="tommyinnit" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_submission_flair"
+                style="?attr/textAppearanceBodyMedium"
+                android:background="@drawable/flair_background"
+                app:layout_constraintStart_toEndOf="@id/text_subreddit_name"
+                app:layout_constraintTop_toTopOf="@id/text_subreddit_name"
+                app:layout_constraintBottom_toBottomOf="@id/text_subreddit_name"
+                android:layout_marginStart="8dp"
+                android:padding="3dp"
+                tools:text="Tanboo"
+                tools:textColor="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_submission_title"
+                style="@style/Bold.H2"
+                app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
+                app:layout_constraintTop_toBottomOf="@id/text_subreddit_name"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="8dp"
+                tools:text="This is a random post in this subreddit" />
+
+            <include
+                android:id="@+id/selftext_preview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                layout="@layout/submission_markdown"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="@dimen/spacing_m"
+                android:layout_marginEnd="@dimen/spacing_m"
+                android:layout_marginTop="8dp"
+                tools:visibility="gone" />
+
+            <include
+                android:id="@+id/image_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                layout="@layout/submission_image_preview"
+                app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/video_preview"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                layout="@layout/submission_video_preview"
+                app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/external_link_preview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                layout="@layout/submission_link_preview"
+                app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginHorizontal="@dimen/spacing_l"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <androidx.constraintlayout.widget.Barrier
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/preview_group"
+                app:constraint_referenced_ids="selftext_preview,image_preview,video_preview,external_link_preview"
+                app:barrierDirection="bottom" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:id="@+id/image_upvote_indicator"
+                style="@style/Icon"
+                app:layout_constraintTop_toBottomOf="@id/preview_group"
+                app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_arrow_upward"
+                android:contentDescription="@string/upvote_icon_content_description" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_upvote_count"
+                style="?attr/textAppearanceBodyMedium"
+                app:layout_constraintStart_toEndOf="@id/image_upvote_indicator"
+                app:layout_constraintTop_toTopOf="@id/image_upvote_indicator"
+                app:layout_constraintBottom_toBottomOf="@id/image_upvote_indicator"
+                android:layout_marginStart="4dp"
+                tools:text="1.6K" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/image_time_indicator"
+                style="@style/Icon"
+                app:layout_constraintTop_toTopOf="@id/image_upvote_indicator"
+                app:layout_constraintBottom_toBottomOf="@id/image_upvote_indicator"
+                app:layout_constraintStart_toEndOf="@id/text_upvote_count"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_clock"
+                android:contentDescription="@string/clock_icon_content_description" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_time_since_post"
+                style="?attr/textAppearanceBodyMedium"
+                app:layout_constraintStart_toEndOf="@id/image_time_indicator"
+                app:layout_constraintTop_toTopOf="@id/image_time_indicator"
+                app:layout_constraintBottom_toBottomOf="@id/image_time_indicator"
+                android:layout_marginStart="3dp"
+                tools:text="16h" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/image_upvote_ratio_indicator"
+                style="@style/Icon"
+                app:layout_constraintTop_toTopOf="@id/image_upvote_indicator"
+                app:layout_constraintBottom_toBottomOf="@id/image_upvote_indicator"
+                app:layout_constraintStart_toEndOf="@id/text_time_since_post"
+                android:layout_marginStart="4dp"
+                android:src="@drawable/ic_smile"
+                android:contentDescription="@string/smile_icon_content_description" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_upvote_ratio"
+                style="?attr/textAppearanceBodyMedium"
+                app:layout_constraintStart_toEndOf="@id/image_upvote_ratio_indicator"
+                app:layout_constraintTop_toTopOf="@id/image_time_indicator"
+                app:layout_constraintBottom_toBottomOf="@id/image_time_indicator"
+                android:layout_marginStart="3dp"
+                tools:text="94%" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/submission_pin"
+                app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
+                app:layout_constraintTop_toBottomOf="@id/image_upvote_indicator"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_pin"
+                app:tint="@color/green"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_submission_author"
+                style="@style/Bold.Label"
+                app:layout_constraintStart_toEndOf="@id/submission_pin"
+                app:layout_constraintTop_toBottomOf="@id/image_upvote_indicator"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="@dimen/spacing_l"
+                tools:text="u/chertycherty" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/text_author_flair"
+                style="?attr/textAppearanceBodyMedium"
+                android:background="@drawable/flair_background"
+                app:layout_constraintStart_toEndOf="@id/text_submission_author"
+                app:layout_constraintTop_toTopOf="@id/text_submission_author"
+                app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
+                android:layout_marginStart="@dimen/spacing_m"
+                android:padding="3dp"
+                tools:text="Someone" />
+
+            <include
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                layout="@layout/content_awards_view"
+                android:id="@+id/awards"
+                app:layout_constraintTop_toTopOf="@id/text_submission_author"
+                app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
+                app:layout_constraintStart_toEndOf="@id/text_author_flair"
+                android:layout_marginStart="8dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/hide_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            app:layout_constraintTop_toBottomOf="@id/preview_image_container"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:layout_marginEnd="@dimen/spacing_l"
+            android:text="@string/share_image_hide_username" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/hide_subreddit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            app:layout_constraintTop_toBottomOf="@id/hide_username"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:layout_marginEnd="@dimen/spacing_l"
+            android:text="@string/share_image_hide_subreddit" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/share_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/hide_subreddit"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/save_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="@dimen/spacing_l"
+            android:layout_marginEnd="@dimen/spacing_s"
+            android:layout_marginStart="@dimen/spacing_l"
+            android:layout_marginTop="@dimen/spacing_m"
+            style="@style/ShapeAppearanceOverlay.Material3.Button"
+            android:text="@string/share_as_image_button" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/share_button"
+            app:layout_constraintBottom_toBottomOf="@id/share_button"
+            app:layout_constraintStart_toEndOf="@id/share_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="@dimen/spacing_m"
+            android:layout_marginEnd="@dimen/spacing_l"
+            style="@style/ShapeAppearanceOverlay.Material3.Button"
+            android:text="@string/save_as_image_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

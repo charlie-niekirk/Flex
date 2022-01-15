@@ -13,7 +13,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
 import me.cniekirk.flex.databinding.MediaMetadataDialogBinding
 import me.cniekirk.flex.util.getUriFromBitmap
 import me.cniekirk.flex.util.loadImage

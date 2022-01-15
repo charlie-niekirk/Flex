@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.annotation.ColorInt
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -17,9 +17,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
-import com.google.android.exoplayer2.SimpleExoPlayer
 import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
 import im.ene.toro.exoplayer.ExoCreator
@@ -27,26 +24,29 @@ import im.ene.toro.exoplayer.ExoPlayerViewHelper
 import im.ene.toro.exoplayer.Playable
 import im.ene.toro.media.PlaybackInfo
 import im.ene.toro.widget.Container
-import jp.wasabeef.glide.transformations.BlurTransformation
+import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
-import me.cniekirk.flex.data.remote.model.Resolution
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
-import me.cniekirk.flex.ui.model.UserPreferences
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
 enum class ViewType {
     IMAGE,
     VIDEO,
+    YOUTUBE,
     SELF_TEXT,
     GALLERY,
-    LINK
+    IMGUR_GALLERY,
+    LINK,
+    TWITTER,
+    POLL
 }
 
 class SubmissionListAdapter(
     private val submissionsActionListener: SubmissionActionListener,
-    private val userPreferences: UserPreferences,
+    private val settings: FlexSettings,
     private val exoCreator: ExoCreator)
     : PagingDataAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
 
@@ -92,6 +92,40 @@ class SubmissionListAdapter(
                         false
                     ))
             }
+            ViewType.POLL.ordinal -> {
+                PollViewHolder(
+                    PollListItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    ))
+            }
+            ViewType.YOUTUBE.ordinal -> {
+                YoutubeViewHolder(
+                    YoutubeListItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
+            }
+            ViewType.IMGUR_GALLERY.ordinal -> {
+                GallerySubmissionViewHolder(
+                    GalleryListItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    ))
+            }
+            ViewType.TWITTER.ordinal -> {
+                TwitterViewHolder(
+                    TweetListItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
+            }
             else -> {
                 SelfTextSubmissionViewHolder(
                     SelfTextListItemBinding.inflate(
@@ -106,6 +140,9 @@ class SubmissionListAdapter(
     override fun getItemViewType(position: Int): Int {
         var viewType = 0
         val item = getItem(position)
+        if (item?.pollData != null) {
+            return ViewType.POLL.ordinal
+        }
         if (item?.isSelf == true) {
             return ViewType.SELF_TEXT.ordinal
         }
@@ -115,9 +152,11 @@ class SubmissionListAdapter(
                 is Link.ImageLink -> { ViewType.IMAGE.ordinal }
                 Link.RedGifLink -> { ViewType.IMAGE.ordinal }
                 Link.RedditGallery -> { ViewType.GALLERY.ordinal }
+                is Link.ImgurGalleryLink -> { ViewType.IMGUR_GALLERY.ordinal }
                 Link.RedditVideo -> { ViewType.VIDEO.ordinal }
-                is Link.TwitterLink -> { ViewType.LINK.ordinal }
+                is Link.TwitterLink -> { ViewType.TWITTER.ordinal }
                 is Link.VideoLink -> { ViewType.VIDEO.ordinal }
+                is Link.YoutubeLink -> { ViewType.YOUTUBE.ordinal }
                 Link.StreamableLink -> { ViewType.VIDEO.ordinal }
                 Link.GfycatLink -> { ViewType.VIDEO.ordinal }
             }
@@ -127,7 +166,10 @@ class SubmissionListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         getItem(position)?.let { post ->
-            if (post.isSelf == true) {
+            if (post.pollData != null) {
+                val pollHolder = (holder as PollViewHolder)
+                pollHolder.bind(post)
+            } else if (post.isSelf == true) {
                 val selfTextHolder = (holder as SelfTextSubmissionViewHolder)
                 selfTextHolder.bind(post)
             } else {
@@ -166,7 +208,7 @@ class SubmissionListAdapter(
                         }
                         is Link.TwitterLink -> {
                             Timber.d("Twitter link")
-                            val linkHolder = (holder as ExternalLinkSubmissionViewHolder)
+                            val linkHolder = (holder as TwitterViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.VideoLink -> {
@@ -184,6 +226,14 @@ class SubmissionListAdapter(
                             val viewHolder = (holder as VideoSubmissionViewHolder)
                             viewHolder.bind(post, post.url)
                         }
+                        is Link.ImgurGalleryLink -> {
+                            val galleryHolder = (holder as SubmissionDetailHeaderAdapter.GallerySubmissionViewHolder)
+                            galleryHolder.bind(post)
+                        }
+                        is Link.YoutubeLink -> {
+                            val viewHolder = (holder as YoutubeViewHolder)
+                            viewHolder.bind(post, it.videoId)
+                        }
                     }
                 }
             }
@@ -194,6 +244,7 @@ class SubmissionListAdapter(
         private val binding: SelfTextListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: AuthedSubmission) {
+            binding.actions.root.visibility = View.GONE
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
@@ -302,6 +353,7 @@ class SubmissionListAdapter(
         private val binding: ImageListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: AuthedSubmission, imageUrl: String) {
+            binding.actions.root.visibility = View.GONE
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
@@ -399,9 +451,10 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
-            if (imageUrl.isBlank() && post.preview != null) {
+            if (post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
+                    binding.imagePreview.submissionImage.ratio = resolution.height.toFloat() / resolution.width.toFloat()
                     binding.imagePreview.submissionImage.loadImage(resolution.url, post.over18)
                 }
             } else {
@@ -418,6 +471,8 @@ class SubmissionListAdapter(
         private var exoPlayerViewHelper: ExoPlayerViewHelper? = null
 
         fun bind(post: AuthedSubmission, videoUrl: String) {
+            binding.actions.root.visibility = View.GONE
+
             mediaUri = Uri.parse(videoUrl)
 
             // Load the thumbnail
@@ -465,6 +520,8 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.text = post.authorFlairText
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -584,6 +641,8 @@ class SubmissionListAdapter(
         private val binding: GalleryListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: AuthedSubmission) {
+            binding.actions.root.visibility = View.GONE
+
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
@@ -682,29 +741,44 @@ class SubmissionListAdapter(
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
 
-            val media = post.mediaMetadata?.values?.toList()
-            binding.mediaGalleryPreview.textGalleryCount.text =
-                binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
-            media?.let {
-                if (media.size > 2) {
+            post.imgurGalleryLinks?.let {
+                binding.mediaGalleryPreview.textGalleryCount.text =
+                    binding.root.context.getString(R.string.image_gallery_submission_label, it.size)
+                if (it.size > 2) {
                     binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
-                    binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
-                        media[0].id,
-                        media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
-                    binding.mediaGalleryPreview.secondImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
-                        media[1].id,
-                        media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
-                    binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
-                        media[2].id,
-                        media[2].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    binding.mediaGalleryPreview.firstImage.loadImage(it[0], post.over18)
+                    binding.mediaGalleryPreview.firstImage.loadImage(it[1], post.over18)
+                    binding.mediaGalleryPreview.firstImage.loadImage(it[2], post.over18)
                 } else {
                     binding.mediaGalleryPreview.secondImage.visibility = View.GONE
-                    binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
-                        media[0].id,
-                        media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
-                    binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
-                        media[1].id,
-                        media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    binding.mediaGalleryPreview.firstImage.loadImage(it[0], post.over18)
+                    binding.mediaGalleryPreview.firstImage.loadImage(it[1], post.over18)
+                }
+            } ?: run {
+                val media = post.mediaMetadata?.values?.toList()
+                binding.mediaGalleryPreview.textGalleryCount.text =
+                    binding.root.context.getString(R.string.image_gallery_submission_label, media?.size)
+                media?.let {
+                    if (media.size > 2) {
+                        binding.mediaGalleryPreview.secondImage.visibility = View.VISIBLE
+                        binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].id,
+                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                        binding.mediaGalleryPreview.secondImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                            media[1].id,
+                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                        binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                            media[2].id,
+                            media[2].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    } else {
+                        binding.mediaGalleryPreview.secondImage.visibility = View.GONE
+                        binding.mediaGalleryPreview.firstImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                            media[0].id,
+                            media[0].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                        binding.mediaGalleryPreview.thirdImage.loadImage(binding.root.context.getString(R.string.reddit_image_url,
+                            media[1].id,
+                            media[1].m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" }), post.over18)
+                    }
                 }
             }
             binding.mediaGalleryPreview.root.setOnClickListener {
@@ -717,6 +791,8 @@ class SubmissionListAdapter(
         private val binding: LinkListItemBinding): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: AuthedSubmission) {
+            binding.actions.root.visibility = View.GONE
+
             binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
@@ -827,19 +903,353 @@ class SubmissionListAdapter(
         }
     }
 
+    inner class PollViewHolder(private val binding: PollListItemBinding): RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(post: AuthedSubmission) {
+            binding.actions.root.visibility = View.GONE
+
+            binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
+            binding.textSubmissionTitle.text = post.title
+            binding.textSubredditName.text = post.subreddit
+            binding.textCommentsCount.text = post.numComments?.condense()
+            binding.textUpvoteCount.text = post.ups?.condense()
+            binding.textTimeSincePost.text = post.created?.toLong()?.getElapsedTime()
+            binding.textSubmissionAuthor.text = binding.root.context.getString(R.string.author_format, post.author)
+            post.linkFlairText?.let {
+                binding.textSubmissionFlair.visibility = View.VISIBLE
+                binding.textSubmissionFlair.text = it
+                if (post.linkFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.linkFlairBackgroundColor))
+                }
+                if (post.linkFlairTextColor.equals("dark", true)) {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.white))
+                }
+            } ?: run {
+                binding.textSubmissionFlair.visibility = View.GONE
+            }
+            if (post.authorFlairText.isNullOrBlank()) {
+                binding.textAuthorFlair.visibility = View.GONE
+            } else {
+                binding.textAuthorFlair.visibility = View.VISIBLE
+                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+            }
+            if (post.stickied!!) {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.green))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.BOLD)
+                binding.submissionPin.visibility = View.VISIBLE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.submissionPin.id,
+                    ConstraintSet.END,
+                    binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
+                cs.applyTo(binding.root)
+            } else {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
+                binding.submissionPin.visibility = View.GONE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.textSubredditName.id,
+                    ConstraintSet.START)
+                cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
+            val adapter = PollOptionsAdapter()
+            binding.pollPreview.pollOptions.adapter = adapter
+            adapter.submitList(post.pollData!!.options)
+            binding.pollPreview.voteCount.text = "${post.pollData.totalVoteCount?.condense()} votes"
+            binding.pollPreview.timeRemaining.text = "${post.pollData.votingEndTimestamp!!.getElapsedTime(false)} remaining"
+        }
+    }
+
+    inner class YoutubeViewHolder(private val binding: YoutubeListItemBinding)
+        : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(post: AuthedSubmission, videoId: String) {
+            binding.actions.root.visibility = View.GONE
+
+            binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
+            binding.textSubmissionTitle.text = post.title
+            binding.textSubredditName.text = post.subreddit
+            binding.textCommentsCount.text = post.numComments?.condense()
+            binding.textUpvoteCount.text = post.ups?.condense()
+            binding.textTimeSincePost.text = post.created?.toLong()?.getElapsedTime()
+            binding.textSubmissionAuthor.text = binding.root.context.getString(R.string.author_format, post.author)
+            post.linkFlairText?.let {
+                binding.textSubmissionFlair.visibility = View.VISIBLE
+                binding.textSubmissionFlair.text = it
+                if (post.linkFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.linkFlairBackgroundColor))
+                }
+                if (post.linkFlairTextColor.equals("dark", true)) {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.white))
+                }
+            } ?: run {
+                binding.textSubmissionFlair.visibility = View.GONE
+            }
+            if (post.authorFlairText.isNullOrBlank()) {
+                binding.textAuthorFlair.visibility = View.GONE
+            } else {
+                binding.textAuthorFlair.visibility = View.VISIBLE
+                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+            }
+            if (post.stickied!!) {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.green))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.BOLD)
+                binding.submissionPin.visibility = View.VISIBLE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.submissionPin.id,
+                    ConstraintSet.END,
+                    binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
+                cs.applyTo(binding.root)
+            } else {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
+                binding.submissionPin.visibility = View.GONE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.textSubredditName.id,
+                    ConstraintSet.START)
+                cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
+            binding.videoPlayer.loadImage(videoId.toYtThumb(), false)
+            binding.videoPlayer.setOnClickListener {
+                submissionsActionListener.onYoutubeVideoClicked(videoId)
+            }
+        }
+
+    }
+
+    inner class TwitterViewHolder(private val binding: TweetListItemBinding)
+        : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(post: AuthedSubmission) {
+            binding.actions.root.visibility = View.GONE
+
+            binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnLongClickListener {
+                submissionsActionListener.onPostLongClicked(post)
+                true
+            }
+            binding.textSubmissionTitle.text = post.title
+            binding.textSubredditName.text = post.subreddit
+            binding.textCommentsCount.text = post.numComments?.condense()
+            binding.textUpvoteCount.text = post.ups?.condense()
+            binding.textTimeSincePost.text = post.created?.toLong()?.getElapsedTime()
+            binding.textSubmissionAuthor.text = binding.root.context.getString(R.string.author_format, post.author)
+            post.linkFlairText?.let {
+                binding.textSubmissionFlair.visibility = View.VISIBLE
+                binding.textSubmissionFlair.text = it
+                if (post.linkFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.linkFlairBackgroundColor))
+                }
+                if (post.linkFlairTextColor.equals("dark", true)) {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.white))
+                }
+            } ?: run {
+                binding.textSubmissionFlair.visibility = View.GONE
+            }
+            if (post.authorFlairText.isNullOrBlank()) {
+                binding.textAuthorFlair.visibility = View.GONE
+            } else {
+                binding.textAuthorFlair.visibility = View.VISIBLE
+                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+            }
+            if (post.stickied!!) {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.green))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.BOLD)
+                binding.submissionPin.visibility = View.VISIBLE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.submissionPin.id,
+                    ConstraintSet.END,
+                    binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
+                cs.applyTo(binding.root)
+            } else {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
+                binding.submissionPin.visibility = View.GONE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.textSubredditName.id,
+                    ConstraintSet.START)
+                cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
+            post.tweetDetails?.let { tweet ->
+                Timber.d("Tweet: $tweet")
+                binding.tweetPreview.tweetAuthorName.text = tweet.includes?.users?.get(0)?.name
+                Glide.with(binding.root).load(tweet.includes?.users?.get(0)?.profileImageUrl)
+                    .circleCrop()
+                    .into(binding.tweetPreview.tweetProfileImage)
+                binding.tweetPreview.tweetProfileVerified.isVisible = tweet.includes?.users?.get(0)?.verified ?: false
+                binding.tweetPreview.tweetBody.text = tweet.data?.text
+            }
+        }
+
+    }
+
     private fun ImageView.getSuitablePreview(previews: List<Resolution>): Resolution? {
         if (previews.isNotEmpty()) {
             var preview = previews.last()
-            if (preview.width * preview.height > 1000000) {
+            if (preview.width * preview.height > 700000) {
                 for (i in previews.size - 1 downTo 0) {
                     preview = previews[i]
                     if (width >= preview.width) {
-                        if (preview.width * preview.height <= 1000000) {
+                        if (preview.width * preview.height <= 700000) {
                             return preview
                         }
                     } else {
                         val height = width / preview.width * preview.height
-                        if (width * height <= 1000000) {
+                        if (width * height <= 700000) {
                             return preview
                         }
                     }
@@ -859,5 +1269,6 @@ class SubmissionListAdapter(
         fun onPostClicked(post: AuthedSubmission)
         fun onPostLongClicked(post: AuthedSubmission)
         fun onGalleryClicked(post: AuthedSubmission)
+        fun onYoutubeVideoClicked(videoId: String)
     }
 }

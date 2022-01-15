@@ -1,7 +1,7 @@
 package me.cniekirk.flex.domain
 
 import kotlinx.coroutines.flow.Flow
-import me.cniekirk.flex.data.remote.redgifs.GfycatLinks
+import me.cniekirk.flex.data.remote.model.reddit.redgifs.GfycatLinks
 
 interface MediaResolutionRepository {
 

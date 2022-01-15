@@ -71,7 +71,6 @@ class LoginWebviewFragment : FullscreenDialog() {
                                 parseUrl(url)
                             }
                             val code = parsed.getValue("code")
-                            Timber.d("Code: $code")
                             viewModel.onCodeIntercepted(code.substring(0, code.lastIndexOf("#")))
                         }
                     }

@@ -49,12 +49,23 @@ import timber.log.Timber
 
 import io.noties.markwon.core.spans.*
 import androidx.annotation.NonNull
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 
 import io.noties.markwon.core.spans.HeadingSpan
+import java.time.Duration
+import kotlin.math.absoluteValue
 
 
-
-
+private val imgurRegex = Regex("""(https?:)?/?/?(\w+\.)?imgur\.com/a/(\w+)""")
+private val imgurGalleryRegex = Regex("""(https?:)?/?/?(\w+\.)?imgur\.com/a/(\S*)""")
+private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gif?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
+private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi|gifv)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
+private val wikipediaRegex = Regex("""(https?:)?/?/?(\S+\.)wikipedia.org/wiki/[\w+_-]+""")
+private val youtubeRegex = Regex("""http(?:s?)://(?:www\.)?youtu(?:be\.com/watch\?v=|\.be/)([\w\-_]+)(\?t=[\w]+)?(&(amp;)?‌​[\w?‌​=]*)?""")
+private val twitterRegex = Regex("""^https?://twitter\.com/(?:#!/)?(\w+)/status(es)?/(\d+)(\?\S+)?""")
+private val urlRegex = Regex(
+    """((?:(http|https|Http|Https)://(?:(?:[a-zA-Z0-9$\-_.+!*'(),;?&=]|(?:%[a-fA-F0-9]{2})){1,64}(?::(?:[a-zA-Z0-9$\-_.+!*'(),;?&=]|(?:%[a-fA-F0-9]{2})){1,25})?@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-_]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdeghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?::\d{1,5})?)(/(?:(?:[a-zA-Z0-9;/?:@&=#~%\-.+!*',_])|(?:%[a-fA-F0-9]{2}))*)?"""
+)
 
 fun Int.condense(): String {
     val cdf = CompactDecimalFormat.getInstance(ULocale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT)
@@ -75,12 +86,13 @@ private const val DAY_MILLIS = 24 * HOUR_MILLIS
 private const val MONTH_MILLIS = 30 * DAY_MILLIS
 private const val YEAR_MILLIS = 12 * MONTH_MILLIS
 
-private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gif?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
-private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi|gifv)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
-
-fun Long.getElapsedTime(): String {
+fun Long.getElapsedTime(adjust: Boolean = true): String {
     val now = System.currentTimeMillis()
-    val diff = now - (this * 1000)
+    val diff = if (adjust) {
+        now - (this * 1000)
+    } else {
+        (now - this).absoluteValue
+    }
     return when {
         diff < MINUTE_MILLIS -> {
             "now"
@@ -141,8 +153,14 @@ fun String.processLink(block: (Link) -> Unit) {
         this.contains("reddit.com/gallery") -> {
             block(Link.RedditGallery)
         }
-        this.startsWith("https://www.twitter.com") -> {
+        imgurGalleryRegex.matches(this) -> {
+            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))
+        }
+        twitterRegex.matches(this) -> {
             block(Link.TwitterLink(this))
+        }
+        youtubeRegex.matches(this) -> {
+            block(Link.YoutubeLink(youtubeRegex.matchEntire(this)?.groupValues?.get(1) ?: ""))
         }
         else -> {
             block(Link.ExternalLink)
@@ -173,8 +191,11 @@ suspend fun String.processLinkInternal(block: suspend (Link) -> Unit) {
         this.contains("reddit.com/gallery") -> {
             block(Link.RedditGallery)
         }
-        this.startsWith("https://www.twitter.com") -> {
-            block(Link.TwitterLink(this))
+        imgurGalleryRegex.matches(this) -> {
+            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))
+        }
+        twitterRegex.matches(this) -> {
+            block(Link.TwitterLink(twitterRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))
         }
         else -> {
             block(Link.ExternalLink)
@@ -284,10 +305,6 @@ val easterEggMap = mapOf(
 fun Context.getEasterEggString(subreddit: String): String =
     getString(easterEggMap[subreddit.lowercase()] ?: R.string.default_empty_comments)
 
-private val urlRegex = Regex(
-    """((?:(http|https|Http|Https)://(?:(?:[a-zA-Z0-9$\-_.+!*'(),;?&=]|(?:%[a-fA-F0-9]{2})){1,64}(?::(?:[a-zA-Z0-9$\-_.+!*'(),;?&=]|(?:%[a-fA-F0-9]{2})){1,25})?@)?)?((?:(?:[a-zA-Z0-9][a-zA-Z0-9\-_]{0,64}\.)+(?:(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])|(?:biz|b[abdefghijmnorstvwyz])|(?:cat|com|coop|c[acdfghiklmnoruvxyz])|d[ejkmoz]|(?:edu|e[cegrstu])|f[ijkmor]|(?:gov|g[abdefghilmnpqrstuwy])|h[kmnrtu]|(?:info|int|i[delmnoqrst])|(?:jobs|j[emop])|k[eghimnrwyz]|l[abcikrstuvy]|(?:mil|mobi|museum|m[acdeghklmnopqrstuvwxyz])|(?:name|net|n[acefgilopruz])|(?:org|om)|(?:pro|p[aefghklmnrstwy])|qa|r[eouw]|s[abcdeghijklmnortuvyz]|(?:tel|travel|t[cdfghjklmnoprtvwz])|u[agkmsyz]|v[aceginu]|w[fs]|y[etu]|z[amw]))|(?:(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[0-9])))(?::\d{1,5})?)(/(?:(?:[a-zA-Z0-9;/?:@&=#~%\-.+!*'(),_])|(?:%[a-fA-F0-9]{2}))*)?"""
-)
-
 fun CharSequence.getUrls(): List<CharSequence>? {
     return if (urlRegex.containsMatchIn(this)) {
         val matches = urlRegex.findAll(this, 0)
@@ -312,11 +329,15 @@ fun ImageView.loadImage(imageUrl: String, over18: Boolean) {
             .load(imageUrl)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 7)))
             .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerInside()
+            .transition(withCrossFade())
             .into(this)
     } else {
         Glide.with(this)
             .load(imageUrl)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerInside()
+            .transition(withCrossFade())
             .into(this)
     }
 }
@@ -333,6 +354,24 @@ fun Context.resolveThemeAttr(@AttrRes attrRes: Int): TypedValue {
     val typedValue = TypedValue()
     theme.resolveAttribute(attrRes, typedValue, true)
     return typedValue
+}
+
+fun String.toYtThumb(): String =
+    "https://img.youtube.com/vi/%s/0.jpg".format(this)
+
+fun String.extractContentLinks(): List<ContentLink> {
+    val imgur = imgurRegex.findAll(this).map { ContentLink.ImgurImageLink(it.value) }.distinct()
+    val imgurGallery = imgurGalleryRegex.findAll(this).map { ContentLink.ImgurGalleryLink(it.groupValues[3]) }.distinct()
+    val image = imageRegex.findAll(this).map { ContentLink.ImageLink(it.value) }.distinct()
+    val video = videoRegex.findAll(this).map { ContentLink.VideoLink(it.value) }.distinct()
+    val wikipedia = wikipediaRegex.findAll(this).map { ContentLink.WikipediaLink(it.value) }.distinct()
+    val youtube = youtubeRegex.findAll(this).map { ContentLink.YoutubeLink(it.value) }.distinct()
+    val regular = urlRegex.findAll(this).map { it.value }.distinct()
+
+    val reg = regular
+        .filterNot { (imgur + imgurGallery + image + video + wikipedia + youtube).map { link -> link.url }.contains(it) }.map { ContentLink.WebLink(it) }
+
+    return (imgur + imgurGallery + image + video + wikipedia + youtube + reg).toList()
 }
 
 fun Context.createMarkdownEditor(markwon: Markwon? = null, linkOnClick: LinkSpanHandler.OnClick): MarkwonEditor {
@@ -533,4 +572,20 @@ fun Context.createMarkdownEditor(markwon: Markwon? = null, linkOnClick: LinkSpan
         })
         .useEditHandler(LinkSpanHandler(linkOnClick))
         .build()
+}
+
+fun Duration.humanReadableFormat() =
+    this.toString()
+        .substring(2)
+        .replace("(\\d[HMS])(?!$)", "$1 ")
+        .lowercase()
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
 }

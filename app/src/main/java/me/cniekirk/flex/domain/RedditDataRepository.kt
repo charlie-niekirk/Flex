@@ -1,14 +1,15 @@
 package me.cniekirk.flex.domain
 
 import kotlinx.coroutines.flow.Flow
-import me.cniekirk.flex.data.remote.model.CommentData
-import me.cniekirk.flex.data.remote.model.MoreComments
-import me.cniekirk.flex.data.remote.model.auth.Token
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
-import me.cniekirk.flex.data.remote.model.flair.UserFlairItem
-import me.cniekirk.flex.data.remote.model.rules.Rules
-import me.cniekirk.flex.data.remote.model.subreddit.ModUser
-import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.MoreComments
+import me.cniekirk.flex.data.remote.model.reddit.auth.Token
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
+import me.cniekirk.flex.data.remote.model.reddit.rules.Rules
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.ModUser
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.wikipedia.WikiSummary
 import me.cniekirk.flex.ui.gallery.DownloadState
 
 interface RedditDataRepository {
@@ -46,4 +47,6 @@ interface RedditDataRepository {
     fun submitComment(markdown: String, parentThing: String): Flow<RedditResult<CommentData>>
 
     fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
+
+    suspend fun getWikipediaSummary(article: String): RedditResult<WikiSummary>
 }

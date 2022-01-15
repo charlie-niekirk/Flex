@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.google.android.exoplayer2.database.ExoDatabaseProvider
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import dagger.Lazy
@@ -12,77 +15,54 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import im.ene.toro.exoplayer.Config
+import im.ene.toro.exoplayer.ExoCreator
+import im.ene.toro.exoplayer.MediaSourceBuilder
+import im.ene.toro.exoplayer.ToroExo
+import io.noties.markwon.Markwon
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.linkify.LinkifyPlugin
+import io.noties.markwon.recycler.MarkwonAdapter
+import io.noties.markwon.recycler.table.TableEntry
+import io.noties.markwon.recycler.table.TableEntryPlugin
+import io.noties.markwon.syntax.Prism4jThemeDefault
+import io.noties.markwon.syntax.SyntaxHighlightPlugin
+import io.noties.prism4j.GrammarImpl
+import io.noties.prism4j.Prism4j
 import me.cniekirk.flex.BuildConfig
+import me.cniekirk.flex.R
 import me.cniekirk.flex.data.local.db.AppDatabase
+import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
-import me.cniekirk.flex.data.local.prefs.Preferences
-import me.cniekirk.flex.data.remote.auth.LoggedInAuthenticator
-import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
-import me.cniekirk.flex.data.remote.model.envelopes.*
+import me.cniekirk.flex.data.remote.*
+import me.cniekirk.flex.data.remote.model.reddit.auth.LoggedInAuthenticator
+import me.cniekirk.flex.data.remote.model.reddit.auth.PreLoginAuthenticator
+import me.cniekirk.flex.data.remote.model.reddit.base.EnvelopeKind
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.*
+import me.cniekirk.flex.data.remote.model.reddit.util.ForceToBooleanJsonAdapter
+import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
+import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.domain.RedditDataRepository
+import me.cniekirk.flex.util.video.LoopExoCreator
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.commonmark.ext.gfm.tables.TableBlock
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
-import im.ene.toro.exoplayer.ToroExo
-import im.ene.toro.exoplayer.MediaSourceBuilder
-
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
-
-import im.ene.toro.exoplayer.ExoCreator
-
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
-
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import im.ene.toro.exoplayer.Config
-import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
-import me.cniekirk.flex.data.remote.*
-import me.cniekirk.flex.data.remote.auth.PreLoginAuthenticator
-import me.cniekirk.flex.data.remote.model.util.ForceToBooleanJsonAdapter
-import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
-import me.cniekirk.flex.domain.ImgurDataRepository
-import me.cniekirk.flex.util.video.LoopExoCreator
-import java.io.File
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 class PreLoginModule {
-
-    @Provides
-    @Singleton
-    fun provideCache(@ApplicationContext context: Context): Cache {
-        return Cache(context.cacheDir, 102400L)
-    }
-
-    @Provides
-    @Named("preAuth")
-    @Singleton
-    fun provideOkHttp(cache: Cache): OkHttpClient {
-        return if (BuildConfig.DEBUG) {
-            val logger = HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY }
-            OkHttpClient.Builder()
-                .cache(cache)
-                .callTimeout(10000, TimeUnit.MILLISECONDS)
-                .addInterceptor(logger)
-                .addInterceptor(NullRepliesInterceptor)
-                .build()
-        } else {
-            OkHttpClient.Builder()
-                .cache(cache)
-                .callTimeout(10000, TimeUnit.MILLISECONDS)
-                .addInterceptor(NullRepliesInterceptor)
-                .build()
-        }
-    }
 
     @Provides
     @Named("preLogin")
@@ -155,27 +135,6 @@ class PreLoginModule {
     }
 
     @Provides
-    @Singleton
-    fun provideMoshi(): Moshi {
-        return Moshi.Builder()
-            .add(PolymorphicJsonAdapterFactory.of(EnvelopedData::class.java, "kind")
-                    .withSubtype(EnvelopedComment::class.java, EnvelopeKind.Comment.value)
-                    .withSubtype(EnvelopedMoreComment::class.java, EnvelopeKind.More.value)
-                    .withSubtype(EnvelopedSubmission::class.java, EnvelopeKind.Link.value)
-            ).add(
-                PolymorphicJsonAdapterFactory.of(EnvelopedContribution::class.java, "kind")
-                    .withSubtype(EnvelopedSubmission::class.java, EnvelopeKind.Link.value)
-                    .withSubtype(EnvelopedComment::class.java, EnvelopeKind.Comment.value)
-                    .withSubtype(EnvelopedMoreComment::class.java, EnvelopeKind.More.value)
-            ).add(
-                PolymorphicJsonAdapterFactory.of(EnvelopedCommentData::class.java, "kind")
-                    .withSubtype(EnvelopedComment::class.java, EnvelopeKind.Comment.value)
-                    .withSubtype(EnvelopedMoreComment::class.java, EnvelopeKind.More.value)
-            )
-            .add(ForceToBooleanJsonAdapter).build()
-    }
-
-    @Provides
     @Named("imgurRetrofit")
     @Singleton
     fun provideImgurRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -183,6 +142,17 @@ class PreLoginModule {
             .callFactory { okHttpClient.get().newCall(it) }
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .baseUrl("https://api.imgur.com/")
+            .build()
+    }
+
+    @Provides
+    @Named("wikiRetrofit")
+    @Singleton
+    fun provideWikiRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://en.wikipedia.org/api/rest_v1/")
             .build()
     }
 
@@ -308,6 +278,11 @@ class PreLoginModule {
 
     @Provides
     @Singleton
+    fun provideWikiApi(@Named("wikiRetrofit") retrofit: Retrofit): WikipediaApi
+            = retrofit.create(WikipediaApi::class.java)
+
+    @Provides
+    @Singleton
     fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
             : RedditDataRepository = redditDataRepositoryImpl
 
@@ -318,24 +293,15 @@ class PreLoginModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room
-            .databaseBuilder(context, AppDatabase::class.java, "app-database")
-            .allowMainThreadQueries()
-            .build()
+    fun provideImageLoader(@ApplicationContext context: Context): ImageLoader {
+        return ImageLoader.Builder(context).build()
     }
 
     @Provides
     @Singleton
-    fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
-
-    @Provides
-    @Singleton
-    fun providePreLoginUserDao(appDatabase: AppDatabase): PreLoginUserDao = appDatabase.preLoginUserDao()
-
-    @Provides
-    @Singleton
-    fun providePreferences(@ApplicationContext context: Context): Preferences = Preferences(context)
+    fun provideImageRequest(@ApplicationContext context: Context): ImageRequest.Builder {
+        return ImageRequest.Builder(context)
+    }
 
     object NullRepliesInterceptor : Interceptor {
 
@@ -359,18 +325,6 @@ class PreLoginModule {
 
     @Provides
     @Singleton
-    fun provideImageLoader(@ApplicationContext context: Context): ImageLoader {
-        return ImageLoader.Builder(context).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideImageRequest(@ApplicationContext context: Context): ImageRequest.Builder {
-        return ImageRequest.Builder(context)
-    }
-
-    @Provides
-    @Singleton
     fun provideSimpleCache(@ApplicationContext context: Context): SimpleCache {
         return SimpleCache(
             File(context.cacheDir, "/exoplayer"),
@@ -385,6 +339,28 @@ class PreLoginModule {
             .setCache(simpleCache)
             .build()
         return LoopExoCreator(ToroExo.with(context), config)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMarkwon(@ApplicationContext context: Context): Markwon {
+        return Markwon
+            .builder(context)
+            .usePlugin(StrikethroughPlugin())
+            .usePlugin(LinkifyPlugin.create())
+            .usePlugin(TableEntryPlugin.create(context))
+            //.usePlugin(SyntaxHighlightPlugin.create(Prism4j(GrammarLocatorDef()), Prism4jThemeDefault()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMarkwonAdapter(): MarkwonAdapter {
+        return MarkwonAdapter.builder(R.layout.adapter_default_entry, R.id.text_default)
+            .include(TableBlock::class.java, TableEntry.create {
+                it.tableLayout(R.layout.adapter_table_block, R.id.table_layout)
+                    .textLayoutIsRoot(R.layout.view_table_entry_cell)
+            }).build()
     }
 
 }

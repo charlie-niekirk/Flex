@@ -1,0 +1,97 @@
+package me.cniekirk.flex.data.remote.model.strapi
+
+
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
+data class Post(
+    @Json(name = "authorInfo")
+    val authorInfo: AuthorInfo?,
+    @Json(name = "authorOnlyInfo")
+    val authorOnlyInfo: Any?,
+    @Json(name = "awardings")
+    val awardings: List<Awarding>?,
+    @Json(name = "commentCount")
+    val commentCount: Double?,
+    @Json(name = "content")
+    val content: Any?,
+    @Json(name = "createdAt")
+    val createdAt: String?,
+    @Json(name = "crosspostCount")
+    val crosspostCount: Int?,
+    @Json(name = "distinguishedAs")
+    val distinguishedAs: Any?,
+    @Json(name = "domain")
+    val domain: String?,
+    @Json(name = "editedAt")
+    val editedAt: Any?,
+    @Json(name = "flair")
+    val flair: Flair?,
+    @Json(name = "id")
+    val id: String?,
+    @Json(name = "isArchived")
+    val isArchived: Boolean?,
+    @Json(name = "isContestMode")
+    val isContestMode: Boolean?,
+    @Json(name = "isCrosspostable")
+    val isCrosspostable: Boolean?,
+    @Json(name = "isHidden")
+    val isHidden: Boolean?,
+    @Json(name = "isLocked")
+    val isLocked: Boolean?,
+    @Json(name = "isMediaOnly")
+    val isMediaOnly: Boolean?,
+    @Json(name = "isNsfw")
+    val isNsfw: Boolean?,
+    @Json(name = "isOriginalContent")
+    val isOriginalContent: Boolean?,
+    @Json(name = "isPollIncluded")
+    val isPollIncluded: Boolean?,
+    @Json(name = "isSaved")
+    val isSaved: Boolean?,
+    @Json(name = "isScoreHidden")
+    val isScoreHidden: Boolean?,
+    @Json(name = "isSelfPost")
+    val isSelfPost: Boolean?,
+    @Json(name = "isSpoiler")
+    val isSpoiler: Boolean?,
+    @Json(name = "isStickied")
+    val isStickied: Boolean?,
+    @Json(name = "isVisited")
+    val isVisited: Boolean?,
+    @Json(name = "liveCommentsWebsocket")
+    val liveCommentsWebsocket: String?,
+    @Json(name = "media")
+    val media: Media?,
+    @Json(name = "moderationInfo")
+    val moderationInfo: Any?,
+    @Json(name = "outboundLink")
+    val outboundLink: OutboundLink?,
+    @Json(name = "permalink")
+    val permalink: String?,
+    @Json(name = "postEventInfo")
+    val postEventInfo: Any?,
+    @Json(name = "score")
+    val score: Int?,
+    @Json(name = "subreddit")
+    val subreddit: Subreddit?,
+    @Json(name = "suggestedCommentSort")
+    val suggestedCommentSort: String?,
+    @Json(name = "thumbnail")
+    val thumbnail: Any?,
+    @Json(name = "title")
+    val title: String?,
+    @Json(name = "__typename")
+    val typename: String?,
+    @Json(name = "upvoteRatio")
+    val upvoteRatio: Double?,
+    @Json(name = "url")
+    val url: String?,
+    @Json(name = "viewCount")
+    val viewCount: Any?,
+    @Json(name = "voteState")
+    val voteState: String?,
+    @Json(name = "whitelistStatus")
+    val whitelistStatus: String?
+)

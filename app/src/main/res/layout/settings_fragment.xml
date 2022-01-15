@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/colorSurface">
 
     <com.google.android.material.appbar.MaterialToolbar
@@ -13,7 +14,53 @@
         app:titleCentered="true"
         app:titleTextAppearance="@style/Bold.H2"
         app:title="@string/title_settings"
+        app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_settings_profiles_label"
+        style="?attr/textAppearanceBodySmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_toolbar"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:text="@string/settings_profiles_title" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/settings_profiles_divider"
+        android:background="@color/accent"
+        app:layout_constraintTop_toBottomOf="@id/text_settings_profiles_label"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:alpha="0.2" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/setting_profiles_list"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/settings_profiles_divider"
+        android:layout_marginTop="@dimen/spacing_l"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/setting_profile_list_item"
+        tools:itemCount="3" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_profile_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setting_profiles_list"
+        android:layout_marginStart="@dimen/spacing_xl"
+        android:layout_marginEnd="@dimen/spacing_xl"
+        android:layout_marginTop="@dimen/spacing_l"
+        style="@style/ThemeOverlay.Material3.Button"
+        android:text="@string/add_profile" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -21,7 +68,7 @@
         android:id="@+id/text_nsfw_settings_label"
         style="?attr/textAppearanceBodySmall"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/add_profile_button"
         android:layout_marginTop="@dimen/spacing_xl"
         android:layout_marginStart="@dimen/spacing_l"
         android:text="@string/nsfw_title" />
@@ -46,8 +93,6 @@
         android:layout_marginStart="@dimen/spacing_xl"
         android:layout_marginEnd="@dimen/spacing_xl"
         android:text="@string/blur_nsfw"
-        app:thumbTint="@color/accent"
-        app:trackTint="@color/gray"
         android:checked="true" />
 
     <TextView
@@ -59,26 +104,28 @@
         app:layout_constraintTop_toBottomOf="@id/nsfw_blur_enabled"
         android:layout_marginTop="@dimen/spacing_xl"
         android:layout_marginStart="@dimen/spacing_l"
-        android:text="@string/media_title" />
+        android:text="@string/posts_title" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:id="@+id/media_settings_divider"
+        android:id="@+id/posts_settings_divider"
         android:background="@color/accent"
         app:layout_constraintTop_toBottomOf="@id/text_media_settings_label"
         android:layout_marginTop="@dimen/spacing_l"
         android:alpha="0.2" />
 
-<!--    <TextView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:id="@+id/text_settings_title"-->
-<!--        style="@style/Text.Bold.H2"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        android:layout_marginTop="@dimen/spacing_xl"-->
-<!--        android:text="@string/title_settings" />-->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/post_previews_enabled"
+        app:layout_constraintTop_toBottomOf="@id/posts_settings_divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_m"
+        android:layout_marginStart="@dimen/spacing_xl"
+        android:layout_marginEnd="@dimen/spacing_xl"
+        android:text="@string/show_preview"
+        android:checked="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

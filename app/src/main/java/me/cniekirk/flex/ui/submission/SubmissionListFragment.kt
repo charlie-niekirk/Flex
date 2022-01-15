@@ -1,19 +1,13 @@
 package me.cniekirk.flex.ui.submission
 
-import android.content.Context
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import androidx.annotation.VisibleForTesting
+import android.view.*
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -21,19 +15,22 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
@@ -62,18 +59,6 @@ class SubmissionListFragment
     private var adapter: SubmissionListAdapter? = null
 
     @Inject lateinit var exoCreator: ExoCreator
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_bottom_navigation, menu)
@@ -111,14 +96,36 @@ class SubmissionListFragment
             viewModel.onUiEvent(SubmissionListEvent.SubredditOptions)
         }
 
-        observe(viewModel.userPrefsFlow) { userPrefs ->
-            userPrefs?.let {
+        binding.settingsButton.setOnClickListener {
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+            it.findNavController().navigate(R.id.action_submissionListFragment_to_settingsFragment)
+        }
 
-                adapter = SubmissionListAdapter(
-                    this@SubmissionListFragment,
-                    userPrefs,
-                    exoCreator)
-                adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        observe(viewModel.settingsFlow) { settings ->
+            if (settings.profilesCount == 0) {
+                val dlgView = LayoutInflater.from(requireContext()).inflate(R.layout.analytics_dialog_view, null)
+                // If first launch
+                MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Material3_MaterialAlertDialog_Centered)
+                    .setTitle(R.string.analytics_dialog_title)
+                    .setIcon(R.drawable.ic_data_analytics)
+                    .setView(dlgView)
+                    .setPositiveButton(R.string.ok) { dialog, _ ->
+                        if (dlgView.findViewById<SwitchMaterial>(R.id.crashlytics_checkbox).isChecked) {
+                            Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
+                        } else if (dlgView.findViewById<SwitchMaterial>(R.id.analytics_checkbox).isChecked) {
+                            Firebase.analytics.setAnalyticsCollectionEnabled(true)
+                        }
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModel.initialiseDefaultSettings()
+                        }
+                        dialog.dismiss()
+                    }.show()
+            } else {
+                if (adapter == null) {
+                    adapter = SubmissionListAdapter(this@SubmissionListFragment, settings, exoCreator)
+                    adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                }
                 binding.listSubmissions.setItemViewCacheSize(20)
                 binding.listSubmissions.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
                 binding.listSubmissions.adapter = adapter?.withLoadStateFooter(
@@ -141,7 +148,6 @@ class SubmissionListFragment
                 }
             }
         }
-        viewModel.getPreferences()
 
         binding.submissionSort.setOnClickListener {
             it.findNavController().navigate(
@@ -214,12 +220,20 @@ class SubmissionListFragment
     }
 
     override fun onPostLongClicked(post: AuthedSubmission) {
-        //binding.root.transitionToEnd()
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
+        binding.root.findNavController().navigate(action)
     }
 
     override fun onGalleryClicked(post: AuthedSubmission) {
         val action = SubmissionListFragmentDirections
-            .actionSubmissionListFragmentToSlidingGalleryContainer(post)
+            .actionSubmissionListFragmentToSlidingGalleryContainer(post, null)
+        binding.root.findNavController().navigate(action)
+    }
+
+    override fun onYoutubeVideoClicked(videoId: String) {
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToYoutubePlayer(videoId)
         binding.root.findNavController().navigate(action)
     }
 

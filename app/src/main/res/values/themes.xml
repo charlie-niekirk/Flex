@@ -115,4 +115,13 @@
         <item name="hintEnabled">false</item>
     </style>
 
+    <style name="roundedCornersImageView" parent="">
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyBottomLeft">rounded</item>
+        <item name="cornerFamilyBottomRight">cut</item>
+        <item name="cornerFamilyTopRight">cut</item>
+        <item name="cornerSizeTopLeft">@dimen/spacing_m</item>
+        <item name="cornerSizeBottomLeft">@dimen/spacing_m</item>
+    </style>
+
 </resources>

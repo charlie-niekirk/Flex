@@ -1,17 +1,16 @@
 package me.cniekirk.flex.data.remote
 
 import android.util.Base64
-import me.cniekirk.flex.data.remote.model.*
-import me.cniekirk.flex.data.remote.model.auth.ScopesWrapper
-import me.cniekirk.flex.data.remote.model.auth.Token
-import me.cniekirk.flex.data.remote.model.base.UserList
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
-import me.cniekirk.flex.data.remote.model.flair.UserFlairItem
-import me.cniekirk.flex.data.remote.model.rules.Rules
-import me.cniekirk.flex.data.remote.model.subreddit.ModUser
-import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.reddit.*
+import me.cniekirk.flex.data.remote.model.reddit.auth.ScopesWrapper
+import me.cniekirk.flex.data.remote.model.reddit.auth.Token
+import me.cniekirk.flex.data.remote.model.reddit.base.UserList
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
+import me.cniekirk.flex.data.remote.model.reddit.rules.Rules
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.ModUser
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
 import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 

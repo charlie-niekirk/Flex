@@ -15,6 +15,7 @@ import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubredditRulesFragmentBinding
@@ -38,6 +39,7 @@ class SubredditRulesFragment : BaseFragment(R.layout.subreddit_rules_fragment) {
             .builder(requireContext())
             .usePlugin(StrikethroughPlugin())
             .usePlugin(LinkifyPlugin.create())
+            .usePlugin(TablePlugin.create(requireContext()))
             .build()
     }
 

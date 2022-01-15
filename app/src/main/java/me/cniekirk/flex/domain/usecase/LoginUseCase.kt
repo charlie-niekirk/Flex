@@ -2,7 +2,7 @@ package me.cniekirk.flex.domain.usecase
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import me.cniekirk.flex.data.remote.model.auth.Token
+import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.di.IoDispatcher
 import me.cniekirk.flex.domain.FlowUseCase
 import me.cniekirk.flex.domain.RedditDataRepository

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import me.cniekirk.flex.data.remote.model.auth.Token
+import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.LoginUseCase
 import javax.inject.Inject
