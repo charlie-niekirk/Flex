@@ -100,7 +100,7 @@ class SubmissionListFragment
                     adapter = SubmissionListAdapter(this@SubmissionListFragment, settings, exoCreator)
                     adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 }
-                binding.listSubmissions.setItemViewCacheSize(20)
+                //binding.listSubmissions.setItemViewCacheSize(20)
                 binding.listSubmissions.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
                 binding.listSubmissions.adapter = adapter?.withLoadStateFooter(
                     footer = SubmissionListLoadingStateAdapter()

@@ -31,7 +31,6 @@ class ContainerActivity : AppCompatActivity() {
         val binding = ContainerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        setSupportActionBar(binding.bottomAppBar)
         binding.floatingActionButton.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             val options = ActivityOptions.makeSceneTransitionAnimation(
