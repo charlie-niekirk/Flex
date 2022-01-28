@@ -18,7 +18,7 @@ fun provideAuthorizeUrl(): String {
     val params = arrayOf(
         "client_id=$CLIENT_ID",
         "response_type=code",
-        "state=${generateRandomString()}",
+        "state=$randomString",
         "redirect_uri=https://localhost",
         "duration=permanent",
         "scope=identity edit flair history modconfig modflair modlog modposts modwiki mysubreddits privatemessages read report save submit subscribe vote wikiedit wikiread creddits modcontributors modmail modothers livemanage account modself"
@@ -33,9 +33,7 @@ fun addParamsToUrl(url: String, array: Array<String>): String {
     return url.plus(array.joinToString(separator = "&", prefix = "?"))
 }
 
-fun generateRandomString(): String {
-    return (RANDSTR_MIN..RANDSTR_MAX).map { STRING_CHARACTERS.random() }.joinToString("")
-}
+val randomString = (RANDSTR_MIN..RANDSTR_MAX).map { STRING_CHARACTERS.random() }.joinToString("")
 
 fun String.toAuthParams(): Map<String, String> {
     val params: MutableMap<String, String> = HashMap()

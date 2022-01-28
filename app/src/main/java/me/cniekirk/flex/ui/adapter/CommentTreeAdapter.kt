@@ -26,10 +26,7 @@ import me.cniekirk.flex.databinding.SubmissionCommentCollapsedListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentLoadMoreListItemBinding
 import me.cniekirk.flex.ui.gallery.SlidingGalleryContainer
-import me.cniekirk.flex.util.ContentLink
-import me.cniekirk.flex.util.getDepthColour
-import me.cniekirk.flex.util.resolveColorAttr
-import me.cniekirk.flex.util.toYtThumb
+import me.cniekirk.flex.util.*
 
 enum class CommentViewType {
     COMMENT,
@@ -138,7 +135,7 @@ class CommentTreeAdapter(
                 }
                 commentLocked.isGone = !item.isLocked!!
                 commentPinned.isGone = !item.isStickied!!
-                commentUpvoteNumber.text = item.score.toString()
+                commentUpvoteNumber.text = item.score?.condense()
                 val topAwards = item.allAwarding?.sortedByDescending { it.coinPrice }?.take(3)
                 if (!topAwards.isNullOrEmpty()) {
                     binding.awards.textTotalAwardCount.visibility = View.VISIBLE

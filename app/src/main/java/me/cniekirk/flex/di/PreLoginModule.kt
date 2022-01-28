@@ -21,12 +21,15 @@ import im.ene.toro.exoplayer.MediaSourceBuilder
 import im.ene.toro.exoplayer.ToroExo
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.ext.tables.TableTheme
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.recycler.MarkwonAdapter
 import io.noties.markwon.recycler.table.TableEntry
 import io.noties.markwon.recycler.table.TableEntryPlugin
 import io.noties.markwon.syntax.Prism4jThemeDefault
 import io.noties.markwon.syntax.SyntaxHighlightPlugin
+import io.noties.markwon.utils.Dip
 import io.noties.prism4j.GrammarImpl
 import io.noties.prism4j.Prism4j
 import me.cniekirk.flex.BuildConfig
@@ -44,6 +47,7 @@ import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
 import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.domain.RedditDataRepository
+import me.cniekirk.flex.util.resolveColorAttr
 import me.cniekirk.flex.util.video.LoopExoCreator
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -348,7 +352,15 @@ class PreLoginModule {
             .builder(context)
             .usePlugin(StrikethroughPlugin())
             .usePlugin(LinkifyPlugin.create())
-            .usePlugin(TableEntryPlugin.create(context))
+            .usePlugin(TableEntryPlugin.create { builder ->
+                val dip = Dip.create(context)
+                builder
+                    .tableBorderColor(context.resources.getColor(R.color.table_border, null))
+                    .tableHeaderRowBackgroundColor(context.resources.getColor(R.color.table_border, null))
+                    .tableCellPadding(dip.toPx(4))
+                    .tableBorderWidth(dip.toPx(1))
+                    .build()
+            })
             //.usePlugin(SyntaxHighlightPlugin.create(Prism4j(GrammarLocatorDef()), Prism4jThemeDefault()))
             .build()
     }

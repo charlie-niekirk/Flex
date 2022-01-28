@@ -14,7 +14,11 @@
             app:destination="@id/submissionListSortDialogFragment" />
         <action
             android:id="@+id/action_submissionListFragment_to_submissionDetailFragment"
-            app:destination="@id/submissionDetailFragment" />
+            app:destination="@id/submissionDetailFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_submissionListFragment_to_slidingGalleryContainer"
             app:destination="@id/slidingGalleryContainer">
@@ -33,7 +37,11 @@
             app:destination="@id/loginWebviewFragment" />
         <action
             android:id="@+id/action_submissionListFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_submissionListFragment_to_sharePostAsImageDialog"
             app:destination="@id/sharePostAsImageDialog" />

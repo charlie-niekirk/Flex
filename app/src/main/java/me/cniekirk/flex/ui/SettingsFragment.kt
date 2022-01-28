@@ -21,22 +21,6 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
     private val binding by viewBinding(SettingsFragmentBinding::bind)
     private val viewModel by viewModels<SettingsViewModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
-            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
-        }
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
-            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
-        }
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true).apply {
-            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
-        }
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false).apply {
-            duration = resources.getInteger(R.integer.material_motion_duration_long_1).toLong()
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -62,5 +46,4 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
             viewModel.setBlurNsfw()
         }
     }
-
 }

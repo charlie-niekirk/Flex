@@ -97,8 +97,6 @@ class SubmissionListFragment
         }
 
         binding.settingsButton.setOnClickListener {
-            exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
             it.findNavController().navigate(R.id.action_submissionListFragment_to_settingsFragment)
         }
 
@@ -203,9 +201,11 @@ class SubmissionListFragment
     }
 
     private fun stopLoadingAnimation() {
-        binding.loadingIndicator.visibility = View.INVISIBLE
-        loading.unregisterAnimationCallback(callback)
-        loading.reset()
+        view?.let {
+            binding.loadingIndicator.visibility = View.INVISIBLE
+            loading.unregisterAnimationCallback(callback)
+            loading.reset()
+        }
     }
 
     override fun onDestroyView() {

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +26,10 @@ import im.ene.toro.media.PlaybackInfo
 import im.ene.toro.widget.Container
 import io.noties.markwon.Markwon
 import io.noties.markwon.recycler.MarkwonAdapter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
@@ -108,6 +113,15 @@ class SubmissionDetailHeaderAdapter(
                         false
                     ))
             }
+            ViewType.TWITTER.ordinal -> {
+                TwitterViewHolder(
+                    TweetListItemBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                )
+            }
             else -> {
                 SelfTextSubmissionViewHolder(
                     SelfTextListItemBinding.inflate(
@@ -136,7 +150,7 @@ class SubmissionDetailHeaderAdapter(
                 Link.RedditGallery -> { ViewType.GALLERY.ordinal }
                 is Link.ImgurGalleryLink -> { ViewType.IMGUR_GALLERY.ordinal }
                 Link.RedditVideo -> { ViewType.VIDEO.ordinal }
-                is Link.TwitterLink -> { ViewType.LINK.ordinal }
+                is Link.TwitterLink -> { ViewType.TWITTER.ordinal }
                 is Link.VideoLink -> { ViewType.VIDEO.ordinal }
                 Link.StreamableLink -> { ViewType.VIDEO.ordinal }
                 Link.GfycatLink -> { ViewType.VIDEO.ordinal }
@@ -190,7 +204,7 @@ class SubmissionDetailHeaderAdapter(
                         }
                         is Link.TwitterLink -> {
                             Timber.d("Twitter link")
-                            val linkHolder = (holder as ExternalLinkSubmissionViewHolder)
+                            val linkHolder = (holder as TwitterViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.VideoLink -> {
@@ -325,8 +339,13 @@ class SubmissionDetailHeaderAdapter(
             binding.selftextPreview.textSubmissionContentPreview.visibility = View.GONE
             binding.selfTextMarkdown.visibility = View.VISIBLE
             binding.selfTextMarkdown.adapter = markwonAdapter
-            markwonAdapter.setMarkdown(markwon, post.selftext ?: "")
-            markwonAdapter.notifyDataSetChanged()
+            CoroutineScope(Dispatchers.IO).launch {
+                val node = markwon.parse(post.selftext ?: "")
+                withContext(Dispatchers.Main) {
+                    markwonAdapter.setParsedMarkdown(markwon, node)
+                    markwonAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -1049,6 +1068,129 @@ class SubmissionDetailHeaderAdapter(
             }
         }
 
+    }
+
+    inner class TwitterViewHolder(private val binding: TweetListItemBinding)
+        : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(post: AuthedSubmission) {
+            binding.textSubmissionTitle.text = post.title
+            binding.textSubredditName.text = post.subreddit
+            binding.textCommentsCount.text = post.numComments?.condense()
+            binding.textUpvoteCount.text = post.ups?.condense()
+            binding.textTimeSincePost.text = post.created?.toLong()?.getElapsedTime()
+            binding.textSubmissionAuthor.text = binding.root.context.getString(R.string.author_format, post.author)
+            post.linkFlairText?.let {
+                binding.textSubmissionFlair.visibility = View.VISIBLE
+                binding.textSubmissionFlair.text = it
+                if (post.linkFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
+                    binding.textSubmissionFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.linkFlairBackgroundColor))
+                }
+                if (post.linkFlairTextColor.equals("dark", true)) {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textSubmissionFlair.setTextColor(binding.root.resources.getColor(R.color.white))
+                }
+            } ?: run {
+                binding.textSubmissionFlair.visibility = View.GONE
+            }
+            if (post.authorFlairText.isNullOrBlank()) {
+                binding.textAuthorFlair.visibility = View.GONE
+            } else {
+                binding.textAuthorFlair.visibility = View.VISIBLE
+                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+            }
+            if (post.stickied!!) {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.getColor(R.color.green))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.BOLD)
+                binding.submissionPin.visibility = View.VISIBLE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.submissionPin.id,
+                    ConstraintSet.END,
+                    binding.root.context.resources.getDimension(R.dimen.spacing_s).toInt())
+                cs.applyTo(binding.root)
+            } else {
+                binding.textSubmissionAuthor.setTextColor(binding.root.context.resolveColorAttr(android.R.attr.textColorPrimary))
+                binding.textSubmissionAuthor.setTypeface(binding.textSubmissionAuthor.typeface, Typeface.NORMAL)
+                binding.submissionPin.visibility = View.GONE
+                val cs = ConstraintSet()
+                cs.clone(binding.root)
+                cs.connect(
+                    binding.textSubmissionAuthor.id,
+                    ConstraintSet.START,
+                    binding.textSubredditName.id,
+                    ConstraintSet.START)
+                cs.applyTo(binding.root)
+            }
+            val topAwards = post.allAwardings?.sortedByDescending { it.count }?.take(3)
+            if (!topAwards.isNullOrEmpty()) {
+                binding.awards.textTotalAwardCount.visibility = View.VISIBLE
+                binding.awards.textTotalAwardCount.text = topAwards.sumOf { it.count ?: 0 }.toString()
+                when (topAwards.size) {
+                    1 -> {
+                        binding.awards.imageSecondAward.visibility = View.GONE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                    }
+                    2 -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.GONE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                    }
+                    else -> {
+                        binding.awards.imageSecondAward.visibility = View.VISIBLE
+                        binding.awards.imageThirdAward.visibility = View.VISIBLE
+                        Glide.with(binding.root).load(topAwards[0].iconUrl).into(binding.awards.imageFirstAward)
+                        Glide.with(binding.root).load(topAwards[1].iconUrl).into(binding.awards.imageSecondAward)
+                        Glide.with(binding.root).load(topAwards[2].iconUrl).into(binding.awards.imageThirdAward)
+                    }
+                }
+            } else {
+                binding.awards.imageFirstAward.visibility = View.GONE
+                binding.awards.imageSecondAward.visibility = View.GONE
+                binding.awards.imageThirdAward.visibility = View.GONE
+                binding.awards.textTotalAwardCount.visibility = View.GONE
+            }
+            post.tweetDetails?.let { tweet ->
+                tweet.includes?.media?.let { media ->
+                    if (media.first().type?.equals("photo", true) == true) {
+                        binding.tweetPreview.root.visibility = View.GONE
+                        binding.tweetMediaPreview.root.visibility = View.VISIBLE
+                        binding.tweetMediaPreview.tweetAuthorName.text = tweet.includes.users?.get(0)?.name
+                        Glide.with(binding.root).load(tweet.includes.users?.get(0)?.profileImageUrl)
+                            .circleCrop()
+                            .into(binding.tweetMediaPreview.tweetProfileImage)
+                        binding.tweetMediaPreview.tweetProfileVerified.isVisible = tweet.includes.users?.get(0)?.verified ?: false
+                        binding.tweetMediaPreview.tweetBody.text = tweet.data?.text
+                        Glide.with(binding.root).load(media.first().url)
+                            .into(binding.tweetMediaPreview.tweetMedia)
+                    }
+                } ?: run {
+                    binding.tweetPreview.root.visibility = View.VISIBLE
+                    binding.tweetMediaPreview.root.visibility = View.GONE
+                    binding.tweetPreview.tweetAuthorName.text = tweet.includes?.users?.get(0)?.name
+                    Glide.with(binding.root).load(tweet.includes?.users?.get(0)?.profileImageUrl)
+                        .circleCrop()
+                        .into(binding.tweetPreview.tweetProfileImage)
+                    binding.tweetPreview.tweetProfileVerified.isVisible = tweet.includes?.users?.get(0)?.verified ?: false
+                    binding.tweetPreview.tweetBody.text = tweet.data?.text
+                }
+            }
+        }
     }
 
     private fun ImageView.getSuitablePreview(previews: List<Resolution>): Resolution? {

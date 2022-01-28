@@ -1225,13 +1225,29 @@ class SubmissionListAdapter(
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
             post.tweetDetails?.let { tweet ->
-                Timber.d("Tweet: $tweet")
-                binding.tweetPreview.tweetAuthorName.text = tweet.includes?.users?.get(0)?.name
-                Glide.with(binding.root).load(tweet.includes?.users?.get(0)?.profileImageUrl)
-                    .circleCrop()
-                    .into(binding.tweetPreview.tweetProfileImage)
-                binding.tweetPreview.tweetProfileVerified.isVisible = tweet.includes?.users?.get(0)?.verified ?: false
-                binding.tweetPreview.tweetBody.text = tweet.data?.text
+                tweet.includes?.media?.let { media ->
+                    if (media.first().type?.equals("photo", true) == true) {
+                        binding.tweetPreview.root.visibility = View.GONE
+                        binding.tweetMediaPreview.root.visibility = View.VISIBLE
+                        binding.tweetMediaPreview.tweetAuthorName.text = tweet.includes.users?.get(0)?.name
+                        Glide.with(binding.root).load(tweet.includes.users?.get(0)?.profileImageUrl)
+                            .circleCrop()
+                            .into(binding.tweetMediaPreview.tweetProfileImage)
+                        binding.tweetMediaPreview.tweetProfileVerified.isVisible = tweet.includes.users?.get(0)?.verified ?: false
+                        binding.tweetMediaPreview.tweetBody.text = tweet.data?.text
+                        Glide.with(binding.root).load(media.first().url)
+                            .into(binding.tweetMediaPreview.tweetMedia)
+                    }
+                } ?: run {
+                    binding.tweetPreview.root.visibility = View.VISIBLE
+                    binding.tweetMediaPreview.root.visibility = View.GONE
+                    binding.tweetPreview.tweetAuthorName.text = tweet.includes?.users?.get(0)?.name
+                    Glide.with(binding.root).load(tweet.includes?.users?.get(0)?.profileImageUrl)
+                        .circleCrop()
+                        .into(binding.tweetPreview.tweetProfileImage)
+                    binding.tweetPreview.tweetProfileVerified.isVisible = tweet.includes?.users?.get(0)?.verified ?: false
+                    binding.tweetPreview.tweetBody.text = tweet.data?.text
+                }
             }
         }
 

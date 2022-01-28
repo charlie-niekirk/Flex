@@ -21,6 +21,8 @@
     <color name="upvote">#FF8b60</color>
     <color name="downvote">#9494FF</color>
 
+    <color name="table_border">#0E1D2A</color>
+
     <color name="md_theme_light_primary">#00639C</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#CCE5FF</color>

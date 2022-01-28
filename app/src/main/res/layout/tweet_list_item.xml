@@ -57,14 +57,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginHorizontal="@dimen/spacing_l"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        tools:visibility="gone" />
+
+    <include
+        android:id="@+id/tweet_media_preview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        layout="@layout/tweet_media_preview"
+        app:layout_constraintTop_toBottomOf="@id/text_submission_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/spacing_l"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/preview_barrier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:barrierAllowsGoneWidgets="true"
+        app:constraint_referenced_ids="tweet_preview,tweet_media_preview" />
 
     <ImageView
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:id="@+id/image_upvote_indicator"
         style="@style/Icon"
-        app:layout_constraintTop_toBottomOf="@id/tweet_preview"
+        app:layout_constraintTop_toBottomOf="@id/preview_barrier"
         app:layout_constraintStart_toStartOf="@id/text_subreddit_name"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_arrow_upward"

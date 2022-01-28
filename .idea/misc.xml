@@ -4,6 +4,28 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.5901041666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/drawable/external_link_bg.xml" value="0.5703125" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/drawable/table_bg.xml" value="0.5703125" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/drawable/tweet_media_bg.xml" value="0.5703125" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/adapter_default_entry.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/adapter_table_block.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/poll_list_item.xml" value="0.3307291666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/self_text_list_item.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/settings_fragment.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/share_as_image_dialog.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_comment_list_item.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_detail_fragment.xml" value="0.67" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_list_item.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_markdown.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_selftext.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/submission_selftext_preview.xml" value="0.4057971014492754" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/tweet_list_item.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/tweet_media_preview.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/tweet_preview.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/view_table_entry_cell.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/wikipedia_link_preview_view.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_link_preview_view.xml" value="0.5541666666666667" />
+        <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_list_item.xml" value="0.3307291666666667" />
         <entry key="app/src/main/res/drawable/action_sheet_bg.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/attribute_container.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />

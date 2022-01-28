@@ -5,6 +5,9 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
@@ -148,8 +151,20 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 }
             }
         }
+    }
 
-        viewModel.getComments(args.post, "")
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+        val anim: Animation = loadAnimation(activity, nextAnim)
+        anim.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+            override fun onAnimationEnd(animation: Animation?) {
+                if (enter) {
+                    viewModel.getComments(args.post, "")
+                }
+            }
+        })
+        return anim
     }
 
     override fun onLoadMore(moreComments: MoreComments) {
