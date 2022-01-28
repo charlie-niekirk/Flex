@@ -6,22 +6,22 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
-        android:id="@+id/search_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/search_title"
+        style="@style/Bold.H2"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="@dimen/spacing_xl"
-        android:layout_marginStart="@dimen/spacing_l"
-        android:text="Search for anything"
-        android:textStyle="bold" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="24dp"
+        android:text="Search for anything" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/input_layout_search"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:hint="@string/text_tab_search"
+        android:hint="@string/search_hint"
         app:hintTextColor="@color/accent"
         app:boxStrokeColor="@color/accent"
         app:layout_constraintTop_toBottomOf="@id/search_title"
@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/input_search"
-            android:hint="@string/text_tab_search" />
+            android:hint="@string/search_hint" />
 
     </com.google.android.material.textfield.TextInputLayout>
 

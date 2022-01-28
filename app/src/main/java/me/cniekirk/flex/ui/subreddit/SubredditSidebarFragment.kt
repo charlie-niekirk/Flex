@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
@@ -34,6 +35,11 @@ class SubredditSidebarFragment : BaseFragment(R.layout.subreddit_sidebar_fragmen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        if (!actionButton.isOrWillBeHidden) {
+            actionButton.hide()
+        }
 
         binding.textSidebarTitle.text = getString(R.string.sidebar_title_format, args.subreddit)
         binding.backButton.setOnClickListener { findNavController().navigateUp() }

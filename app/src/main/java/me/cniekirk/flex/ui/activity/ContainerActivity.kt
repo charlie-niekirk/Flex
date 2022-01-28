@@ -3,9 +3,12 @@ package me.cniekirk.flex.ui.activity
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
@@ -28,7 +31,7 @@ class ContainerActivity : AppCompatActivity() {
         val binding = ContainerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.bottomAppBar)
+//        setSupportActionBar(binding.bottomAppBar)
         binding.floatingActionButton.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             val options = ActivityOptions.makeSceneTransitionAnimation(
@@ -38,6 +41,8 @@ class ContainerActivity : AppCompatActivity() {
             )
             startActivity(intent, options.toBundle())
         }
+
+        binding.bottomNavigation.setupWithNavController(navController)
     }
 
 }

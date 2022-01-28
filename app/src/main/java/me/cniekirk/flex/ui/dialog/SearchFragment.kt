@@ -1,47 +1,40 @@
 package me.cniekirk.flex.ui.dialog
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import me.cniekirk.flex.databinding.SearchDialogBinding
+import me.cniekirk.flex.R
+import me.cniekirk.flex.databinding.SearchFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubredditResultAdapter
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.textChanges
+import me.cniekirk.flex.util.viewBinding
 import timber.log.Timber
 
 @FlowPreview
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class SearchDialog : FullscreenDialog(), SubredditResultAdapter.SubredditResultListener {
+class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAdapter.SubredditResultListener {
 
-    private var binding: SearchDialogBinding? = null
+    private val binding by viewBinding(SearchFragmentBinding::bind)
     private val viewModel by activityViewModels<SubmissionListViewModel>()
     private val adapter = SubredditResultAdapter(this)
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = SearchDialogBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.apply {
+        binding.apply {
             subredditResultList.addItemDecoration(DividerItemDecoration(
                 requireContext(), LinearLayoutManager.VERTICAL
             ))
@@ -51,11 +44,11 @@ class SearchDialog : FullscreenDialog(), SubredditResultAdapter.SubredditResultL
 
             randomSubContainer.setOnClickListener {
                 viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("random"))
-                dismiss()
+                binding.root.findNavController().popBackStack()
             }
             randomNsfwContainer.setOnClickListener {
                 viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("randnsfw"))
-                dismiss()
+                binding.root.findNavController().popBackStack()
             }
 
             inputSearch.textChanges()
@@ -83,13 +76,8 @@ class SearchDialog : FullscreenDialog(), SubredditResultAdapter.SubredditResultL
         }
     }
 
-    override fun onDestroyView() {
-        binding = null
-        super.onDestroyView()
-    }
-
     override fun onSubredditSelected(subreddit: String) {
         viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(subreddit))
-        dismiss()
+        binding.root.findNavController().popBackStack()
     }
 }

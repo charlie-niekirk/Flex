@@ -21,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
@@ -80,6 +81,11 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        if (!actionButton.isOrWillBeHidden) {
+            actionButton.hide()
+        }
 
         binding.apply {
             markwon.setMarkdown(commentContent, args.comment.body ?: "")

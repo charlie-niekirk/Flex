@@ -23,12 +23,12 @@ class YoutubePlayer : Fragment(R.layout.youtube_player_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
-        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-        if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
-            bottomAppBar.performHide()
-        }
+//        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
+//        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+//        if (!actionButton.isOrWillBeHidden) {
+//            actionButton.hide()
+//            bottomAppBar.performHide()
+//        }
 
         binding.apply {
             lifecycle.addObserver(youtubePlayer)

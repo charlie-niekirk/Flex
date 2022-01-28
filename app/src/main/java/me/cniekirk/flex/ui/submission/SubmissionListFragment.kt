@@ -4,8 +4,10 @@ import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.*
-import androidx.biometric.BiometricPrompt
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,12 +17,9 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
-import com.google.android.material.transition.MaterialSharedAxis
-import com.google.android.material.transition.SlideDistanceProvider
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
@@ -64,36 +63,13 @@ class SubmissionListFragment
         inflater.inflate(R.menu.menu_bottom_navigation, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.search -> {
-                // Show dialog
-                findNavController().navigate(R.id.action_submissionListFragment_to_searchDialog)
-                return true
-            }
-            R.id.account -> {
-                // Show login or account options
-                findNavController().navigate(R.id.action_submissionListFragment_to_loginWebviewFragment)
-                return true
-            }
-        }
-        return false
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
         if (actionButton.isOrWillBeHidden) {
             actionButton.show()
-            bottomAppBar.performShow()
-        }
-
-        bottomAppBar.setNavigationOnClickListener {
-            // Show a dialog
-            viewModel.onUiEvent(SubmissionListEvent.SubredditOptions)
         }
 
         binding.settingsButton.setOnClickListener {

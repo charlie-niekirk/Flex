@@ -152,7 +152,13 @@ class SubmissionListAdapter(
                 is Link.ImageLink -> { ViewType.IMAGE.ordinal }
                 Link.RedGifLink -> { ViewType.IMAGE.ordinal }
                 Link.RedditGallery -> { ViewType.GALLERY.ordinal }
-                is Link.ImgurGalleryLink -> { ViewType.IMGUR_GALLERY.ordinal }
+                is Link.ImgurGalleryLink -> {
+                    if (item.imgurGalleryLinks?.size!! > 1) {
+                        ViewType.IMGUR_GALLERY.ordinal
+                    } else {
+                        ViewType.IMAGE.ordinal
+                    }
+                }
                 Link.RedditVideo -> { ViewType.VIDEO.ordinal }
                 is Link.TwitterLink -> { ViewType.TWITTER.ordinal }
                 is Link.VideoLink -> { ViewType.VIDEO.ordinal }
@@ -176,27 +182,22 @@ class SubmissionListAdapter(
                 getItem(position)?.urlOverriddenByDest?.processLink {
                     when (it) {
                         Link.ExternalLink -> {
-                            Timber.d("External link")
                             val linkHolder = (holder as ExternalLinkSubmissionViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.ImageLink -> {
-                            Timber.d("Image link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
                             imageHolder.bind(post, it.url)
                         }
                         Link.RedGifLink -> {
-                            Timber.d("Redgif link")
                             val imageHolder = (holder as ImageSubmissionViewHolder)
                             imageHolder.bind(post, post.url)
                         }
                         Link.RedditGallery -> {
-                            Timber.d("Gallery link")
                             val galleryHolder = (holder as GallerySubmissionViewHolder)
                             galleryHolder.bind(post)
                         }
                         Link.RedditVideo -> {
-                            Timber.d("Reddit V link")
                             val url = if (post.crosspostParentList.isNullOrEmpty()) {
                                 post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!
                             } else {
@@ -207,28 +208,29 @@ class SubmissionListAdapter(
                             videoHolder.bind(post, url)
                         }
                         is Link.TwitterLink -> {
-                            Timber.d("Twitter link")
                             val linkHolder = (holder as TwitterViewHolder)
                             linkHolder.bind(post)
                         }
                         is Link.VideoLink -> {
-                            Timber.d("Video link")
                             val videoHolder = (holder as VideoSubmissionViewHolder)
                             videoHolder.bind(post, it.url)
                         }
                         is Link.StreamableLink -> {
-                            Timber.d("Streamable link")
                             val viewHolder = (holder as VideoSubmissionViewHolder)
                             viewHolder.bind(post, post.url)
                         }
                         Link.GfycatLink -> {
-                            Timber.d("Gfycat link: ${post.url}")
                             val viewHolder = (holder as VideoSubmissionViewHolder)
                             viewHolder.bind(post, post.url)
                         }
                         is Link.ImgurGalleryLink -> {
-                            val galleryHolder = (holder as SubmissionDetailHeaderAdapter.GallerySubmissionViewHolder)
-                            galleryHolder.bind(post)
+                            if (post.imgurGalleryLinks?.size!! > 1) {
+                                val galleryHolder = (holder as GallerySubmissionViewHolder)
+                                galleryHolder.bind(post)
+                            } else {
+                                val imageHolder = (holder as ImageSubmissionViewHolder)
+                                imageHolder.bind(post, post.imgurGalleryLinks!!.first())
+                            }
                         }
                         is Link.YoutubeLink -> {
                             val viewHolder = (holder as YoutubeViewHolder)

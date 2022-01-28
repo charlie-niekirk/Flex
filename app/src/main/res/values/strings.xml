@@ -127,4 +127,5 @@
     <string name="share_as_image_button">Share</string>
     <string name="save_as_image_button">Save</string>
     <string name="youtube_pill_text">YouTube</string>
+    <string name="search_hint">Subreddits, users etc.</string>
 </resources>

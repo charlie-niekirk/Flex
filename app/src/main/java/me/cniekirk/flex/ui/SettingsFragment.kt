@@ -24,12 +24,12 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
-        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-        if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
-            bottomAppBar.performHide()
-        }
+//        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
+//        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+//        if (!actionButton.isOrWillBeHidden) {
+//            actionButton.hide()
+//            bottomAppBar.performHide()
+//        }
 
         observe(viewModel.settings) { settings ->
             val adapter = SettingProfilesAdapter()
