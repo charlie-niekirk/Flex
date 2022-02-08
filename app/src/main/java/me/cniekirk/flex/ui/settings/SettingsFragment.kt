@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SettingsFragmentBinding
@@ -13,6 +15,11 @@ import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
 import me.cniekirk.flex.util.observe
 import me.cniekirk.flex.util.viewBinding
 
+/**
+ * Fragment to show the possible settings the user can change within the application
+ *
+ * @author Charlie Niekirk
+ */
 @AndroidEntryPoint
 class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
 
@@ -22,12 +29,12 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
-//        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-//        if (!actionButton.isOrWillBeHidden) {
-//            actionButton.hide()
-//            bottomAppBar.performHide()
-//        }
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        if (actionButton.isOrWillBeHidden) {
+            actionButton.visibility = View.VISIBLE
+            bottomBar.visibility = View.VISIBLE
+        }
 
         observe(viewModel.settings) { settings ->
             val adapter = SettingProfilesAdapter()

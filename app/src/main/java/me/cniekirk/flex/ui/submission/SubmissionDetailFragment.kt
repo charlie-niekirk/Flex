@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,8 +75,10 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
         super.onViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
         }
 
         binding.apply {

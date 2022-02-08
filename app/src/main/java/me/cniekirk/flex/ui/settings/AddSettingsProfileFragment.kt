@@ -7,6 +7,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
@@ -29,8 +30,10 @@ class AddSettingsProfileFragment : BaseFragment(R.layout.add_setting_profile_fra
         super.onViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
         }
 
         binding.geofenceEnabled.setOnCheckedChangeListener { _, isChecked ->
@@ -65,13 +68,13 @@ class AddSettingsProfileFragment : BaseFragment(R.layout.add_setting_profile_fra
     }
 
     override fun onPause() {
-        binding.geofenceMap.onPause()
         super.onPause()
+        binding.geofenceMap.onPause()
     }
 
     override fun onStop() {
-        binding.geofenceMap.onStop()
         super.onStop()
+        binding.geofenceMap.onStop()
     }
 
     override fun onLowMemory() {

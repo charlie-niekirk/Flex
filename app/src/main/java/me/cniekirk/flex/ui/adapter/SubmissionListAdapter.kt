@@ -1,9 +1,14 @@
 package me.cniekirk.flex.ui.adapter
 
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +22,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
 import im.ene.toro.exoplayer.ExoCreator
@@ -24,6 +31,7 @@ import im.ene.toro.exoplayer.ExoPlayerViewHelper
 import im.ene.toro.exoplayer.Playable
 import im.ene.toro.media.PlaybackInfo
 import im.ene.toro.widget.Container
+import io.noties.markwon.SpannableBuilder
 import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
@@ -278,10 +286,31 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                if (post.author.equals("tommyinnit", true)) {
-                    binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
                 } else {
-                    binding.textAuthorFlair.text = post.authorFlairText
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
                 }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
@@ -289,6 +318,11 @@ class SubmissionListAdapter(
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -387,7 +421,32 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
@@ -395,6 +454,11 @@ class SubmissionListAdapter(
                 }
                 else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -519,13 +583,43 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -676,13 +770,43 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -826,13 +950,43 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -941,13 +1095,43 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -1051,13 +1235,43 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                    binding.textAuthorFlair.text = spannable
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {
@@ -1161,13 +1375,42 @@ class SubmissionListAdapter(
                 binding.textAuthorFlair.visibility = View.GONE
             } else {
                 binding.textAuthorFlair.visibility = View.VISIBLE
-                binding.textAuthorFlair.text = post.authorFlairText
+                if (post.authorFlairRichtext.isNullOrEmpty()) {
+                    if (post.author.equals("tommyinnit", true)) {
+                        binding.textAuthorFlair.text = post.authorFlairText + " 5'10\""
+                    } else {
+                        binding.textAuthorFlair.text = post.authorFlairText
+                    }
+                } else {
+                    val spannable = SpannableString(post.authorFlairText)
+                    post.authorFlairRichtext.forEach {
+                        if (it.e.equals("emoji", true)) {
+                            Glide.with(binding.root.context)
+                                .asDrawable()
+                                .load(it.u)
+                                .into(object : CustomTarget<Drawable>(){
+                                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                                        resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
+                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                        binding.textAuthorFlair.text = spannable
+                                    }
+                                    override fun onLoadCleared(placeholder: Drawable?) {}
+                                })
+                        }
+                    }
+                }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
+                }
+                if (post.authorFlairTextColor.equals("dark", true)) {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.black))
+                } else {
+                    binding.textAuthorFlair.setTextColor(binding.root.resources.getColor(R.color.white))
                 }
             }
             if (post.stickied!!) {

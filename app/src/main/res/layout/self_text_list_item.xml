@@ -182,7 +182,9 @@
         app:layout_constraintTop_toTopOf="@id/text_submission_author"
         app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
         android:layout_marginStart="@dimen/spacing_m"
-        android:padding="3dp"
+        android:paddingBottom="3dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         tools:text="Someone" />
 
     <include

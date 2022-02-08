@@ -17,6 +17,7 @@ import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -68,8 +69,10 @@ class SubmissionListFragment
         setHasOptionsMenu(true)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (actionButton.isOrWillBeHidden) {
-            actionButton.show()
+            actionButton.visibility = View.VISIBLE
+            bottomBar.visibility = View.VISIBLE
         }
 
         binding.settingsButton.setOnClickListener {
