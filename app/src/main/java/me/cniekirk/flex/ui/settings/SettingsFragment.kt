@@ -1,15 +1,13 @@
-package me.cniekirk.flex.ui
+package me.cniekirk.flex.ui.settings
 
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.transition.MaterialSharedAxis
-import com.google.android.material.transition.SlideDistanceProvider
+import androidx.navigation.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SettingsFragmentBinding
+import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SettingProfilesAdapter
 import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
 import me.cniekirk.flex.util.observe
@@ -40,6 +38,11 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
 
             binding.nsfwBlurEnabled.isChecked = enabledProfile.blurNsfw
             binding.postPreviewsEnabled.isChecked = enabledProfile.showPreviews
+        }
+
+        binding.addProfileButton.setOnClickListener {
+            val action = SettingsFragmentDirections.actionSettingsFragmentToAddSettingsProfileFragment()
+            binding.root.findNavController().navigate(action)
         }
 
         binding.nsfwBlurEnabled.setOnClickListener {

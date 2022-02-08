@@ -14,7 +14,6 @@
         app:titleCentered="true"
         app:titleTextAppearance="@style/Bold.H2"
         app:title="@string/title_settings"
-        app:navigationIcon="@drawable/ic_arrow_back"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

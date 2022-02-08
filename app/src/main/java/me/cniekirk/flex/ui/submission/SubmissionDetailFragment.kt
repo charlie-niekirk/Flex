@@ -130,7 +130,6 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 }
                 is RedditResult.Success -> {
                     if (comments.data.isNullOrEmpty()) {
-                        binding.commentsTreeList.visibility = View.GONE
                         binding.emptyCommentEasterEgg.visibility = View.VISIBLE
                         binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post.subreddit)
                     } else {
@@ -188,7 +187,11 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
 
     override fun onGalleryClicked(post: AuthedSubmission) {
-        TODO("Not yet implemented")
+        val action = if (post.imgurGalleryLinks.isNullOrEmpty() || post.imgurGalleryLinks!!.size < 2) {
+            SubmissionDetailFragmentDirections.actionSubmissionDetailFragmentToSlidingGalleryContainer(null, post)
+        } else {
+            //SubmissionDetailFragmentDirections.actionSubmissionDetailFragmentToSlidingGalleryContainer(, null)
+        }
     }
 
     override fun onImageClicked(post: AuthedSubmission) {

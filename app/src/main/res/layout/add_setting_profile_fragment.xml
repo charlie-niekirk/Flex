@@ -3,7 +3,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/add_profile_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/Bold.H2"
+        app:title="@string/title_add_profile"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/profile_name_layout"
@@ -11,7 +21,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_profile_toolbar"
         android:layout_marginTop="@dimen/spacing_xl"
         android:layout_marginStart="@dimen/spacing_l"
         android:layout_marginEnd="@dimen/spacing_l">
@@ -57,6 +67,29 @@
         android:layout_marginEnd="@dimen/spacing_xl"
         android:text="@string/enable_geofencing"
         android:checked="false" />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/geofence_map"
+        android:layout_width="match_parent"
+        android:layout_height="270dp"
+        app:layout_constraintTop_toBottomOf="@id/geofence_enabled"
+        android:visibility="gone" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/geofence_radius_slider"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/geofence_map"
+        app:layout_constraintStart_toStartOf="@id/geofence_map"
+        app:layout_constraintEnd_toEndOf="@id/geofence_map"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:layout_marginEnd="@dimen/spacing_l"
+        android:contentDescription="@string/geofence_slider_desc"
+        android:value="500.0"
+        android:valueFrom="0.0"
+        android:valueTo="5000.0"
+        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/save_button"

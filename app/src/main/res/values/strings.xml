@@ -120,7 +120,7 @@
     <string name="add_profile">Add Profile</string>
     <string name="profile_name_input_hint">Profile Name</string>
     <string name="profile_geofence_title">Geofence settings profile</string>
-    <string name="enable_geofencing">Apply when entering a geofence?</string>
+    <string name="enable_geofencing">Apply profile when entering a geofence?</string>
     <string name="share_as_image_title">Image preview</string>
     <string name="share_image_hide_username">Hide username</string>
     <string name="share_image_hide_subreddit">Hide subreddit</string>
@@ -128,4 +128,6 @@
     <string name="save_as_image_button">Save</string>
     <string name="youtube_pill_text">YouTube</string>
     <string name="search_hint">Subreddits, users etc.</string>
+    <string name="title_add_profile">Add Profile</string>
+    <string name="geofence_slider_desc">Geofence Radius Slider</string>
 </resources>

@@ -95,9 +95,13 @@
     </activity>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="me.cniekirk.flex.ui.SettingsFragment"
+        android:name="me.cniekirk.flex.ui.settings.SettingsFragment"
         android:label="SettingsFragment"
-        tools:layout="@layout/settings_fragment" />
+        tools:layout="@layout/settings_fragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_addSettingsProfileFragment"
+            app:destination="@id/addSettingsProfileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="me.cniekirk.flex.ui.dialog.SearchFragment"
@@ -186,4 +190,8 @@
             android:name="videoId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/addSettingsProfileFragment"
+        android:name="me.cniekirk.flex.ui.settings.AddSettingsProfileFragment"
+        android:label="AddSettingsProfileFragment" />
 </navigation>

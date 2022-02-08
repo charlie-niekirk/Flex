@@ -22,6 +22,8 @@
     <color name="downvote">#9494FF</color>
 
     <color name="table_border">#D5E4F6</color>
+    <color name="circle_stroke">#94CCFF</color>
+    <color name="circle_fill">#60004A76</color>
 
     <color name="md_theme_light_primary">#00639C</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
