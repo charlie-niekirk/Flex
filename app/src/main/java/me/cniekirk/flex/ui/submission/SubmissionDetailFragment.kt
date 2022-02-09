@@ -24,13 +24,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.LinkResolverDef
 import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonConfiguration
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.recycler.MarkwonAdapter
 import io.noties.markwon.recycler.table.TableEntry
 import io.noties.markwon.recycler.table.TableEntryPlugin
+import io.noties.markwon.utils.Dip
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Comment
@@ -41,10 +45,7 @@ import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
-import me.cniekirk.flex.util.condense
-import me.cniekirk.flex.util.getEasterEggString
-import me.cniekirk.flex.util.observe
-import me.cniekirk.flex.util.viewBinding
+import me.cniekirk.flex.util.*
 import org.commonmark.ext.gfm.tables.TableBlock
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,7 +68,53 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
     private var adapter: CommentTreeAdapter? = null
 
-    @Inject lateinit var markwon: Markwon
+    private val markwon by lazy(LazyThreadSafetyMode.NONE) {
+        Markwon.builder(requireContext()).usePlugin(StrikethroughPlugin())
+            .usePlugin(LinkifyPlugin.create())
+            .usePlugin(TableEntryPlugin.create { builder ->
+                val dip = Dip.create(requireContext())
+                builder
+                    .tableBorderColor(
+                        requireContext().resources.getColor(
+                            R.color.table_border,
+                            null
+                        )
+                    )
+                    .tableHeaderRowBackgroundColor(
+                        requireContext().resources.getColor(
+                            R.color.table_border,
+                            null
+                        )
+                    )
+                    .tableCellPadding(dip.toPx(4))
+                    .tableBorderWidth(dip.toPx(1))
+                    .build()
+            })
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
+                    builder.linkResolver(object : LinkResolverDef() {
+                        override fun resolve(view: View, link: String) {
+                            link.processLink {
+                                when (it) {
+                                    is Link.ImgurGalleryLink -> {
+                                        val action = SubmissionDetailFragmentDirections
+                                            .actionSubmissionDetailFragmentToSlidingGalleryContainer(
+                                                it.albumId,
+                                                args.post
+                                            )
+                                        findNavController().navigate(action)
+                                    }
+                                    else -> {
+                                        super.resolve(view, link)
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }
+            })
+            .build()
+    }
     @Inject lateinit var markwonAdapter: MarkwonAdapter
     @Inject lateinit var exoCreator: ExoCreator
 
@@ -178,7 +225,6 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
 
     override fun onImgurGalleryClicked(albumId: String) {
-        Timber.d("ALBUM: $albumId")
         val action = SubmissionDetailFragmentDirections
             .actionSubmissionDetailFragmentToSlidingGalleryContainer(albumId, args.post)
         findNavController().navigate(action)

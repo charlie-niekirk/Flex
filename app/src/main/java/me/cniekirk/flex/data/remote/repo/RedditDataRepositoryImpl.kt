@@ -1,10 +1,15 @@
 package me.cniekirk.flex.data.remote.repo
 
 import android.content.Context
+import android.os.Build
 import androidx.annotation.IntRange
+import androidx.datastore.core.DataStore
+import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
@@ -26,6 +31,9 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.gallery.DownloadState
 import me.cniekirk.flex.util.getHttpBasicAuthHeader
 import me.cniekirk.flex.util.toAuthParams
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -39,7 +47,8 @@ class RedditDataRepositoryImpl @Inject constructor(
     private val wikipediaApi: WikipediaApi,
     @ApplicationContext private val context: Context,
     private val preLoginUserDao: PreLoginUserDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val flexSettings: DataStore<FlexSettings>
 ) : RedditDataRepository {
 
     override fun getAccessToken(code: String): Flow<RedditResult<Token>> = flow {
@@ -55,49 +64,39 @@ class RedditDataRepositoryImpl @Inject constructor(
     override fun downvoteThing(thingId: String) = vote(thingId, -1)
 
     override fun downloadMedia(url: String): Flow<RedditResult<DownloadState>> = flow {
-//        preferences.downloadDirFlow.collect {
-//            if (it.isEmpty()) {
-//                emit(RedditResult.Success(DownloadState.NoDefinedLocation))
-//            } else {
-//                // Actually download
-//                val response = downloadRedditApi.downloadMedia(url)
-//                if (response.isSuccessful) {
-//                    val treeUri = context.contentResolver.persistedUriPermissions.firstOrNull()?.uri
-//                    treeUri?.let { uri ->
-//                        // Get selected directory and create the file
-//                        val directory = DocumentFile.fromTreeUri(context, uri)
-//                        val file = directory?.createFile(response.headers()["content-type"] ?: "image/jpeg",
-//                            UUID.randomUUID().toString().replace("-", "") + url.substring(url.lastIndexOf(".")))
-//
-//                        file?.let {
-//                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-//                                response.body()?.byteStream()?.use { input ->
-//                                    FileOutputStream(file.uri.toString()).use { output ->
-//                                        input.copyTo(output)
-//                                        emit(RedditResult.Success(DownloadState.Success))
-//                                    }
-//                                }
-//                            } else {
-//                                response.body()?.byteStream()?.use { input ->
-//                                    context.contentResolver.openOutputStream(file.uri)?.use { output ->
-//                                        input.copyTo(output)
-//                                    }
-//                                }
-//                            }
-//                            emit(RedditResult.Success(DownloadState.Success))
-//                        } ?: run {
-//                            emit(RedditResult.Error(Exception("Unknown!")))
-//                        }
-//
-//                    } ?: run {
-//                        emit(RedditResult.Success(DownloadState.NoDefinedLocation))
-//                    }
-//                } else {
-//                    emit(RedditResult.Error(IOException(response.message())))
-//                }
-//            }
-//        }
-        emit(RedditResult.Success(DownloadState.NoDefinedLocation))
+        val treeUri = context.contentResolver.persistedUriPermissions.firstOrNull()?.uri
+        treeUri?.let {
+            // Actually download
+            val response = downloadRedditApi.downloadMedia(url)
+            if (response.isSuccessful) {
+                // Get selected directory and create the file
+                val directory = DocumentFile.fromTreeUri(context, it)
+                val file = directory?.createFile(response.headers()["content-type"] ?: "image/jpeg",
+                    UUID.randomUUID().toString().replace("-", "") + url.substring(url.lastIndexOf(".")))
+
+                file?.let {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                        response.body()?.byteStream()?.use { input ->
+                            FileOutputStream(file.uri.toString()).use { output ->
+                                input.copyTo(output)
+                                emit(RedditResult.Success(DownloadState.Success))
+                            }
+                        }
+                    } else {
+                        response.body()?.byteStream()?.use { input ->
+                            context.contentResolver.openOutputStream(file.uri)?.use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                    }
+                    emit(RedditResult.Success(DownloadState.Success))
+                } ?: run {
+                    emit(RedditResult.Error(Exception("Unknown!")))
+                }
+            } else {
+                emit(RedditResult.Error(IOException(response.message())))
+            }
+        } ?: run { emit(RedditResult.Success(DownloadState.NoDefinedLocation)) }
     }
 
     override suspend fun getWikipediaSummary(article: String): RedditResult<WikiSummary> {

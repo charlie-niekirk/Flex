@@ -57,7 +57,7 @@ import kotlin.math.absoluteValue
 
 
 private val imgurRegex = Regex("""(https?:)?/?/?(\w+\.)?imgur\.com/a/(\w+)""")
-private val imgurGalleryRegex = Regex("""(https?:)?/?/?(\w+\.)?imgur\.com/a/(\S*)""")
+private val imgurGalleryRegex = Regex("""(https?:)?/?/?(\w+\.)?imgur\.com/(a|gallery)/(\S*)""")
 private val imageRegex = Regex("""\b(https?://\S*?\.(?:png|jpe?g|gif?)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
 private val videoRegex = Regex("""\b(https?://\S*?\.(?:mov|mp4|mpe?g|avi|gifv)(?:\?(?:(?:(?:[\w_-]+=[\w_-]+)(?:&[\w_-]+=[\w_-]+)*)|(?:[\w_-]+)))?)\b""")
 private val wikipediaRegex = Regex("""(https?:)?/?/?(\S+\.)wikipedia.org/wiki/[\w+_-]+""")
@@ -154,7 +154,7 @@ fun String.processLink(block: (Link) -> Unit) {
             block(Link.RedditGallery)
         }
         imgurGalleryRegex.matches(this) -> {
-            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))
+            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(4) ?: ""))
         }
         twitterRegex.matches(this) -> {
             block(Link.TwitterLink(this))
@@ -192,7 +192,7 @@ suspend fun String.processLinkInternal(block: suspend (Link) -> Unit) {
             block(Link.RedditGallery)
         }
         imgurGalleryRegex.matches(this) -> {
-            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))
+            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(4) ?: ""))
         }
         twitterRegex.matches(this) -> {
             block(Link.TwitterLink(twitterRegex.matchEntire(this)?.groupValues?.get(3) ?: ""))

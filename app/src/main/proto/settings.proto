@@ -11,4 +11,5 @@ message FlexSettings {
     bool blur_nsfw = 4;
   }
   repeated Profile profiles = 1;
+  string download_location = 2;
 }
