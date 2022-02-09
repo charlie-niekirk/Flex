@@ -14,6 +14,9 @@ import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
 
+/**
+ *
+ */
 interface RedditApi {
 
     @GET("r/{subreddit}{sortType}.json?raw_json=1")

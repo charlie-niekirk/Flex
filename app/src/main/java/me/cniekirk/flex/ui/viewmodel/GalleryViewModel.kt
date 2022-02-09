@@ -63,5 +63,4 @@ class GalleryViewModel @Inject constructor(
     fun resetState() {
         _downloadState.value = DownloadState.Idle
     }
-
 }

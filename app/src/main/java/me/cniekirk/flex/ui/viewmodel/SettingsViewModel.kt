@@ -41,5 +41,4 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
-
 }
