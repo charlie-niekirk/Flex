@@ -75,10 +75,6 @@ class SubmissionListFragment
             bottomBar.visibility = View.VISIBLE
         }
 
-        binding.settingsButton.setOnClickListener {
-            it.findNavController().navigate(R.id.action_submissionListFragment_to_settingsFragment)
-        }
-
         observe(viewModel.settingsFlow) { settings ->
             if (settings.profilesCount == 0) {
                 val dlgView = LayoutInflater.from(requireContext()).inflate(R.layout.analytics_dialog_view, null)
@@ -109,7 +105,7 @@ class SubmissionListFragment
                     footer = SubmissionListLoadingStateAdapter()
                 )
                 // Collect paginated submissions and submit to adapter
-                lifecycleScope.launchWhenCreated {
+                viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                     adapter?.addLoadStateListener { loadState ->
                         if (loadState.refresh is LoadState.Loading) {
                             startLoadingAnimation()

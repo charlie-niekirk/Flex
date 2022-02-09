@@ -97,7 +97,7 @@ class SubredditSubmissionsPagingSource(
                             val tweet = twitterApi.getTweet(link.url)
                             it.data = it.data.copy(tweetDetails = tweet)
                         }
-                        else -> {}
+                        else -> { /* No-op */ }
                     }
                 }
             }
