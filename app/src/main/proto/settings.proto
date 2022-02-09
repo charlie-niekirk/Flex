@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "me.cniekirk.flex";
+option java_multiple_files = true;
+
+message FlexSettings {
+  message Profile {
+    string name = 1;
+    bool selected = 2;
+    bool show_previews = 3;
+    bool blur_nsfw = 4;
+  }
+  repeated Profile profiles = 1;
+  string download_location = 2;
+}

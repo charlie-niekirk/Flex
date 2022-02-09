@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
 import me.cniekirk.flex.databinding.SubredditResultListItemBinding
 import me.cniekirk.flex.util.condense
 

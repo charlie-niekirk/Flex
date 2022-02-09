@@ -4,11 +4,9 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
-import me.cniekirk.flex.data.remote.GfycatApi
-import me.cniekirk.flex.data.remote.RedGifsApi
-import me.cniekirk.flex.data.remote.RedditApi
-import me.cniekirk.flex.data.remote.StreamableApi
-import me.cniekirk.flex.data.remote.model.AuthedSubmission
+import me.cniekirk.flex.data.remote.*
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
+import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLinkInternal
 import timber.log.Timber
@@ -17,8 +15,10 @@ class SubredditSubmissionsPagingSource(
     private val redditApi: RedditApi,
     private val authRedditApi: RedditApi,
     private val streamableApi: StreamableApi,
+    private val imgurApi: ImgurApi,
     private val gfycatApi: GfycatApi,
     private val redGifsApi: RedGifsApi,
+    private val twitterApi: TwitterApi,
     private val subreddit: String,
     private val sortType: String,
     private val preLoginUserDao: PreLoginUserDao,
@@ -89,7 +89,13 @@ class SubredditSubmissionsPagingSource(
                                 }
                             }
                         }
-                        is Link.ImageLink -> {
+                        is Link.ImgurGalleryLink -> {
+                            val imgurResponse = imgurApi.getGalleryImages(link.albumId)
+                            it.data = it.data.copy(imgurGalleryLinks = imgurResponse.data?.map { image -> image.link })
+                        }
+                        is Link.TwitterLink -> {
+                            val tweet = twitterApi.getTweet(link.url)
+                            it.data = it.data.copy(tweetDetails = tweet)
                         }
                         else -> {}
                     }

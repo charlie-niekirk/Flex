@@ -15,6 +15,7 @@ import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
+import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubredditRulesFragmentBinding
@@ -38,6 +39,7 @@ class SubredditRulesFragment : BaseFragment(R.layout.subreddit_rules_fragment) {
             .builder(requireContext())
             .usePlugin(StrikethroughPlugin())
             .usePlugin(LinkifyPlugin.create())
+            .usePlugin(TablePlugin.create(requireContext()))
             .build()
     }
 
@@ -56,11 +58,9 @@ class SubredditRulesFragment : BaseFragment(R.layout.subreddit_rules_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
         if (!actionButton.isOrWillBeHidden) {
             actionButton.hide()
-            bottomAppBar.performHide()
         }
 
         binding.apply {

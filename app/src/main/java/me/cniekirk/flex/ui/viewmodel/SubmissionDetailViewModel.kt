@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.data.remote.model.CommentData
-import me.cniekirk.flex.data.remote.model.MoreComments
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
+import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
 import me.cniekirk.flex.domain.model.MoreCommentsRequest
@@ -27,14 +27,16 @@ class SubmissionDetailViewModel @Inject constructor(
     private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel() {
 
+    // TODO: ADD TOP PART AS HEADER RV ITEM TO REMOVE JANK
+
     private val _commentsTree: MutableStateFlow<RedditResult<List<CommentData>>> = MutableStateFlow(RedditResult.Loading)
     val commentsTree: StateFlow<RedditResult<List<CommentData>>> = _commentsTree
     private val _voteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)
     val voteState: StateFlow<RedditResult<Boolean>> = _voteState
 
-    fun getComments(submissionId: String, sortType: String) {
+    fun getComments(submission: AuthedSubmission, sortType: String) {
         viewModelScope.launch {
-            getCommentsUseCase(CommentRequest(submissionId, sortType))
+            getCommentsUseCase(CommentRequest(submission.id, sortType))
                 .collect { comments -> _commentsTree.value = comments }
         }
     }

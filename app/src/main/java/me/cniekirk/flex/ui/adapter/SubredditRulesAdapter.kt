@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.noties.markwon.Markwon
-import me.cniekirk.flex.data.remote.model.rules.Rule
+import me.cniekirk.flex.data.remote.model.reddit.rules.Rule
 import me.cniekirk.flex.databinding.SubredditRuleListItemBinding
 
 class SubredditRulesAdapter(

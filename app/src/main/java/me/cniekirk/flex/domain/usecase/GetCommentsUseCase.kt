@@ -1,19 +1,18 @@
 package me.cniekirk.flex.domain.usecase
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.data.remote.model.CommentData
-import me.cniekirk.flex.data.remote.model.base.Listing
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
+import me.cniekirk.flex.data.remote.model.reddit.Comment
+import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.base.Listing
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedCommentData
 import me.cniekirk.flex.di.IoDispatcher
 import me.cniekirk.flex.domain.FlowUseCase
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
-import timber.log.Timber
+import me.cniekirk.flex.util.ContentLink
 import javax.inject.Inject
 
 /**
@@ -37,6 +36,26 @@ class GetCommentsUseCase @Inject constructor(
         val commentTree = response.lastOrNull()?.data as Listing<EnvelopedCommentData>
         val comments = mutableListOf<CommentData>()
         buildTree(commentTree, comments)
+
+        comments.forEach {
+            it.contentLinks?.forEach { link ->
+                when (link) {
+                    is ContentLink.WikipediaLink -> {
+                        when (val wikiSummary = repository.getWikipediaSummary(link.url.substringAfterLast("/"))) {
+                            is RedditResult.Success -> {
+                                (it.contentLinks?.find { old -> old.url.equals(link.url, true) } as ContentLink.WikipediaLink).apply {
+                                    title = wikiSummary.data.title
+                                    summary = wikiSummary.data.extract
+                                }
+                            }
+                            else -> {}
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+
         emit(RedditResult.Success(comments))
     }
 

@@ -11,12 +11,14 @@ import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.GallerySliderHostFragmentBinding
+import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.adapter.MediaGalleryPagerAdapter
 import me.cniekirk.flex.ui.dialog.SubmissionCopyDialogFragment
 import me.cniekirk.flex.ui.dialog.SubmissionMediaInformationDialog
 import me.cniekirk.flex.ui.dialog.SubmissionShareDialogFragment
 import me.cniekirk.flex.ui.viewmodel.GalleryViewModel
 import me.cniekirk.flex.util.observe
+import timber.log.Timber
 
 @AndroidEntryPoint
 class SlidingGalleryContainer : AppCompatActivity() {
@@ -44,39 +46,92 @@ class SlidingGalleryContainer : AppCompatActivity() {
             }
         }
 
-        binding.apply {
-            args.post.mediaMetadata?.values?.toList()?.let {
-                pager.adapter = MediaGalleryPagerAdapter(this@SlidingGalleryContainer, it)
-                pageNumber.text = getString(R.string.gallery_page_number, pager.currentItem + 1, it.size)
-                pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        pageNumber.text = getString(R.string.gallery_page_number, position + 1, it.size)
-                    }
-                })
-            }
-            backButton.setOnClickListener { finish() }
+        observe(viewModel.imgurGallery) {
+            when (it) {
+                is RedditResult.Error -> {
+                    Timber.e(it.errorMessage)
+                }
+                RedditResult.Loading -> {
 
-            val allUrls = args.post.mediaMetadata?.values?.toList()?.map { item ->
-                getString(
-                    R.string.reddit_image_url,
-                    item.id,
-                    item.m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" })
+                }
+                is RedditResult.Success -> {
+                    val links = it.data.data?.map { image -> image.link }
+
+                    binding.apply {
+                        pager.adapter = MediaGalleryPagerAdapter(
+                            this@SlidingGalleryContainer,
+                            imgurImages = links
+                        )
+
+                        backButton.setOnClickListener { finish() }
+
+                        pageNumber.text = getString(R.string.gallery_page_number, pager.currentItem + 1, links?.size)
+                        pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                            override fun onPageSelected(position: Int) {
+                                pageNumber.text = getString(R.string.gallery_page_number, position + 1, links?.size)
+                            }
+                        })
+
+                        downloadButton.setOnClickListener {
+                            viewModel.download(links?.get(pager.currentItem) ?: "")
+                        }
+                        shareButton.setOnClickListener {
+                            val dialog = SubmissionShareDialogFragment.newInstance(args.post, links!!, pager.currentItem)
+                            dialog.show(supportFragmentManager, "Share")
+                        }
+                        copyUrlButton.setOnClickListener {
+                            val dialog = SubmissionCopyDialogFragment.newInstance(args.post, links!![pager.currentItem])
+                            dialog.show(supportFragmentManager, "Copy")
+                        }
+                        infoButton.setOnClickListener {
+                            val dialog = SubmissionMediaInformationDialog.newInstance(links!![pager.currentItem])
+                            dialog.show(supportFragmentManager, "Info")
+                        }
+                    }
+                }
+                else -> {}
             }
-            allUrls?.let {
-                downloadButton.setOnClickListener {
-                    viewModel.download(allUrls[pager.currentItem])
-                }
-                shareButton.setOnClickListener {
-                    val dialog = SubmissionShareDialogFragment.newInstance(args.post, allUrls, pager.currentItem)
-                    dialog.show(supportFragmentManager, "Share")
-                }
-                copyUrlButton.setOnClickListener {
-                    val dialog = SubmissionCopyDialogFragment.newInstance(args.post, allUrls[pager.currentItem])
-                    dialog.show(supportFragmentManager, "Copy")
-                }
-                infoButton.setOnClickListener {
-                    val dialog = SubmissionMediaInformationDialog.newInstance(allUrls[pager.currentItem])
-                    dialog.show(supportFragmentManager, "Info")
+        }
+
+        args.imgurAlbumHash?.let {
+            viewModel.getImgurGallery(it)
+        } ?: run {
+            args.post.let { post ->
+                binding.apply {
+                    post.mediaMetadata?.values?.toList()?.let {
+                        pager.adapter = MediaGalleryPagerAdapter(this@SlidingGalleryContainer, it)
+                        pageNumber.text = getString(R.string.gallery_page_number, pager.currentItem + 1, it.size)
+                        pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                            override fun onPageSelected(position: Int) {
+                                pageNumber.text = getString(R.string.gallery_page_number, position + 1, it.size)
+                            }
+                        })
+                    }
+                    backButton.setOnClickListener { finish() }
+
+                    val allUrls = post.mediaMetadata?.values?.toList()?.map { item ->
+                        getString(
+                            R.string.reddit_image_url,
+                            item.id,
+                            item.m?.let { it.substring(it.indexOf('/') + 1) } ?: run { "jpg" })
+                    }
+                    allUrls?.let {
+                        downloadButton.setOnClickListener {
+                            viewModel.download(allUrls[pager.currentItem])
+                        }
+                        shareButton.setOnClickListener {
+                            val dialog = SubmissionShareDialogFragment.newInstance(post, allUrls, pager.currentItem)
+                            dialog.show(supportFragmentManager, "Share")
+                        }
+                        copyUrlButton.setOnClickListener {
+                            val dialog = SubmissionCopyDialogFragment.newInstance(post, allUrls[pager.currentItem])
+                            dialog.show(supportFragmentManager, "Copy")
+                        }
+                        infoButton.setOnClickListener {
+                            val dialog = SubmissionMediaInformationDialog.newInstance(allUrls[pager.currentItem])
+                            dialog.show(supportFragmentManager, "Info")
+                        }
+                    }
                 }
             }
         }

@@ -6,7 +6,6 @@ import im.ene.toro.exoplayer.Config
 import im.ene.toro.exoplayer.DefaultExoCreator
 import im.ene.toro.exoplayer.ToroExo
 
-
 class LoopExoCreator(toro: ToroExo, config: Config) : DefaultExoCreator(toro, config) {
 
     override fun createPlayer(): SimpleExoPlayer {

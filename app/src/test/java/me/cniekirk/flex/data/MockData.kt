@@ -1,15 +1,15 @@
 package me.cniekirk.flex.data
 
-import me.cniekirk.flex.data.remote.model.Comment
-import me.cniekirk.flex.data.remote.model.CommentData
-import me.cniekirk.flex.data.remote.model.Gildings
-import me.cniekirk.flex.data.remote.model.base.EnvelopeKind
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedComment
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentData
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedCommentDataListing
-import me.cniekirk.flex.data.remote.model.envelopes.EnvelopedContributionListing
-import me.cniekirk.flex.data.remote.model.listings.CommentDataListing
-import me.cniekirk.flex.data.remote.model.listings.ContributionListing
+import me.cniekirk.flex.data.remote.model.reddit.Comment
+import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.Gildings
+import me.cniekirk.flex.data.remote.model.reddit.base.EnvelopeKind
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedComment
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedCommentData
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedCommentDataListing
+import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedContributionListing
+import me.cniekirk.flex.data.remote.model.reddit.listings.CommentDataListing
+import me.cniekirk.flex.data.remote.model.reddit.listings.ContributionListing
 
 private val any = Any()
 private val gildings = Gildings(1, 2)

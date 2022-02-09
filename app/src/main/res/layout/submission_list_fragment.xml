@@ -6,7 +6,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".ui.submission.SubmissionListFragment">
 
     <TextView
@@ -20,6 +19,16 @@
         android:layout_marginTop="24dp"
         android:text="Home"
         tools:text="r/tommyinnit" />
+
+    <ImageView
+        android:id="@+id/settings_button"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_submission_source"
+        app:layout_constraintBottom_toBottomOf="@id/text_submission_source"
+        android:layout_marginEnd="@dimen/spacing_l"
+        app:srcCompat="@drawable/ic_settings" />
 
     <LinearLayout
         android:layout_width="wrap_content"

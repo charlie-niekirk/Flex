@@ -9,5 +9,7 @@ sealed class Link {
     object GfycatLink : Link()
     object RedditGallery : Link()
     data class TwitterLink(val url: String) : Link()
+    data class YoutubeLink(val videoId: String) : Link()
+    data class ImgurGalleryLink(val albumId: String) : Link()
     object StreamableLink : Link()
 }

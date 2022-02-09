@@ -1,6 +1,5 @@
 package me.cniekirk.flex.ui.subreddit
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -15,7 +14,7 @@ import com.google.android.material.transition.MaterialSharedAxis
 import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.flair.UserFlairItem
+import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
 import me.cniekirk.flex.databinding.SubredditUserFlairSelectionFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
@@ -49,11 +48,9 @@ class SubredditUserFlairFragment : BaseFragment(R.layout.subreddit_user_flair_se
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bottomAppBar = requireActivity().findViewById<BottomAppBar>(R.id.bottom_app_bar)
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
         if (!actionButton.isOrWillBeHidden) {
             actionButton.hide()
-            bottomAppBar.performHide()
         }
 
         binding.apply {

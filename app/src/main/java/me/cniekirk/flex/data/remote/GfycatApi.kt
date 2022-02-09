@@ -1,6 +1,6 @@
 package me.cniekirk.flex.data.remote
 
-import me.cniekirk.flex.data.remote.redgifs.GfycatLinks
+import me.cniekirk.flex.data.remote.model.reddit.redgifs.GfycatLinks
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path

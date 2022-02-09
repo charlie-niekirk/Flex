@@ -6,10 +6,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import me.cniekirk.flex.data.remote.model.flair.UserFlairItem
-import me.cniekirk.flex.data.remote.model.rules.Rules
-import me.cniekirk.flex.data.remote.model.subreddit.ModUser
-import me.cniekirk.flex.data.remote.model.subreddit.Subreddit
+import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
+import me.cniekirk.flex.data.remote.model.reddit.rules.Rules
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.ModUser
+import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.*
 import javax.inject.Inject

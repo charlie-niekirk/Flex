@@ -109,4 +109,25 @@
     <string name="submit_comment_success">Comment posted!</string>
     <string name="submit_comment_error">Failed to post comment!</string>
     <string name="submit_comment_no_content_error">Comment must contain some content.</string>
+    <string name="analytics_dialog_title">Data Collection</string>
+    <string name="analytics_explanation">Analytics help me to identify and fix bugs, as well as helping to provide a better experience. However, privacy is a human right and all data collection is disabled by default.</string>
+    <string name="crashlytics_checkbox">Enable Crashlytics</string>
+    <string name="analytics_checkbox">Enable Analytics</string>
+    <string name="analytics_settings">These settings can be changed anytime in the apps settings.</string>
+    <string name="posts_title">Posts</string>
+    <string name="show_preview">Show post previews</string>
+    <string name="settings_profiles_title">Settings profiles</string>
+    <string name="add_profile">Add Profile</string>
+    <string name="profile_name_input_hint">Profile Name</string>
+    <string name="profile_geofence_title">Geofence settings profile</string>
+    <string name="enable_geofencing">Apply profile when entering a geofence?</string>
+    <string name="share_as_image_title">Image preview</string>
+    <string name="share_image_hide_username">Hide username</string>
+    <string name="share_image_hide_subreddit">Hide subreddit</string>
+    <string name="share_as_image_button">Share</string>
+    <string name="save_as_image_button">Save</string>
+    <string name="youtube_pill_text">YouTube</string>
+    <string name="search_hint">Subreddits, users etc.</string>
+    <string name="title_add_profile">Add Profile</string>
+    <string name="geofence_slider_desc">Geofence Radius Slider</string>
 </resources>
