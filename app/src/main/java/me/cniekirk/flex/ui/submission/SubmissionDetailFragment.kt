@@ -115,6 +115,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             })
             .build()
     }
+
     @Inject lateinit var markwonAdapter: MarkwonAdapter
     @Inject lateinit var exoCreator: ExoCreator
 
