@@ -130,4 +130,5 @@
     <string name="search_hint">Subreddits, users etc.</string>
     <string name="title_add_profile">Add Profile</string>
     <string name="geofence_slider_desc">Geofence Radius Slider</string>
+    <string name="image_save_success">Image saved successfully!</string>
 </resources>

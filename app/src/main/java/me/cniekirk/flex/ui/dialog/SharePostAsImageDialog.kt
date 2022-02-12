@@ -8,7 +8,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -26,6 +29,8 @@ import io.noties.markwon.recycler.table.TableEntryPlugin
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.ShareAsImageDialogBinding
+import me.cniekirk.flex.ui.gallery.DownloadState
+import me.cniekirk.flex.ui.viewmodel.ShareAsImageViewModel
 import me.cniekirk.flex.util.*
 import org.commonmark.ext.gfm.tables.TableBlock
 
@@ -49,6 +54,7 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
     }
     private var binding: ShareAsImageDialogBinding? = null
     private val args by navArgs<SharePostAsImageDialogArgs>()
+    private val viewModel by viewModels<ShareAsImageViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,6 +99,8 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
                 selftextPreview.selfTextMarkdown.visibility = View.VISIBLE
                 imagePreview.submissionImage.visibility = View.GONE
                 videoPreview.videoPlayer.visibility = View.GONE
+                tweetPreview.root.visibility = View.GONE
+                tweetMediaPreview.root.visibility = View.GONE
                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
                 selftextPreview.selfTextMarkdown.adapter = markwonAdapter
                 markwonAdapter.setMarkdown(markwon, args.post.selftext ?: "")
@@ -105,6 +113,8 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
                             Link.ExternalLink -> {
                                 videoPreview.videoPlayer.visibility = View.GONE
                                 imagePreview.submissionImage.visibility = View.GONE
+                                tweetPreview.root.visibility = View.GONE
+                                tweetMediaPreview.root.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.VISIBLE
                                 externalLinkPreview.linkContent.text = args.post.url
                                 Glide.with(externalLinkPreview.linkImage)
@@ -123,6 +133,8 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
                             is Link.ImageLink -> {
                                 videoPreview.videoPlayer.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                tweetPreview.root.visibility = View.GONE
+                                tweetMediaPreview.root.visibility = View.GONE
                                 imagePreview.submissionImage.visibility = View.VISIBLE
                                 Glide.with(imagePreview.submissionImage)
                                     .load(it.url)
@@ -132,19 +144,50 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
                             is Link.VideoLink -> {
                                 imagePreview.submissionImage.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                tweetPreview.root.visibility = View.GONE
+                                tweetMediaPreview.root.visibility = View.GONE
                                 videoPreview.videoPlayer.visibility = View.VISIBLE
                                 //videoPreview.videoPlayer.initialise(simpleExoPlayer, args.post.urlOverriddenByDest ?: "")
                             }
                             Link.RedditVideo -> {
                                 imagePreview.submissionImage.visibility = View.GONE
                                 externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                tweetPreview.root.visibility = View.GONE
+                                tweetMediaPreview.root.visibility = View.GONE
                                 videoPreview.videoPlayer.visibility = View.VISIBLE
 //                                player = videoPreview.videoPlayer.initialise(simpleExoPlayer,
 //                                    args.post.media?.redditVideo?.dashUrl ?:
 //                                    args.post.media?.redditVideo?.fallbackUrl!!)
                             }
                             is Link.TwitterLink -> {
-                                // TODO: Get Twitter API access
+                                args.post.tweetDetails?.let { tweet ->
+                                    imagePreview.submissionImage.visibility = View.GONE
+                                    externalLinkPreview.externalLinkContainer.visibility = View.GONE
+                                    videoPreview.videoPlayer.visibility = View.GONE
+                                    tweet.includes?.media?.let { media ->
+                                        if (media.first().type?.equals("photo", true) == true) {
+                                            tweetPreview.root.visibility = View.GONE
+                                            tweetMediaPreview.root.visibility = View.VISIBLE
+                                            tweetMediaPreview.tweetAuthorName.text = tweet.includes.users?.get(0)?.name
+                                            Glide.with(root).load(tweet.includes.users?.get(0)?.profileImageUrl)
+                                                .circleCrop()
+                                                .into(tweetMediaPreview.tweetProfileImage)
+                                            tweetMediaPreview.tweetProfileVerified.isVisible = tweet.includes.users?.get(0)?.verified ?: false
+                                            tweetMediaPreview.tweetBody.text = tweet.data?.text
+                                            Glide.with(root).load(media.first().url)
+                                                .into(tweetMediaPreview.tweetMedia)
+                                        }
+                                    } ?: run {
+                                        tweetPreview.root.visibility = View.VISIBLE
+                                        tweetMediaPreview.root.visibility = View.GONE
+                                        tweetPreview.tweetAuthorName.text = tweet.includes?.users?.get(0)?.name
+                                        Glide.with(root).load(tweet.includes?.users?.get(0)?.profileImageUrl)
+                                            .circleCrop()
+                                            .into(tweetPreview.tweetProfileImage)
+                                        tweetPreview.tweetProfileVerified.isVisible = tweet.includes?.users?.get(0)?.verified ?: false
+                                        tweetPreview.tweetBody.text = tweet.data?.text
+                                    }
+                                }
                             }
                         }
                     }
@@ -219,6 +262,27 @@ class SharePostAsImageDialog : BottomSheetDialogFragment() {
                         val uri = getUriFromBitmap(bmp)
                         shareMedia(uri)
                     }
+                }
+            }
+
+            saveButton.setOnClickListener {
+                previewImageContainer.bitmap { bmp ->
+                    viewModel.saveImage(args.post.subreddit, bmp)
+                }
+            }
+        }
+
+        observe(viewModel.downloadState) {
+            when (it) {
+                DownloadState.Success -> {
+                    Toast.makeText(requireContext(), R.string.image_save_success, Toast.LENGTH_SHORT).show()
+                    dismiss()
+                }
+                DownloadState.NoDefinedLocation -> {
+                    // Show directory chooser
+                }
+                DownloadState.Idle -> {
+                    // Do nothing
                 }
             }
         }

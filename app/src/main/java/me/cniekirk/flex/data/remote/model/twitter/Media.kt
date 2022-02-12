@@ -11,5 +11,7 @@ data class Media(
     @Json(name = "type")
     val type: String?,
     @Json(name = "url")
-    val url: String?
+    val url: String?,
+    @Json(name = "preview_image_url")
+    val previewImageUrl: String?
 )

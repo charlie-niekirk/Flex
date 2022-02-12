@@ -12,6 +12,7 @@ import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
+import me.cniekirk.flex.data.local.repo.LocalDataRepositoryImpl
 import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.model.reddit.auth.LoggedInAuthenticator
 import me.cniekirk.flex.data.remote.model.reddit.auth.PreLoginAuthenticator
@@ -21,6 +22,7 @@ import me.cniekirk.flex.data.remote.model.reddit.util.ForceToBooleanJsonAdapter
 import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
 import me.cniekirk.flex.domain.ImgurDataRepository
+import me.cniekirk.flex.domain.LocalDataRepository
 import me.cniekirk.flex.domain.RedditDataRepository
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -317,6 +319,11 @@ class NetworkModule {
     @Singleton
     fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
             : RedditDataRepository = redditDataRepositoryImpl
+
+    @Provides
+    @Singleton
+    fun provideLocalDataRepo(localDataRepositoryImpl: LocalDataRepositoryImpl)
+            : LocalDataRepository = localDataRepositoryImpl
 
     @Provides
     @Singleton

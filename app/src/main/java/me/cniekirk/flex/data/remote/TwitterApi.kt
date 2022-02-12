@@ -14,7 +14,7 @@ interface TwitterApi {
         @Header("Authorization") bearer: String = "Bearer AAAAAAAAAAAAAAAAAAAAAAtvYAEAAAAAdk1wrZ6vXUPUvyOECpeqDUp60WU%3DUlRPUonqQuCljHWaHXHa4OLmUCmTyeRrrNANcKUbubLg6V3B3a",
         @Query("expansions") expansions: String = "referenced_tweets.id.author_id,attachments.media_keys",
         @Query("user.fields") userFields: String = "name,profile_image_url,created_at,verified",
-        @Query("media.fields") mediaFields: String = "url"
+        @Query("media.fields") mediaFields: String = "url,preview_image_url"
     ): TweetResponse
 
 }

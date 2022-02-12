@@ -7,6 +7,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -34,19 +36,22 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        if (!actionButton.isOrWillBeHidden) {
+            actionButton.visibility = View.GONE
+        }
+
         binding.apply {
             subredditResultList.addItemDecoration(DividerItemDecoration(
                 requireContext(), LinearLayoutManager.VERTICAL
             ))
             subredditResultList.adapter = adapter
-            randomNsfwContainer.clipToOutline = true
-            randomSubContainer.clipToOutline = true
 
-            randomSubContainer.setOnClickListener {
+            randomButton.setOnClickListener {
                 viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("random"))
                 binding.root.findNavController().popBackStack()
             }
-            randomNsfwContainer.setOnClickListener {
+            randomNsfwButton.setOnClickListener {
                 viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("randnsfw"))
                 binding.root.findNavController().popBackStack()
             }

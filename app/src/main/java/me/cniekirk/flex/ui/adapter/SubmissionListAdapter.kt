@@ -1471,16 +1471,20 @@ class SubmissionListAdapter(
             }
             post.tweetDetails?.let { tweet ->
                 tweet.includes?.media?.let { media ->
+                    binding.tweetPreview.root.visibility = View.GONE
+                    binding.tweetMediaPreview.root.visibility = View.VISIBLE
+                    binding.tweetMediaPreview.tweetAuthorName.text = tweet.includes.users?.get(0)?.name
+                    Glide.with(binding.root).load(tweet.includes.users?.get(0)?.profileImageUrl)
+                        .circleCrop()
+                        .into(binding.tweetMediaPreview.tweetProfileImage)
+                    binding.tweetMediaPreview.tweetProfileVerified.isVisible = tweet.includes.users?.get(0)?.verified ?: false
+                    binding.tweetMediaPreview.tweetBody.text = tweet.data?.text
                     if (media.first().type?.equals("photo", true) == true) {
-                        binding.tweetPreview.root.visibility = View.GONE
-                        binding.tweetMediaPreview.root.visibility = View.VISIBLE
-                        binding.tweetMediaPreview.tweetAuthorName.text = tweet.includes.users?.get(0)?.name
-                        Glide.with(binding.root).load(tweet.includes.users?.get(0)?.profileImageUrl)
-                            .circleCrop()
-                            .into(binding.tweetMediaPreview.tweetProfileImage)
-                        binding.tweetMediaPreview.tweetProfileVerified.isVisible = tweet.includes.users?.get(0)?.verified ?: false
-                        binding.tweetMediaPreview.tweetBody.text = tweet.data?.text
                         Glide.with(binding.root).load(media.first().url)
+                            .into(binding.tweetMediaPreview.tweetMedia)
+                    }
+                    if (media.first().type?.equals("video", true) == true) {
+                        Glide.with(binding.root).load(media.first().previewImageUrl)
                             .into(binding.tweetMediaPreview.tweetMedia)
                     }
                 } ?: run {
