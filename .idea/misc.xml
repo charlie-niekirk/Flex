@@ -63,6 +63,7 @@
         <entry key="app/src/main/res/layout/adapter_table_block.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/add_setting_profile_fragment.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/analytics_dialog_view.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/authenticated_account_fragment.xml" value="0.165" />
         <entry key="app/src/main/res/layout/compose_comment_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.1" />
