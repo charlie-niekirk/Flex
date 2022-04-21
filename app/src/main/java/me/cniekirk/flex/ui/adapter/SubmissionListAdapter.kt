@@ -1046,8 +1046,9 @@ class SubmissionListAdapter(
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
             binding.externalLinkPreview.linkContent.text = post.url
+            Timber.d("IMAGE: ${post}")
             Glide.with(binding.externalLinkPreview.linkImage)
-                .load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url)
+                .load(post.preview?.images?.lastOrNull()?.resolutions?.lastOrNull()?.url?.replace("amp;", ""))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .transform(CenterCrop(), GranularRoundedCorners(
                     binding.root.resources.getDimension(R.dimen.spacing_m),

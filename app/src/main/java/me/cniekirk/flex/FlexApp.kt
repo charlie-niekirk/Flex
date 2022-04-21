@@ -12,6 +12,8 @@ class FlexApp : Application() {
         DynamicColors.applyToActivitiesIfAvailable(this)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        } else {
+
         }
     }
 }

@@ -10,5 +10,4 @@ open class BaseFragment(@LayoutRes id: Int) : Fragment(id) {
         super.onResume()
         setCurrentScreen()
     }
-
 }

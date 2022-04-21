@@ -62,18 +62,21 @@ dependencies {
     // Core dependencies
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.6.0-alpha02'
+    implementation 'com.google.android.material:material:1.7.0-alpha01'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.datastore:datastore:1.0.0"
     implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+
+    // MVI
+    implementation 'org.orbit-mvi:orbit-viewmodel:4.3.2'
 
     // DI dependencies
     implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -110,7 +113,7 @@ dependencies {
     implementation 'com.pierfrancescosoffritti.androidyoutubeplayer:core:11.0.1'
 
     // Logging dependencies
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2"
 
     // Firebase dependencies
@@ -134,11 +137,11 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito.kotlin:mockito-kotlin:2.2.11"
     testImplementation 'app.cash.turbine:turbine:0.6.1'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.4.0'
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.38.1'
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
     kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.38.1'
     debugImplementation "androidx.fragment:fragment-testing:1.4.1"
 }

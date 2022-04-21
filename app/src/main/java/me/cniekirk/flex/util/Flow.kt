@@ -1,7 +1,9 @@
 package me.cniekirk.flex.util
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -17,7 +19,7 @@ fun <T: Any?> LifecycleOwner.observe(flow: Flow<T>, block: suspend (T) -> Unit) 
     val lifecycleOwner = if (this is Fragment) viewLifecycleOwner else this
     lifecycleOwner.lifecycleScope.launch {
         lifecycleOwner.whenStarted {
-            flow.collect(block)
+            flow.collect { block(it) }
         }
     }
 }
