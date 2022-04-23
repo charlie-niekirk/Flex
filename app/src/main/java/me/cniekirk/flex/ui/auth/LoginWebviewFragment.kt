@@ -12,8 +12,10 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavGraph
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.get
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.LoginWebviewFragmentBinding
@@ -51,6 +53,8 @@ class LoginWebviewFragment : FullscreenDialog() {
                 RedditResult.Loading -> { }
                 is RedditResult.Success -> {
                     dismiss()
+                    (findNavController().graph[R.id.accountNavGraph] as NavGraph).setStartDestination(R.id.authenticatedAccountFragment)
+                    findNavController().navigate(R.id.authenticatedAccountFragment)
                 }
                 is RedditResult.Error -> {
                     Timber.e(it.errorMessage)
@@ -87,5 +91,4 @@ class LoginWebviewFragment : FullscreenDialog() {
         binding = null
         super.onDestroyView()
     }
-
 }

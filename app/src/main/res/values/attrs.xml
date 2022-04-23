@@ -5,4 +5,9 @@
         <attr format="float" name="ari_ratio"/>
     </declare-styleable>
 
+    <declare-styleable name="AccountStatItem">
+        <attr name="stat_name" format="string" />
+        <attr name="stat_value" format="string" />
+    </declare-styleable>
+
 </resources>

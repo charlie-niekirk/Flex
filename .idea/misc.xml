@@ -28,6 +28,7 @@
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/wikipedia_link_preview_view.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_link_preview_view.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_list_item.xml" value="0.3307291666666667" />
+        <entry key="app/src/main/res/drawable/account_stat_bg.xml" value="0.2755" />
         <entry key="app/src/main/res/drawable/action_sheet_bg.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/attribute_container.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
@@ -59,11 +60,12 @@
         <entry key="app/src/main/res/drawable/upvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/yt_background.xml" value="0.2235" />
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
+        <entry key="app/src/main/res/layout/account_stat_item.xml" value="0.375" />
         <entry key="app/src/main/res/layout/adapter_default_entry.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/adapter_table_block.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/add_setting_profile_fragment.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/analytics_dialog_view.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/authenticated_account_fragment.xml" value="0.165" />
+        <entry key="app/src/main/res/layout/authenticated_account_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/compose_comment_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.1" />

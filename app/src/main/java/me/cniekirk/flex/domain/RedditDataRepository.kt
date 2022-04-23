@@ -3,6 +3,7 @@ package me.cniekirk.flex.domain
 import kotlinx.coroutines.flow.Flow
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
+import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedContributionListing
 import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
@@ -47,6 +48,8 @@ interface RedditDataRepository {
     fun submitComment(markdown: String, parentThing: String): Flow<RedditResult<CommentData>>
 
     fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
+
+    fun getMe(): Flow<RedditResult<RedditUser>>
 
     suspend fun getWikipediaSummary(article: String): RedditResult<WikiSummary>
 }

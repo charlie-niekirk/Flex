@@ -72,6 +72,11 @@ fun Int.condense(): String {
     return cdf.format(this)
 }
 
+fun Long.condense(): String {
+    val cdf = CompactDecimalFormat.getInstance(ULocale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT)
+    return cdf.format(this)
+}
+
 fun String.selfTextPreview(): String {
     return replace("&amp;#x200B;", "").
     replace("&#x200B;", "").

@@ -12,7 +12,7 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_search" />
     <item
-        android:id="@+id/loginWebviewFragment"
+        android:id="@+id/accountNavGraph"
         android:title="@string/text_tab_account"
         app:showAsAction="always"
         android:icon="@drawable/ic_account" />

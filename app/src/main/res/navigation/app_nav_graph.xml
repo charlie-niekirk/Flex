@@ -48,6 +48,9 @@
         <action
             android:id="@+id/action_submissionListFragment_to_youtubePlayer"
             app:destination="@id/youtubePlayer" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_authenticatedAccountFragment"
+            app:destination="@id/authenticatedAccountFragment" />
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
@@ -75,11 +78,11 @@
             android:id="@+id/action_submissionDetailFragment_to_slidingGalleryContainer"
             app:destination="@id/slidingGalleryContainer" />
     </fragment>
-    <dialog
-        android:id="@+id/loginWebviewFragment"
-        android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"
-        android:label="LoginWebviewFragment"
-        tools:layout="@layout/login_webview_fragment" />
+<!--    <dialog-->
+<!--        android:id="@+id/loginWebviewFragment"-->
+<!--        android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"-->
+<!--        android:label="LoginWebviewFragment"-->
+<!--        tools:layout="@layout/login_webview_fragment" />-->
     <activity
         android:id="@+id/slidingGalleryContainer"
         android:name="me.cniekirk.flex.ui.gallery.SlidingGalleryContainer"
@@ -194,4 +197,20 @@
         android:id="@+id/addSettingsProfileFragment"
         android:name="me.cniekirk.flex.ui.settings.AddSettingsProfileFragment"
         android:label="AddSettingsProfileFragment" />
+<!--    <fragment-->
+<!--        android:id="@+id/authenticatedAccountFragment"-->
+<!--        android:name="me.cniekirk.flex.ui.auth.AuthenticatedAccountFragment"-->
+<!--        android:label="AuthenticatedAccountFragment"-->
+<!--        tools:layout="@layout/authenticated_account_fragment" />-->
+    <navigation android:id="@+id/accountNavGraph"
+        app:startDestination="@id/loginWebviewFragment">
+        <dialog
+            android:id="@+id/loginWebviewFragment"
+            android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"
+            android:label="LoginWebviewFragment" />
+        <fragment
+            android:id="@+id/authenticatedAccountFragment"
+            android:name="me.cniekirk.flex.ui.auth.AuthenticatedAccountFragment"
+            android:label="AuthenticatedAccountFragment" />
+    </navigation>
 </navigation>

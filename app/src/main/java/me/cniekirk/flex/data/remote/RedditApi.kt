@@ -2,6 +2,7 @@ package me.cniekirk.flex.data.remote
 
 import android.util.Base64
 import me.cniekirk.flex.data.remote.model.reddit.*
+import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
 import me.cniekirk.flex.data.remote.model.reddit.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.data.remote.model.reddit.base.UserList
@@ -47,6 +48,11 @@ interface RedditApi {
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
+
+    @GET("api/v1/me")
+    suspend fun getMe(
+        @Header("Authorization") authorization: String? = null
+    ): RedditUser
 
     @FormUrlEncoded
     @POST("api/v1/access_token")

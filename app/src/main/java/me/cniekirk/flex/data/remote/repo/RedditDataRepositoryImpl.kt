@@ -18,6 +18,7 @@ import me.cniekirk.flex.data.remote.RedditApi
 import me.cniekirk.flex.data.remote.WikipediaApi
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
+import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedCommentData
 import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedContributionListing
@@ -97,6 +98,15 @@ class RedditDataRepositoryImpl @Inject constructor(
                 emit(RedditResult.Error(IOException(response.message())))
             }
         } ?: run { emit(RedditResult.Success(DownloadState.NoDefinedLocation)) }
+    }
+
+    override fun getMe(): Flow<RedditResult<RedditUser>> = flow {
+        userDao.getAll().firstOrNull()?.let {
+            val response = authRedditApi.getMe("Bearer ${it.accessToken}")
+            emit(RedditResult.Success(response))
+        } ?: run {
+            emit(RedditResult.UnAuthenticated)
+        }
     }
 
     override suspend fun getWikipediaSummary(article: String): RedditResult<WikiSummary> {

@@ -76,6 +76,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     // MVI
+    implementation 'org.orbit-mvi:orbit-core:4.3.2'
     implementation 'org.orbit-mvi:orbit-viewmodel:4.3.2'
 
     // DI dependencies
