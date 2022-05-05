@@ -100,7 +100,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                         val action = SubmissionDetailFragmentDirections
                                             .actionSubmissionDetailFragmentToSlidingGalleryContainer(
                                                 it.albumId,
-                                                args.post
+                                                args.post!!
                                             )
                                         findNavController().navigate(action)
                                     }
@@ -122,17 +122,19 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        if (!actionButton.isOrWillBeHidden) {
-            actionButton.visibility = View.GONE
-            bottomBar.visibility = View.GONE
+        if (false) {
+            val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+            val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+            if (!actionButton.isOrWillBeHidden) {
+                actionButton.visibility = View.GONE
+                bottomBar.visibility = View.GONE
+            }
         }
 
         binding.apply {
             backButton.setOnClickListener { it.findNavController().popBackStack() }
 
-            textCommentsTitle.text = getString(R.string.comments_title, args.post.numComments?.condense())
+            textCommentsTitle.text = getString(R.string.comments_title, args.post?.numComments?.condense())
             loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
                 override fun onAnimationEnd(drawable: Drawable?) {
                     loadingIndicator.post { loading.start() }
@@ -140,18 +142,20 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             })
             loading.start()
 
-            val headerAdapter = SubmissionDetailHeaderAdapter(this@SubmissionDetailFragment, null, exoCreator, markwon, markwonAdapter)
-            adapter = CommentTreeAdapter(args.post, markwon, this@SubmissionDetailFragment)
-            commentsTreeList.adapter = ConcatAdapter(headerAdapter, adapter)
-            headerAdapter.submitList(listOf(args.post))
+            args.post?.let {
+                val headerAdapter = SubmissionDetailHeaderAdapter(this@SubmissionDetailFragment, null, exoCreator, markwon, markwonAdapter)
+                adapter = CommentTreeAdapter(it, markwon, this@SubmissionDetailFragment)
+                commentsTreeList.adapter = ConcatAdapter(headerAdapter, adapter)
+                headerAdapter.submitList(listOf(args.post))
 
-            nextTopCommentButton.setOnClickListener {
-                val start = (commentsTreeList.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() - 1
-                val nextItem = adapter?.currentList?.filterIndexed { index, item ->
-                    index > start && item.depth == 0
-                }?.first()
-                smoothScroller.targetPosition = adapter?.currentList?.indexOf(nextItem)?.plus(1) ?: 0
-                commentsTreeList.layoutManager?.startSmoothScroll(smoothScroller)
+                nextTopCommentButton.setOnClickListener {
+                    val start = (commentsTreeList.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() - 1
+                    val nextItem = adapter?.currentList?.filterIndexed { index, item ->
+                        index > start && item.depth == 0
+                    }?.first()
+                    smoothScroller.targetPosition = adapter?.currentList?.indexOf(nextItem)?.plus(1) ?: 0
+                    commentsTreeList.layoutManager?.startSmoothScroll(smoothScroller)
+                }
             }
         }
 
@@ -182,7 +186,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 is RedditResult.Success -> {
                     if (comments.data.isNullOrEmpty()) {
                         binding.emptyCommentEasterEgg.visibility = View.VISIBLE
-                        binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post.subreddit)
+                        binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post!!.subreddit)
                     } else {
                         adapter?.submitList(comments.data)
                         binding.emptyCommentEasterEgg.visibility = View.GONE
@@ -199,24 +203,30 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                 }
             }
         }
+
+        args.post?.let {
+            viewModel.getComments(it, "")
+        }
     }
 
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        val anim: Animation = loadAnimation(activity, nextAnim)
-        anim.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation?) {}
-            override fun onAnimationRepeat(animation: Animation?) {}
-            override fun onAnimationEnd(animation: Animation?) {
-                if (enter) {
-                    viewModel.getComments(args.post, "")
-                }
-            }
-        })
-        return anim
-    }
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+//        val anim: Animation = loadAnimation(activity, nextAnim)
+//        anim.setAnimationListener(object : Animation.AnimationListener {
+//            override fun onAnimationStart(animation: Animation?) {}
+//            override fun onAnimationRepeat(animation: Animation?) {}
+//            override fun onAnimationEnd(animation: Animation?) {
+//                if (enter) {
+//                    args.post?.let {
+//                        viewModel.getComments(it, "")
+//                    }
+//                }
+//            }
+//        })
+//        return anim
+//    }
 
     override fun onLoadMore(moreComments: MoreComments) {
-        viewModel.getMoreComments(moreComments, args.post.name)
+        viewModel.getMoreComments(moreComments, args.post!!.name)
     }
 
     override fun onReply(comment: Comment) {
@@ -227,7 +237,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
 
     override fun onImgurGalleryClicked(albumId: String) {
         val action = SubmissionDetailFragmentDirections
-            .actionSubmissionDetailFragmentToSlidingGalleryContainer(albumId, args.post)
+            .actionSubmissionDetailFragmentToSlidingGalleryContainer(albumId, args.post!!)
         findNavController().navigate(action)
     }
 

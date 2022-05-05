@@ -27,8 +27,6 @@ class SubmissionDetailViewModel @Inject constructor(
     private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel() {
 
-    // TODO: ADD TOP PART AS HEADER RV ITEM TO REMOVE JANK
-
     private val _commentsTree: MutableStateFlow<RedditResult<List<CommentData>>> = MutableStateFlow(RedditResult.Loading)
     val commentsTree: StateFlow<RedditResult<List<CommentData>>> = _commentsTree
     private val _voteState: MutableStateFlow<RedditResult<Boolean>> = MutableStateFlow(RedditResult.Loading)

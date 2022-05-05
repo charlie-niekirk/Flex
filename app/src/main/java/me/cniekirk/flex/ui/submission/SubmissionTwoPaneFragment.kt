@@ -5,13 +5,14 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
-import androidx.fragment.app.Fragment
+import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.AbstractListDetailFragment
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -30,43 +31,41 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.R
+import me.cniekirk.flex.SubmissionDetailGraphDirections
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
-import me.cniekirk.flex.databinding.SubmissionListFragmentBinding
+import me.cniekirk.flex.databinding.SubmissionMasterDetailPaneBinding
 import me.cniekirk.flex.domain.RedditResult
-import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
-import me.cniekirk.flex.util.viewBinding
 import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * [Fragment] displaying a list of submissions from any source i.e. MultiReddit, Subreddit, Home etc.
- *
- * @author Charlie Niekirk
- */
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class SubmissionListFragment
-    : BaseFragment(R.layout.submission_list_fragment), SubmissionListAdapter.SubmissionActionListener {
+class SubmissionTwoPaneFragment : AbstractListDetailFragment(), SubmissionListAdapter.SubmissionActionListener {
 
-    // Shared VM with the sort dialog fragment
+    private var binding: SubmissionMasterDetailPaneBinding? = null
     private val viewModel by activityViewModels<SubmissionListViewModel>()
-    private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
-    private val binding by viewBinding(SubmissionListFragmentBinding::bind)
+    private val loading by lazy(LazyThreadSafetyMode.NONE) {
+        binding?.listPane?.loadingIndicator?.drawable as AnimatedVectorDrawable
+    }
     private var adapter: SubmissionListAdapter? = null
 
-    @Inject lateinit var exoCreator: ExoCreator
+    @Inject
+    lateinit var exoCreator: ExoCreator
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_bottom_navigation, menu)
+    override fun onCreateListPaneView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.submission_master_detail_pane, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+    override fun onCreateDetailPaneNavHostFragment(): NavHostFragment {
+        return NavHostFragment.create(R.navigation.submission_detail_graph)
+    }
+
+    override fun onListPaneViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onListPaneViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
         val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -74,6 +73,8 @@ class SubmissionListFragment
             actionButton.visibility = View.VISIBLE
             bottomBar.visibility = View.VISIBLE
         }
+
+        binding = SubmissionMasterDetailPaneBinding.bind(view)
 
         observe(viewModel.settingsFlow) { settings ->
             if (settings.profilesCount == 0) {
@@ -96,12 +97,12 @@ class SubmissionListFragment
                     }.show()
             } else {
                 if (adapter == null) {
-                    adapter = SubmissionListAdapter(this@SubmissionListFragment, settings, exoCreator)
+                    adapter = SubmissionListAdapter(this@SubmissionTwoPaneFragment, settings, exoCreator)
                     adapter?.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 }
                 //binding.listSubmissions.setItemViewCacheSize(20)
-                binding.listSubmissions.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
-                binding.listSubmissions.adapter = adapter?.withLoadStateFooter(
+                binding?.listPane?.listSubmissions?.addItemDecoration(DividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL))
+                binding?.listPane?.listSubmissions?.adapter = adapter?.withLoadStateFooter(
                     footer = SubmissionListLoadingStateAdapter()
                 )
                 // Collect paginated submissions and submit to adapter
@@ -122,27 +123,27 @@ class SubmissionListFragment
             }
         }
 
-        binding.submissionSort.setOnClickListener {
+        binding?.listPane?.submissionSort?.setOnClickListener {
             it.findNavController().navigate(
                 R.id.action_submissionListFragment_to_submissionListSortDialogFragment
             )
         }
 
-        // Keep the sort UI updated
-        observe(viewModel.sortFlow) {
-            if (it.isNotEmpty() && it.length > 1) {
-                binding.textSubmissionSortLabel.text =
-                    it.substring(1).replaceFirstChar { char ->
-                    char.uppercaseChar()
-                }
-            } else {
-                binding.textSubmissionSortLabel.text = getString(R.string.sort_best)
-            }
-        }
+//        // Keep the sort UI updated
+//        observe(viewModel.sortFlow) {
+//            if (it.isNotEmpty() && it.length > 1) {
+//                binding.textSubmissionSortLabel.text =
+//                    it.substring(1).replaceFirstChar { char ->
+//                        char.uppercaseChar()
+//                    }
+//            } else {
+//                binding.textSubmissionSortLabel.text = getString(R.string.sort_best)
+//            }
+//        }
 
         // Keep the submission source updated
         observe(viewModel.subredditFlow) {
-            binding.textSubmissionSource.text = it
+            binding?.listPane?.textSubmissionSource?.text = it
         }
 
         observe(viewModel.subredditInfo) {
@@ -165,55 +166,44 @@ class SubmissionListFragment
 
     private val callback = object : Animatable2.AnimationCallback() {
         override fun onAnimationEnd(drawable: Drawable?) {
-            binding.loadingIndicator.post { loading.start() }
+            binding?.listPane?.loadingIndicator?.post { loading.start() }
         }
     }
 
     private fun startLoadingAnimation() {
-        binding.loadingIndicator.visibility = View.VISIBLE
+        binding?.listPane?.loadingIndicator?.visibility = View.VISIBLE
         loading.registerAnimationCallback(callback)
         loading.start()
     }
 
     private fun stopLoadingAnimation() {
         view?.let {
-            binding.loadingIndicator.visibility = View.INVISIBLE
+            binding?.listPane?.loadingIndicator?.visibility = View.INVISIBLE
             loading.unregisterAnimationCallback(callback)
             loading.reset()
         }
     }
 
-    override fun onDestroyView() {
-        loading.unregisterAnimationCallback(callback)
-        super.onDestroyView()
-    }
-
     override fun onPostClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSubmissionDetailFragment(post)
-//        binding.root.findNavController().navigate(action)
+        val detailNavController = childFragmentManager.findFragmentById(R.id.detail_pane)?.findNavController()
+        detailNavController?.navigate(SubmissionDetailGraphDirections.toSubmissionDetailFragment(post))
+        if (binding?.slidingPaneLayout?.isSlideable == true) {
+            binding?.slidingPaneLayout?.openPane()
+        }
     }
 
     override fun onPostLongClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
-//        binding.root.findNavController().navigate(action)
     }
 
     override fun onGalleryClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSlidingGalleryContainer(post, null)
-//        binding.root.findNavController().navigate(action)
     }
 
     override fun onYoutubeVideoClicked(videoId: String) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToYoutubePlayer(videoId)
-//        binding.root.findNavController().navigate(action)
     }
 
-    override fun onPause() {
-        viewModel.resetSubredditInfo()
-        super.onPause()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        loading.unregisterAnimationCallback(callback)
+        binding = null
     }
 }

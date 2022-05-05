@@ -255,7 +255,9 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission) {
             binding.actions.root.visibility = View.GONE
-            binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnClickListener {
+                submissionsActionListener.onPostClicked(post)
+            }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
                 true

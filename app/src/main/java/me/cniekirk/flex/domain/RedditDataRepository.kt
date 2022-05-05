@@ -1,6 +1,8 @@
 package me.cniekirk.flex.domain
 
+import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
@@ -50,6 +52,8 @@ interface RedditDataRepository {
     fun downloadMedia(url: String): Flow<RedditResult<DownloadState>>
 
     fun getMe(): Flow<RedditResult<RedditUser>>
+
+    fun getSelfPosts(username: String): Flow<PagingData<AuthedSubmission>>
 
     suspend fun getWikipediaSummary(article: String): RedditResult<WikiSummary>
 }

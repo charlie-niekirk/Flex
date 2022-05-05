@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.slidingpanelayout.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sliding_pane_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+<!--    <androidx.fragment.app.FragmentContainerView-->
+<!--        android:id="@+id/list_pane"-->
+<!--        android:layout_width="380dp"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_gravity="start"-->
+<!--        android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"-->
+<!--        tools:layout="@layout/submission_list_fragment" />-->
+
+    <include
+        android:id="@+id/list_pane"
+        android:layout_width="380dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        layout="@layout/submission_list_fragment" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/detail_pane"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:navGraph="@navigation/submission_detail_graph"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        tools:layout="@layout/submission_detail_fragment" />
+
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

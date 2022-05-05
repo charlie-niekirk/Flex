@@ -5,17 +5,21 @@ import android.os.Build
 import androidx.annotation.IntRange
 import androidx.datastore.core.DataStore
 import androidx.documentfile.provider.DocumentFile
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.db.entity.User
-import me.cniekirk.flex.data.remote.RedditApi
-import me.cniekirk.flex.data.remote.WikipediaApi
+import me.cniekirk.flex.data.remote.*
+import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
@@ -27,6 +31,7 @@ import me.cniekirk.flex.data.remote.model.reddit.rules.Rules
 import me.cniekirk.flex.data.remote.model.reddit.subreddit.ModUser
 import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
 import me.cniekirk.flex.data.remote.model.wikipedia.WikiSummary
+import me.cniekirk.flex.data.remote.pagination.UserSubmissionsPagingSource
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.gallery.DownloadState
@@ -46,6 +51,11 @@ class RedditDataRepositoryImpl @Inject constructor(
     @Named("loginApi") private val authRedditApi: RedditApi,
     @Named("downloadApi") private val downloadRedditApi: RedditApi,
     private val wikipediaApi: WikipediaApi,
+    private val streamableApi: StreamableApi,
+    private val imgurApi: ImgurApi,
+    private val gfycatApi: GfycatApi,
+    private val redGifsApi: RedGifsApi,
+    private val twitterApi: TwitterApi,
     @ApplicationContext private val context: Context,
     private val preLoginUserDao: PreLoginUserDao,
     private val userDao: UserDao,
@@ -106,6 +116,29 @@ class RedditDataRepositoryImpl @Inject constructor(
             emit(RedditResult.Success(response))
         } ?: run {
             emit(RedditResult.UnAuthenticated)
+        }
+    }
+
+    override fun getSelfPosts(username: String): Flow<PagingData<AuthedSubmission>> {
+        userDao.getAll().firstOrNull()?.let {
+            val pager = Pager(
+                config = PagingConfig(pageSize = 15, prefetchDistance = 5),
+                pagingSourceFactory = {
+                    UserSubmissionsPagingSource(
+                        authRedditApi,
+                        streamableApi,
+                        imgurApi,
+                        gfycatApi,
+                        redGifsApi,
+                        twitterApi,
+                        username,
+                        userDao
+                    )
+                }
+            )
+            return pager.flow
+        } ?: run {
+            return flowOf()
         }
     }
 

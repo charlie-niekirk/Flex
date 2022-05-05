@@ -6,19 +6,19 @@
     app:startDestination="@id/submissionListFragment">
     <fragment
         android:id="@+id/submissionListFragment"
-        android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionTwoPaneFragment"
         android:label="submission_list_fragment"
         tools:layout="@layout/submission_list_fragment" >
         <action
             android:id="@+id/action_submissionListFragment_to_submissionListSortDialogFragment"
             app:destination="@id/submissionListSortDialogFragment" />
-        <action
-            android:id="@+id/action_submissionListFragment_to_submissionDetailFragment"
-            app:destination="@id/submissionDetailFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
+<!--        <action-->
+<!--            android:id="@+id/action_submissionListFragment_to_submissionDetailFragment"-->
+<!--            app:destination="@id/submissionDetailFragment"-->
+<!--            app:enterAnim="@anim/fragment_open_enter"-->
+<!--            app:exitAnim="@anim/fragment_open_exit"-->
+<!--            app:popEnterAnim="@anim/fragment_close_enter"-->
+<!--            app:popExitAnim="@anim/fragment_close_exit" />-->
         <action
             android:id="@+id/action_submissionListFragment_to_slidingGalleryContainer"
             app:destination="@id/slidingGalleryContainer">
@@ -57,45 +57,45 @@
         android:name="me.cniekirk.flex.ui.dialog.SubmissionListSortDialogFragment"
         android:label="SubmissionListSortDialogFragment"
         tools:layout="@layout/submission_list_sort_dialog" />
-    <fragment
-        android:id="@+id/submissionDetailFragment"
-        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"
-        android:label="SubmissionDetailFragment"
-        tools:layout="@layout/submission_detail_fragment" >
-        <argument
-            android:name="post"
-            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
-        <action
-            android:id="@+id/action_submissionDetailFragment_to_youtubePlayer"
-            app:destination="@id/youtubePlayer" />
-        <action
-            android:id="@+id/action_submissionDetailFragment_to_composeCommentFragment"
-            app:destination="@id/composeCommentFragment" />
-        <action
-            android:id="@+id/action_submissionDetailFragment_to_sharePostAsImageDialog"
-            app:destination="@id/sharePostAsImageDialog" />
-        <action
-            android:id="@+id/action_submissionDetailFragment_to_slidingGalleryContainer"
-            app:destination="@id/slidingGalleryContainer" />
-    </fragment>
+<!--    <fragment-->
+<!--        android:id="@+id/submissionDetailFragment"-->
+<!--        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"-->
+<!--        android:label="SubmissionDetailFragment"-->
+<!--        tools:layout="@layout/submission_detail_fragment" >-->
+<!--        <argument-->
+<!--            android:name="post"-->
+<!--            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_submissionDetailFragment_to_youtubePlayer"-->
+<!--            app:destination="@id/youtubePlayer" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_submissionDetailFragment_to_composeCommentFragment"-->
+<!--            app:destination="@id/composeCommentFragment" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_submissionDetailFragment_to_sharePostAsImageDialog"-->
+<!--            app:destination="@id/sharePostAsImageDialog" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_submissionDetailFragment_to_slidingGalleryContainer"-->
+<!--            app:destination="@id/slidingGalleryContainer" />-->
+<!--    </fragment>-->
 <!--    <dialog-->
 <!--        android:id="@+id/loginWebviewFragment"-->
 <!--        android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"-->
 <!--        android:label="LoginWebviewFragment"-->
 <!--        tools:layout="@layout/login_webview_fragment" />-->
-    <activity
-        android:id="@+id/slidingGalleryContainer"
-        android:name="me.cniekirk.flex.ui.gallery.SlidingGalleryContainer"
-        android:label="SlidingGalleryContainerFragment"
-        tools:layout="@layout/gallery_slider_host_fragment">
-        <argument
-            android:name="imgurAlbumHash"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="post"
-            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
-    </activity>
+<!--    <activity-->
+<!--        android:id="@+id/slidingGalleryContainer"-->
+<!--        android:name="me.cniekirk.flex.ui.gallery.SlidingGalleryContainer"-->
+<!--        android:label="SlidingGalleryContainerFragment"-->
+<!--        tools:layout="@layout/gallery_slider_host_fragment">-->
+<!--        <argument-->
+<!--            android:name="imgurAlbumHash"-->
+<!--            app:argType="string"-->
+<!--            app:nullable="true" />-->
+<!--        <argument-->
+<!--            android:name="post"-->
+<!--            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />-->
+<!--    </activity>-->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="me.cniekirk.flex.ui.settings.SettingsFragment"
@@ -166,33 +166,33 @@
             android:name="subreddit"
             app:argType="string" />
     </fragment>
-    <fragment
-        android:id="@+id/composeCommentFragment"
-        android:name="me.cniekirk.flex.ui.submission.ComposeCommentFragment"
-        android:label="ComposeCommentFragment"
-        tools:layout="@layout/compose_comment_fragment">
-        <argument
-            android:name="comment"
-            app:argType="me.cniekirk.flex.data.remote.model.reddit.Comment" />
-    </fragment>
-    <dialog
-        android:id="@+id/sharePostAsImageDialog"
-        android:name="me.cniekirk.flex.ui.dialog.SharePostAsImageDialog"
-        android:label="SharePostAsImageDialog"
-        tools:layout="@layout/share_as_image_dialog" >
-        <argument
-            android:name="post"
-            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
-    </dialog>
-    <fragment
-        android:id="@+id/youtubePlayer"
-        android:name="me.cniekirk.flex.ui.submission.YoutubePlayer"
-        android:label="YoutubePlayer"
-        tools:layout="@layout/youtube_player_fragment">
-        <argument
-            android:name="videoId"
-            app:argType="string" />
-    </fragment>
+<!--    <fragment-->
+<!--        android:id="@+id/composeCommentFragment"-->
+<!--        android:name="me.cniekirk.flex.ui.submission.ComposeCommentFragment"-->
+<!--        android:label="ComposeCommentFragment"-->
+<!--        tools:layout="@layout/compose_comment_fragment">-->
+<!--        <argument-->
+<!--            android:name="comment"-->
+<!--            app:argType="me.cniekirk.flex.data.remote.model.reddit.Comment" />-->
+<!--    </fragment>-->
+<!--    <dialog-->
+<!--        android:id="@+id/sharePostAsImageDialog"-->
+<!--        android:name="me.cniekirk.flex.ui.dialog.SharePostAsImageDialog"-->
+<!--        android:label="SharePostAsImageDialog"-->
+<!--        tools:layout="@layout/share_as_image_dialog" >-->
+<!--        <argument-->
+<!--            android:name="post"-->
+<!--            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />-->
+<!--    </dialog>-->
+<!--    <fragment-->
+<!--        android:id="@+id/youtubePlayer"-->
+<!--        android:name="me.cniekirk.flex.ui.submission.YoutubePlayer"-->
+<!--        android:label="YoutubePlayer"-->
+<!--        tools:layout="@layout/youtube_player_fragment">-->
+<!--        <argument-->
+<!--            android:name="videoId"-->
+<!--            app:argType="string" />-->
+<!--    </fragment>-->
     <fragment
         android:id="@+id/addSettingsProfileFragment"
         android:name="me.cniekirk.flex.ui.settings.AddSettingsProfileFragment"

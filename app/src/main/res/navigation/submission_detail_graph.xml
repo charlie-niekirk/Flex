@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/submission_detail_graph"
+    app:startDestination="@id/submissionDetailPlaceholder">
+
+    <fragment
+        android:id="@+id/submissionDetailPlaceholder"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailPlaceholderFragment"
+        android:label="SubmissionDetailPlaceholderFragment"
+        tools:layout="@layout/submission_detail_placeholder" />
+
+    <action
+        android:id="@+id/to_submissionDetailFragment"
+        app:destination="@id/submissionDetailFragment"
+        app:popUpTo="@id/submissionDetailFragment"
+        app:popUpToInclusive="true">
+        <argument
+            android:name="post"
+            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
+    </action>
+
+    <fragment
+        android:id="@+id/submissionDetailFragment"
+        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"
+        android:label="SubmissionDetailFragment"
+        tools:layout="@layout/submission_detail_fragment" >
+        <argument
+            android:name="post"
+            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_submissionDetailFragment_to_youtubePlayer"
+            app:destination="@id/youtubePlayer" />
+        <action
+            android:id="@+id/action_submissionDetailFragment_to_composeCommentFragment"
+            app:destination="@id/composeCommentFragment" />
+        <action
+            android:id="@+id/action_submissionDetailFragment_to_sharePostAsImageDialog"
+            app:destination="@id/sharePostAsImageDialog" />
+        <action
+            android:id="@+id/action_submissionDetailFragment_to_slidingGalleryContainer"
+            app:destination="@id/slidingGalleryContainer" />
+    </fragment>
+
+    <activity
+        android:id="@+id/slidingGalleryContainer"
+        android:name="me.cniekirk.flex.ui.gallery.SlidingGalleryContainer"
+        android:label="SlidingGalleryContainerFragment"
+        tools:layout="@layout/gallery_slider_host_fragment">
+        <argument
+            android:name="imgurAlbumHash"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="post"
+            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
+    </activity>
+
+    <fragment
+        android:id="@+id/youtubePlayer"
+        android:name="me.cniekirk.flex.ui.submission.YoutubePlayer"
+        android:label="YoutubePlayer"
+        tools:layout="@layout/youtube_player_fragment">
+        <argument
+            android:name="videoId"
+            app:argType="string" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/sharePostAsImageDialog"
+        android:name="me.cniekirk.flex.ui.dialog.SharePostAsImageDialog"
+        android:label="SharePostAsImageDialog"
+        tools:layout="@layout/share_as_image_dialog" >
+        <argument
+            android:name="post"
+            app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
+    </dialog>
+
+    <fragment
+        android:id="@+id/composeCommentFragment"
+        android:name="me.cniekirk.flex.ui.submission.ComposeCommentFragment"
+        android:label="ComposeCommentFragment"
+        tools:layout="@layout/compose_comment_fragment">
+        <argument
+            android:name="comment"
+            app:argType="me.cniekirk.flex.data.remote.model.reddit.Comment" />
+    </fragment>
+</navigation>
