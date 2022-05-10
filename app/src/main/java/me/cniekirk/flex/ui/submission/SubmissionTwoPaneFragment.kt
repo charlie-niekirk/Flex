@@ -68,7 +68,7 @@ class SubmissionTwoPaneFragment : AbstractListDetailFragment(), SubmissionListAd
         super.onListPaneViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        val bottomBar = requireActivity().findViewById<View>(R.id.bottom_navigation)
         if (actionButton.isOrWillBeHidden) {
             actionButton.visibility = View.VISIBLE
             bottomBar.visibility = View.VISIBLE
@@ -189,6 +189,13 @@ class SubmissionTwoPaneFragment : AbstractListDetailFragment(), SubmissionListAd
         detailNavController?.navigate(SubmissionDetailGraphDirections.toSubmissionDetailFragment(post))
         if (binding?.slidingPaneLayout?.isSlideable == true) {
             binding?.slidingPaneLayout?.openPane()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (binding?.slidingPaneLayout?.isSlideable == false) {
+            binding?.slidingPaneLayout?.closePane()
         }
     }
 

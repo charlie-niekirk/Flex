@@ -60,6 +60,7 @@
         <entry key="app/src/main/res/drawable/upvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/yt_background.xml" value="0.2235" />
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
+        <entry key="app/src/main/res/layout-w600dp/container_activity.xml" value="0.2413793103448276" />
         <entry key="app/src/main/res/layout/account_stat_item.xml" value="0.375" />
         <entry key="app/src/main/res/layout/adapter_default_entry.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/adapter_table_block.xml" value="0.20526315789473684" />
@@ -70,6 +71,7 @@
         <entry key="app/src/main/res/layout/container_activity.xml" value="0.165" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fab_rail_header.xml" value="0.2413793103448276" />
         <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/image_item_fragment.xml" value="0.28229166666666666" />
@@ -134,6 +136,7 @@
         <entry key="app/src/main/res/layout/youtube_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/youtube_player_activity.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_icon_round.xml" value="0.2755" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2984375" />
         <entry key="app/src/main/res/xml/submission_detail_scene.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/xml/submission_list_layout_description.xml" value="0.1831081081081081" />

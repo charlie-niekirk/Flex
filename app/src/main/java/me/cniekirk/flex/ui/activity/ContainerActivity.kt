@@ -8,7 +8,9 @@ import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
@@ -31,7 +33,7 @@ class ContainerActivity : AppCompatActivity() {
         val binding = ContainerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.floatingActionButton.setOnClickListener {
+        binding.floatingActionButton?.setOnClickListener {
             val intent = Intent(this, CreatePostActivity::class.java)
             val options = ActivityOptions.makeSceneTransitionAnimation(
                 this,
@@ -41,7 +43,10 @@ class ContainerActivity : AppCompatActivity() {
             startActivity(intent, options.toBundle())
         }
 
-        binding.bottomNavigation.setupWithNavController(navController)
+        if (binding.bottomNavigation is NavigationRailView) {
+            binding.bottomNavigation.setupWithNavController(navController)
+        } else if (binding.bottomNavigation is BottomNavigationView) {
+            binding.bottomNavigation.setupWithNavController(navController)
+        }
     }
-
 }
