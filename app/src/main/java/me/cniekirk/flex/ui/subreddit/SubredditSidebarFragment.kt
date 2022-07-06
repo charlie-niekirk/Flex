@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
@@ -37,8 +38,10 @@ class SubredditSidebarFragment : BaseFragment(R.layout.subreddit_sidebar_fragmen
         super.onViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
         }
 
         binding.textSidebarTitle.text = getString(R.string.sidebar_title_format, args.subreddit)

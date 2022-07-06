@@ -34,13 +34,7 @@ class ContainerActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.floatingActionButton?.setOnClickListener {
-            val intent = Intent(this, CreatePostActivity::class.java)
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                this,
-                binding.floatingActionButton,
-                "material_motion_container"
-            )
-            startActivity(intent, options.toBundle())
+
         }
 
         if (binding.bottomNavigation is NavigationRailView) {

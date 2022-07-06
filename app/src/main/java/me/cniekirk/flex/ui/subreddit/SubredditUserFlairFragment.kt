@@ -8,6 +8,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
@@ -33,24 +34,14 @@ class SubredditUserFlairFragment : BaseFragment(R.layout.subreddit_user_flair_se
     private val args by navArgs<SubredditUserFlairFragmentArgs>()
     private val adapter = SubredditUserFlairAdapter(this)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
         }
 
         binding.apply {

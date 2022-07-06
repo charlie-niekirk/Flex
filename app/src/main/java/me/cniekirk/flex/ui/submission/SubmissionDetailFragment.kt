@@ -122,14 +122,14 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (false) {
+//        if (false) {
             val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
             val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
             if (!actionButton.isOrWillBeHidden) {
                 actionButton.visibility = View.GONE
                 bottomBar.visibility = View.GONE
             }
-        }
+//        }
 
         binding.apply {
             backButton.setOnClickListener { it.findNavController().popBackStack() }

@@ -5,20 +5,20 @@
         android:id="@+id/submissionListFragment"
         android:title="@string/text_tab_posts"
         app:showAsAction="always"
-        android:icon="@drawable/ic_list" />
+        android:icon="@drawable/view_list" />
     <item
         android:id="@+id/searchFragment"
         android:title="@string/text_tab_search"
         app:showAsAction="always"
-        android:icon="@drawable/ic_search" />
+        android:icon="@drawable/search" />
     <item
         android:id="@+id/accountNavGraph"
         android:title="@string/text_tab_account"
         app:showAsAction="always"
-        android:icon="@drawable/ic_account" />
+        android:icon="@drawable/account_circle" />
     <item
         android:id="@+id/settingsFragment"
         android:title="@string/text_tab_settings"
         app:showAsAction="always"
-        android:icon="@drawable/ic_settings" />
+        android:icon="@drawable/settings" />
 </menu>

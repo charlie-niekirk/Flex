@@ -3,13 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/submission_detail_graph"
-    app:startDestination="@id/submissionDetailPlaceholder">
-
-    <fragment
-        android:id="@+id/submissionDetailPlaceholder"
-        android:name="me.cniekirk.flex.ui.submission.SubmissionDetailPlaceholderFragment"
-        android:label="SubmissionDetailPlaceholderFragment"
-        tools:layout="@layout/submission_detail_placeholder" />
+    app:startDestination="@id/submissionDetailFragment">
 
     <action
         android:id="@+id/to_submissionDetailFragment"

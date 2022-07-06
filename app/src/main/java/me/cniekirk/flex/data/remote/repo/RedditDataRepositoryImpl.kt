@@ -185,19 +185,19 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun searchSubreddits(query: String, sortType: String): Flow<RedditResult<List<Subreddit>>> = flow {
-        val response = if (userDao.getAll().isNullOrEmpty()) {
+        val response = if (userDao.getAll().isEmpty()) {
             val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
-            preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
+            preLoginRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = true, authorization = accessToken)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
-            authRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = false, authorization = accessToken)
+            authRedditApi.searchSubreddits(query = query, sort = sortType, nsfw = true, authorization = accessToken)
         }
 
         emit(RedditResult.Success(response.data.children.map { it.data }.filter { it.subscribers != null }))
     }
 
     override fun getSubredditRules(subreddit: String): Flow<RedditResult<Rules>> = flow {
-        val response = if (userDao.getAll().isNullOrEmpty()) {
+        val response = if (userDao.getAll().isEmpty()) {
             val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
             preLoginRedditApi.getSubredditRules(accessToken, subreddit)
         } else {
@@ -208,7 +208,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun getSubredditInfo(subreddit: String): Flow<RedditResult<Subreddit>> = flow {
-        val response = if (userDao.getAll().isNullOrEmpty()) {
+        val response = if (userDao.getAll().isEmpty()) {
             val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
             preLoginRedditApi.getSubredditInfo(accessToken, subreddit)
         } else {
@@ -219,7 +219,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -229,7 +229,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun subscribeSubreddit(subredditId: String): Flow<RedditResult<Int>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -243,7 +243,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun unsubscribeSubreddit(subredditId: String): Flow<RedditResult<Int>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -257,7 +257,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun favoriteSubreddit(subreddit: String): Flow<RedditResult<Int>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -271,7 +271,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun unfavoriteSubreddit(subreddit: String): Flow<RedditResult<Int>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -285,7 +285,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun getAvailableUserFlairs(subreddit: String): Flow<RedditResult<List<UserFlairItem>>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
@@ -295,7 +295,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     }
 
     override fun submitComment(markdown: String, parentThing: String): Flow<RedditResult<CommentData>> = flow {
-        if (userDao.getAll().isNullOrEmpty()) {
+        if (userDao.getAll().isEmpty()) {
             emit(RedditResult.UnAuthenticated)
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"

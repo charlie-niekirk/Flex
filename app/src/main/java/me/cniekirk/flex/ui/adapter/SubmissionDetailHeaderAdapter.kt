@@ -4,6 +4,11 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +42,7 @@ import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
 import me.cniekirk.flex.util.*
 import timber.log.Timber
+import kotlin.math.ceil
 
 class SubmissionDetailHeaderAdapter(
     private val submissionsActionListener: SubmissionActionListener,
@@ -344,6 +350,7 @@ class SubmissionDetailHeaderAdapter(
                 withContext(Dispatchers.Main) {
                     markwonAdapter.setParsedMarkdown(markwon, node)
                     markwonAdapter.notifyDataSetChanged()
+
                 }
             }
         }

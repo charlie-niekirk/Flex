@@ -37,6 +37,7 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
+import me.cniekirk.flex.ui.text.getBionikSpanForText
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 

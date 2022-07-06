@@ -75,6 +75,11 @@ class SubmissionListFragment
             bottomBar.visibility = View.VISIBLE
         }
 
+        actionButton?.setOnClickListener {
+            val action = SubmissionListFragmentDirections.actionSubmissionListFragmentToCreatePostFragment()
+            findNavController().navigate(action)
+        }
+
         observe(viewModel.settingsFlow) { settings ->
             if (settings.profilesCount == 0) {
                 val dlgView = LayoutInflater.from(requireContext()).inflate(R.layout.analytics_dialog_view, null)
@@ -152,14 +157,18 @@ class SubmissionListFragment
                 }
                 RedditResult.Loading -> { }
                 is RedditResult.Success -> {
-//                    val action = SubmissionListFragmentDirections
-//                        .actionSubmissionListFragmentToSubredditInformationDialog(it.data)
-//                    findNavController().navigate(action)
+                    val action = SubmissionListFragmentDirections
+                        .actionSubmissionListFragmentToSubredditInformationDialog(it.data)
+                    findNavController().navigate(action)
                 }
                 RedditResult.UnAuthenticated -> {
                     Timber.e("Unauthenticated!")
                 }
             }
+        }
+
+        binding.buttonSubredditOptions.setOnClickListener {
+            viewModel.onUiEvent(SubmissionListEvent.SubredditOptions)
         }
     }
 
@@ -189,27 +198,27 @@ class SubmissionListFragment
     }
 
     override fun onPostClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSubmissionDetailFragment(post)
-//        binding.root.findNavController().navigate(action)
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSubmissionDetailFragment(post)
+        binding.root.findNavController().navigate(action)
     }
 
     override fun onPostLongClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
-//        binding.root.findNavController().navigate(action)
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
+        binding.root.findNavController().navigate(action)
     }
 
     override fun onGalleryClicked(post: AuthedSubmission) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToSlidingGalleryContainer(post, null)
-//        binding.root.findNavController().navigate(action)
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToSlidingGalleryContainer(post, null)
+        binding.root.findNavController().navigate(action)
     }
 
     override fun onYoutubeVideoClicked(videoId: String) {
-//        val action = SubmissionListFragmentDirections
-//            .actionSubmissionListFragmentToYoutubePlayer(videoId)
-//        binding.root.findNavController().navigate(action)
+        val action = SubmissionListFragmentDirections
+            .actionSubmissionListFragmentToYoutubePlayer(videoId)
+        binding.root.findNavController().navigate(action)
     }
 
     override fun onPause() {
