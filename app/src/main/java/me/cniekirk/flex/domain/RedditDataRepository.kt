@@ -2,6 +2,7 @@ package me.cniekirk.flex.domain
 
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
+import me.cniekirk.flex.data.remote.model.pushshift.DeletedComment
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
@@ -20,6 +21,8 @@ interface RedditDataRepository {
     suspend fun getComments(submissionId: String, sortType: String): List<EnvelopedContributionListing>
 
     fun getMoreComments(moreComments: MoreComments, parentId: String): Flow<RedditResult<List<CommentData>>>
+
+    fun getDeletedComment(commentId: String): Flow<RedditResult<DeletedComment>>
 
     fun getAccessToken(code: String): Flow<RedditResult<Token>>
 

@@ -131,4 +131,5 @@
     <string name="title_add_profile">Add Profile</string>
     <string name="geofence_slider_desc">Geofence Radius Slider</string>
     <string name="image_save_success">Image saved successfully!</string>
+    <string name="subreddit_link_prefix">flex://?subreddit=</string>
 </resources>

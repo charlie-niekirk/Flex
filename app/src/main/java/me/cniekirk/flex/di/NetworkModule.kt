@@ -191,6 +191,17 @@ class NetworkModule {
     }
 
     @Provides
+    @Named("pushshiftRetrofit")
+    @Singleton
+    fun providePushshiftRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.pushshift.io/")
+            .build()
+    }
+
+    @Provides
     @Named("userlessRetrofit")
     @Singleton
     fun provideRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -314,6 +325,11 @@ class NetworkModule {
     @Singleton
     fun provideWikiApi(@Named("wikiRetrofit") retrofit: Retrofit): WikipediaApi
             = retrofit.create(WikipediaApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providePushshiftApi(@Named("pushshiftRetrofit") retrofit: Retrofit): PushshiftApi
+            = retrofit.create(PushshiftApi::class.java)
 
     @Provides
     @Singleton

@@ -19,6 +19,7 @@ import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.db.entity.User
 import me.cniekirk.flex.data.remote.*
+import me.cniekirk.flex.data.remote.model.pushshift.DeletedComment
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
@@ -50,6 +51,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     @Named("preLoginApi") private val preLoginRedditApi: RedditApi,
     @Named("loginApi") private val authRedditApi: RedditApi,
     @Named("downloadApi") private val downloadRedditApi: RedditApi,
+    @Named("pushshiftApi") private val pushshiftApi: PushshiftApi,
     private val wikipediaApi: WikipediaApi,
     private val streamableApi: StreamableApi,
     private val imgurApi: ImgurApi,
@@ -182,6 +184,11 @@ class RedditDataRepositoryImpl @Inject constructor(
         } else {
             emit(RedditResult.Error(RuntimeException("Unknown error!")))
         }
+    }
+
+    override fun getDeletedComment(commentId: String): Flow<RedditResult<DeletedComment>> = flow {
+        val deletedComments = pushshiftApi.getDeletedComment(commentId)
+        emit(RedditResult.Success(deletedComments.data!!.first()))
     }
 
     override fun searchSubreddits(query: String, sortType: String): Flow<RedditResult<List<Subreddit>>> = flow {

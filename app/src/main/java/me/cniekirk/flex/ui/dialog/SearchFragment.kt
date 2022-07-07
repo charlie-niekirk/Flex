@@ -3,8 +3,10 @@ package me.cniekirk.flex.ui.dialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -30,7 +32,7 @@ import timber.log.Timber
 class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAdapter.SubredditResultListener {
 
     private val binding by viewBinding(SearchFragmentBinding::bind)
-    private val viewModel by activityViewModels<SubmissionListViewModel>()
+    private val viewModel by viewModels<SubmissionListViewModel>()
     private val adapter = SubredditResultAdapter(this)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,12 +50,12 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
             subredditResultList.adapter = adapter
 
             randomButton.setOnClickListener {
-                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("random"))
-                binding.root.findNavController().popBackStack()
+                findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_subreddit", "random")
+                findNavController().popBackStack()
             }
             randomNsfwButton.setOnClickListener {
-                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("randnsfw"))
-                binding.root.findNavController().popBackStack()
+                findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_subreddit", "randnsfw")
+                findNavController().popBackStack()
             }
 
             inputSearch.textChanges()
@@ -82,7 +84,7 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
     }
 
     override fun onSubredditSelected(subreddit: String) {
-        viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(subreddit))
-        binding.root.findNavController().popBackStack()
+        findNavController().currentBackStackEntry?.savedStateHandle?.set("selected_subreddit", subreddit)
+        findNavController().popBackStack()
     }
 }

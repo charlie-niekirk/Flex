@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.submission
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.animation.Animation
@@ -10,6 +11,7 @@ import android.view.animation.AnimationUtils
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -24,10 +26,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
-import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.LinkResolverDef
-import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonConfiguration
+import io.noties.markwon.*
+import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.linkify.LinkifyPlugin
@@ -44,6 +44,7 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
+import me.cniekirk.flex.ui.text.RedditLinkifyTextAddedListener
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
 import org.commonmark.ext.gfm.tables.TableBlock
@@ -71,6 +72,13 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     private val markwon by lazy(LazyThreadSafetyMode.NONE) {
         Markwon.builder(requireContext()).usePlugin(StrikethroughPlugin())
             .usePlugin(LinkifyPlugin.create())
+            .usePlugin(object : AbstractMarkwonPlugin() {
+                override fun configure(registry: MarkwonPlugin.Registry) {
+                    registry.require(CorePlugin::class.java) { corePlugin ->
+                        corePlugin.addOnTextAddedListener(RedditLinkifyTextAddedListener())
+                    }
+                }
+            })
             .usePlugin(TableEntryPlugin.create { builder ->
                 val dip = Dip.create(requireContext())
                 builder
@@ -105,7 +113,18 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                                         findNavController().navigate(action)
                                     }
                                     else -> {
-                                        super.resolve(view, link)
+                                        if (link.startsWith(requireContext().getString(R.string.subreddit_link_prefix))) {
+                                            // Go to subreddit
+                                            val navOptions = NavOptions.Builder()
+                                                    .setEnterAnim(R.anim.fragment_open_enter)
+                                                    .setExitAnim(R.anim.fragment_open_exit)
+                                                    .setPopEnterAnim(R.anim.fragment_close_enter)
+                                                    .setPopExitAnim(R.anim.fragment_close_exit)
+                                                    .build()
+                                            findNavController().navigate(Uri.parse(link), navOptions)
+                                        } else {
+                                            super.resolve(view, link)
+                                        }
                                     }
                                 }
                             }

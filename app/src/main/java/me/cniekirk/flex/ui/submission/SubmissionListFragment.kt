@@ -10,6 +10,7 @@ import android.view.MenuInflater
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -26,6 +27,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
+import io.noties.markwon.linkify.LinkifyPlugin
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -53,7 +55,7 @@ class SubmissionListFragment
     : BaseFragment(R.layout.submission_list_fragment), SubmissionListAdapter.SubmissionActionListener {
 
     // Shared VM with the sort dialog fragment
-    private val viewModel by activityViewModels<SubmissionListViewModel>()
+    private val viewModel by viewModels<SubmissionListViewModel>()
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val binding by viewBinding(SubmissionListFragmentBinding::bind)
     private var adapter: SubmissionListAdapter? = null
@@ -67,6 +69,21 @@ class SubmissionListFragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+        if (!arguments?.getString("subreddit").isNullOrEmpty()) {
+            viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(arguments?.getString("subreddit")!!))
+        }
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("selected_subreddit")?.observe(viewLifecycleOwner) { result ->
+            Timber.d("RESULT: $result")
+            if (result?.equals("random", true) == true ||
+                result?.equals("randnsfw", true) == true) {
+                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected(result))
+            } else {
+                viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(result))
+            }
+            findNavController().currentBackStackEntry?.savedStateHandle?.remove<String>("selected_subreddit")
+        }
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
         val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)

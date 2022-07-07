@@ -9,6 +9,9 @@
         android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"
         android:label="submission_list_fragment"
         tools:layout="@layout/submission_list_fragment" >
+        <deepLink
+            android:id="@+id/submissionListDeeplink"
+            app:uri="flex://?subreddit={subreddit}" />
         <action
             android:id="@+id/action_submissionListFragment_to_submissionListSortDialogFragment"
             app:destination="@id/submissionListSortDialogFragment" />
