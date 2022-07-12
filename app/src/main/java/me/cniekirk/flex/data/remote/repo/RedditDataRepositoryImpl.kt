@@ -51,7 +51,7 @@ class RedditDataRepositoryImpl @Inject constructor(
     @Named("preLoginApi") private val preLoginRedditApi: RedditApi,
     @Named("loginApi") private val authRedditApi: RedditApi,
     @Named("downloadApi") private val downloadRedditApi: RedditApi,
-    @Named("pushshiftApi") private val pushshiftApi: PushshiftApi,
+    private val pushshiftApi: PushshiftApi,
     private val wikipediaApi: WikipediaApi,
     private val streamableApi: StreamableApi,
     private val imgurApi: ImgurApi,

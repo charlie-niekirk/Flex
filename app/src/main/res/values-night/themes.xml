@@ -71,12 +71,12 @@
 
     <style name="Widget.App.Button" parent="Widget.Material3.Button">
         <item name="android:textAppearance">@style/ButtonText</item>
-        <item name="cornerRadius">@dimen/spacing_m</item>
+        <item name="cornerRadius">@dimen/spacing_m.5</item>
     </style>
 
     <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textAppearance">@style/ButtonText</item>
-        <item name="cornerRadius">@dimen/spacing_m</item>
+        <item name="cornerRadius">@dimen/spacing_m.5</item>
     </style>
 
     <style name="TextInputStyle" parent="Widget.Material3.TextInputLayout.FilledBox">

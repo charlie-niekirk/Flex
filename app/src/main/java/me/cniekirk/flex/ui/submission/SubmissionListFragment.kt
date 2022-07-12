@@ -11,6 +11,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -38,6 +40,7 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
+import me.cniekirk.flex.ui.util.onDialogResult
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
 import me.cniekirk.flex.util.viewBinding
@@ -54,7 +57,6 @@ import javax.inject.Inject
 class SubmissionListFragment
     : BaseFragment(R.layout.submission_list_fragment), SubmissionListAdapter.SubmissionActionListener {
 
-    // Shared VM with the sort dialog fragment
     private val viewModel by viewModels<SubmissionListViewModel>()
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val binding by viewBinding(SubmissionListFragmentBinding::bind)
@@ -142,6 +144,10 @@ class SubmissionListFragment
                     }
                 }
             }
+        }
+
+        onDialogResult<String>(R.id.submissionListFragment, "sort") { sort ->
+            sort?.let { viewModel.onUiEvent(SubmissionListEvent.SortUpdated(it)) }
         }
 
         binding.submissionSort.setOnClickListener {
