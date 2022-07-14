@@ -244,6 +244,14 @@ class SubmissionListFragment
         binding.root.findNavController().navigate(action)
     }
 
+    override fun onSubredditClicked(subreddit: String) {
+
+    }
+
+    override fun onUserClicked(username: String) {
+
+    }
+
     override fun onPause() {
         viewModel.resetSubredditInfo()
         super.onPause()

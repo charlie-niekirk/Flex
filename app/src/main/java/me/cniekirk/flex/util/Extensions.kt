@@ -84,6 +84,10 @@ fun String.selfTextPreview(): String {
     replace("\n", " ").trim(' ')
 }
 
+fun String.clean(): String {
+    return replace("&amp;", "&")
+}
+
 private const val SECOND_MILLIS: Long = 1000
 private const val MINUTE_MILLIS = 60 * SECOND_MILLIS
 private const val HOUR_MILLIS = 60 * MINUTE_MILLIS
@@ -332,9 +336,9 @@ fun ImageView.loadImage(imageUrl: String, over18: Boolean) {
     if (over18) {
         Glide.with(this)
             .load(imageUrl)
+            .centerInside()
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 7)))
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .centerInside()
             .transition(withCrossFade())
             .into(this)
     } else {

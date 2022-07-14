@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 
 class RedditLinkifyTextAddedListener : CorePlugin.OnTextAddedListener {
 
-    private val pattern = Pattern.compile("""/?r/([^\s/]+)""", Pattern.MULTILINE)
+    private val pattern = Pattern.compile("""/?r/([\w/]+)""", Pattern.MULTILINE)
 
     override fun onTextAdded(visitor: MarkwonVisitor, text: String, start: Int) {
         val matcher = pattern.matcher(text)

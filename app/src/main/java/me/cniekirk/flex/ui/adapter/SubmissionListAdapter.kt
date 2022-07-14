@@ -68,7 +68,8 @@ class SubmissionListAdapter(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                    ))
+                    )
+                )
             }
             ViewType.VIDEO.ordinal -> {
                 VideoSubmissionViewHolder(
@@ -525,14 +526,15 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
+            val hideNsfw = settings.profilesList.first().blurNsfw
             if (post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
                     binding.imagePreview.submissionImage.ratio = resolution.height.toFloat() / resolution.width.toFloat()
-                    binding.imagePreview.submissionImage.loadImage(resolution.url, post.over18)
+                    binding.imagePreview.submissionImage.loadImage(resolution.url, hideNsfw && post.over18)
                 }
             } else {
-                binding.imagePreview.submissionImage.loadImage(imageUrl, post.over18)
+                binding.imagePreview.submissionImage.loadImage(imageUrl, hideNsfw && post.over18)
             }
         }
     }
@@ -549,14 +551,13 @@ class SubmissionListAdapter(
 
             mediaUri = Uri.parse(videoUrl)
 
+            val hideNsfw = settings.profilesList.first().blurNsfw
             // Load the thumbnail
             post.preview?.let {
                 val resolution = binding.videoThumbnail.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
                     binding.videoThumbnail.visibility = View.VISIBLE
-                    Glide.with(binding.root.context)
-                        .load(resolution.url)
-                        .into(binding.videoThumbnail)
+                    binding.videoThumbnail.loadImage(resolution.url, hideNsfw && post.over18)
                 }
             }
 
@@ -1544,5 +1545,7 @@ class SubmissionListAdapter(
         fun onPostLongClicked(post: AuthedSubmission)
         fun onGalleryClicked(post: AuthedSubmission)
         fun onYoutubeVideoClicked(videoId: String)
+        fun onSubredditClicked(subreddit: String)
+        fun onUserClicked(username: String)
     }
 }

@@ -346,7 +346,8 @@ class SubmissionDetailHeaderAdapter(
             binding.selfTextMarkdown.visibility = View.VISIBLE
             binding.selfTextMarkdown.adapter = markwonAdapter
             CoroutineScope(Dispatchers.IO).launch {
-                val node = markwon.parse(post.selftext ?: "")
+                Timber.d("THING: ${post.selftext?.clean()}")
+                val node = markwon.parse(post.selftext?.clean() ?: "")
                 withContext(Dispatchers.Main) {
                     markwonAdapter.setParsedMarkdown(markwon, node)
                     markwonAdapter.notifyDataSetChanged()

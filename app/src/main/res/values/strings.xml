@@ -132,4 +132,6 @@
     <string name="geofence_slider_desc">Geofence Radius Slider</string>
     <string name="image_save_success">Image saved successfully!</string>
     <string name="subreddit_link_prefix">flex://?subreddit=</string>
+    <string name="general_title">General</string>
+    <string name="settings_section_icon_cd">Settings section icon</string>
 </resources>

@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -30,6 +32,11 @@ import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
+import io.noties.markwon.image.DefaultMediaDecoder
+import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.ImagesPlugin.ImagesConfigure
+import io.noties.markwon.image.glide.GlideImagesPlugin
+import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
 import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.recycler.MarkwonAdapter
 import io.noties.markwon.recycler.table.TableEntry
@@ -44,6 +51,7 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
+import me.cniekirk.flex.ui.text.FlexLinkifyPlugin
 import me.cniekirk.flex.ui.text.RedditLinkifyTextAddedListener
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
@@ -70,8 +78,9 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     private var adapter: CommentTreeAdapter? = null
 
     private val markwon by lazy(LazyThreadSafetyMode.NONE) {
-        Markwon.builder(requireContext()).usePlugin(StrikethroughPlugin())
-            .usePlugin(LinkifyPlugin.create())
+        Markwon.builder(requireContext())
+            .usePlugin(StrikethroughPlugin())
+            .usePlugin(FlexLinkifyPlugin.create())
             .usePlugin(object : AbstractMarkwonPlugin() {
                 override fun configure(registry: MarkwonPlugin.Registry) {
                     registry.require(CorePlugin::class.java) { corePlugin ->

@@ -62,7 +62,7 @@ kapt {
 dependencies {
     // Core dependencies
     implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.appcompat:appcompat:1.6.0-alpha05'
     implementation 'com.google.android.material:material:1.7.0-alpha02'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
@@ -93,10 +93,13 @@ dependencies {
     implementation "io.noties.markwon:ext-tables:$markwon_version"
     implementation "io.noties.markwon:recycler-table:$markwon_version"
     implementation "io.noties.markwon:syntax-highlight:$markwon_version"
-    implementation "io.noties.markwon:image-coil:$markwon_version"
+    implementation "io.noties.markwon:image-glide:$markwon_version"
+    implementation "io.noties.markwon:image:$markwon_version"
     implementation "io.noties.markwon:linkify:$markwon_version"
     implementation "io.noties.markwon:editor:$markwon_version"
     implementation "io.noties:prism4j:$prism_version"
+
+    implementation "io.coil-kt:coil:2.1.0"
 
     // IO dependencies
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
