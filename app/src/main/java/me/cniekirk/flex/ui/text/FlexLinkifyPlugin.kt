@@ -70,9 +70,9 @@ class FlexLinkifyPlugin internal constructor(
                             start + builder.getSpanEnd(span)
                         )
                     }
-                    for (span in spans) {
-                        visitor.(start + builder.getSpanEnd(span), "(${span.url})")
-                    }
+//                    for (span in spans) {
+////                        visitor.(start + builder.getSpanEnd(span), "(${span.url})")
+//                    }
                 }
             }
         }

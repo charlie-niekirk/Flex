@@ -38,6 +38,9 @@ class GetCommentsUseCase @Inject constructor(
         buildTree(commentTree, comments)
 
         comments.forEach {
+            if (it is Comment && it.author?.equals("AutoModerator", true) == true) {
+                it.isCollapsed = true
+            }
             it.contentLinks?.forEach { link ->
                 when (link) {
                     is ContentLink.WikipediaLink -> {
