@@ -67,6 +67,10 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
     }
 
     private fun react(settingsSideEffect: SettingsSideEffect) {
+        when (settingsSideEffect) {
+            SettingsSideEffect.NotificationsClicked -> {
 
+            }
+        }
     }
 }

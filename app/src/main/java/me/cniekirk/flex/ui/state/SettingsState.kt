@@ -7,5 +7,5 @@ data class SettingsState(
 )
 
 sealed class SettingsSideEffect {
-
+    object NotificationsClicked : SettingsSideEffect()
 }
