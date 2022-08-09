@@ -84,9 +84,19 @@
     <me.cniekirk.flex.ui.view.SettingsSectionItem
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/post_section"
+        android:id="@+id/notifications_section"
         app:layout_constraintTop_toBottomOf="@id/general_settings_divider"
         android:layout_marginTop="@dimen/spacing_l"
+        app:section_title="Notifications"
+        app:section_subtitle="Customise notification settings"
+        app:section_icon="@drawable/notifications" />
+
+    <me.cniekirk.flex.ui.view.SettingsSectionItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/post_section"
+        app:layout_constraintTop_toBottomOf="@id/notifications_section"
+        android:layout_marginTop="@dimen/spacing_m"
         app:section_title="Post view"
         app:section_subtitle="Feed size, preview style and more"
         app:section_icon="@drawable/view_list" />

@@ -92,6 +92,7 @@
         <entry key="app/src/main/res/layout/login_webview_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/media_metadata_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/media_share_dialog.xml" value="0.10843373493975904" />
+        <entry key="app/src/main/res/layout/notification_settings_fragment.xml" value="0.26036767849508335" />
         <entry key="app/src/main/res/layout/options_dialog.xml" value="0.2128623188405797" />
         <entry key="app/src/main/res/layout/poll_list_item.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/poll_option_item.xml" value="0.335" />
@@ -130,6 +131,7 @@
         <entry key="app/src/main/res/layout/subreddit_rule_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_rules_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_sidebar_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_tracker_builder_fragment.xml" value="0.2612227447627191" />
         <entry key="app/src/main/res/layout/subreddit_user_flair_selection_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/tweet_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/tweet_media_preview.xml" value="0.1" />

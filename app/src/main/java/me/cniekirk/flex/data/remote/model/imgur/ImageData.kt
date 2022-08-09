@@ -17,7 +17,7 @@ data class ImageData(
     @Json(name = "animated")
     val animated: Boolean,
     @Json(name = "bandwidth")
-    val bandwidth: Int,
+    val bandwidth: Long,
     @Json(name = "datetime")
     val datetime: Int,
     @Json(name = "description")

@@ -108,11 +108,12 @@ class SubmissionListFragment
                     .setIcon(R.drawable.ic_data_analytics)
                     .setView(dlgView)
                     .setPositiveButton(R.string.ok) { dialog, _ ->
-                        if (dlgView.findViewById<SwitchMaterial>(R.id.crashlytics_checkbox).isChecked) {
-                            Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
-                        } else if (dlgView.findViewById<SwitchMaterial>(R.id.analytics_checkbox).isChecked) {
-                            Firebase.analytics.setAnalyticsCollectionEnabled(true)
-                        }
+                        val crash = dlgView.findViewById<SwitchMaterial>(R.id.crashlytics_checkbox).isChecked
+                        val analytics = dlgView.findViewById<SwitchMaterial>(R.id.analytics_checkbox).isChecked
+
+                        Firebase.crashlytics.setCrashlyticsCollectionEnabled(crash)
+                        Firebase.analytics.setAnalyticsCollectionEnabled(analytics)
+
                         viewLifecycleOwner.lifecycleScope.launch {
                             viewModel.initialiseDefaultSettings()
                         }
