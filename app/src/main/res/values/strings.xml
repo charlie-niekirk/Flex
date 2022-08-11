@@ -139,4 +139,8 @@
     <string name="subreddit_trackers_description">Get notified when posts matching your criteria are created</string>
     <string name="add_subreddit_tracker">Add Subreddit Tracker</string>
     <string name="title_subreddit_tracker">Add Tracker</string>
+    <string name="personal_notifications_switch">Personal notifications</string>
+    <string name="personal_notifications_title">Personal notifications</string>
+    <string name="personal_notifications_description">Private messages, comment replies and mentions</string>
+    <string name="title_create_subreddit_tracker">Create Tracker</string>
 </resources>

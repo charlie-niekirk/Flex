@@ -11,10 +11,9 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SettingsFragmentBinding
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SettingProfilesAdapter
-import me.cniekirk.flex.ui.state.SettingsSideEffect
-import me.cniekirk.flex.ui.state.SettingsState
+import me.cniekirk.flex.ui.settings.state.SettingsSideEffect
+import me.cniekirk.flex.ui.settings.state.SettingsState
 import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
-import me.cniekirk.flex.util.observe
 import me.cniekirk.flex.util.viewBinding
 import org.orbitmvi.orbit.viewmodel.observe
 

@@ -92,6 +92,16 @@
         <item name="cornerRadius">@dimen/spacing_m.5</item>
     </style>
 
+    <style name="Widget.App.Button.Icon" parent="Widget.Material3.Button.Icon">
+        <item name="android:textAppearance">@style/ButtonText</item>
+        <item name="cornerRadius">@dimen/spacing_m.5</item>
+    </style>
+
+    <style name="Widget.App.Button.Elevated.Icon" parent="Widget.Material3.Button.ElevatedButton.Icon">
+        <item name="android:textAppearance">@style/ButtonText</item>
+        <item name="cornerRadius">@dimen/spacing_m.5</item>
+    </style>
+
     <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:textAppearance">@style/ButtonText</item>
         <item name="cornerRadius">@dimen/spacing_m.5</item>

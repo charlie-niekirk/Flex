@@ -18,6 +18,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:id="@+id/subreddit_tracker_container"
         app:layout_constraintTop_toBottomOf="@id/notification_settings_toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,8 +65,8 @@
             app:layout_constraintTop_toBottomOf="@id/subreddit_trackers_divider"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginStart="@dimen/spacing_l"
-            android:layout_marginVertical="@dimen/spacing_m"
-            app:srcCompat="@layout/add_circle" />
+            android:layout_marginVertical="@dimen/spacing_l"
+            app:srcCompat="@drawable/add_circle" />
 
         <TextView
             android:layout_width="0dp"
@@ -76,6 +77,64 @@
             app:layout_constraintStart_toEndOf="@id/add_subreddit_tracker_icon"
             android:layout_marginStart="@dimen/spacing_m"
             android:text="@string/add_subreddit_tracker" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/subreddit_tracker_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="@dimen/spacing_l"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:background="@drawable/account_stat_bg">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/personal_notifications_title"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_l"
+            android:layout_marginHorizontal="@dimen/spacing_l"
+            android:textStyle="bold"
+            android:text="@string/personal_notifications_title" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/personal_notifications_description"
+            app:layout_constraintTop_toBottomOf="@id/personal_notifications_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/spacing_s"
+            android:layout_marginHorizontal="@dimen/spacing_l"
+            android:text="@string/personal_notifications_description" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:id="@+id/personal_notifications_divider"
+            android:background="?attr/colorSecondary"
+            app:layout_constraintTop_toBottomOf="@id/personal_notifications_description"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:alpha="0.2" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/personal_notifications_switch"
+            style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
+            app:layout_constraintTop_toBottomOf="@id/personal_notifications_divider"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginHorizontal="@dimen/spacing_xl"
+            android:layout_marginVertical="@dimen/spacing_l"
+            android:text="@string/personal_notifications_switch"
+            android:checked="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

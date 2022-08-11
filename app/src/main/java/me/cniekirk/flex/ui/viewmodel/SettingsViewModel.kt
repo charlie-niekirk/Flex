@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.FlexSettings
-import me.cniekirk.flex.ui.state.SettingsSideEffect
-import me.cniekirk.flex.ui.state.SettingsState
+import me.cniekirk.flex.ui.settings.state.SettingsSideEffect
+import me.cniekirk.flex.ui.settings.state.SettingsState
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent

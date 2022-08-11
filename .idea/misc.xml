@@ -71,6 +71,7 @@
         <entry key="app/src/main/res/layout/account_stat_item.xml" value="0.375" />
         <entry key="app/src/main/res/layout/adapter_default_entry.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/adapter_table_block.xml" value="0.20526315789473684" />
+        <entry key="app/src/main/res/layout/add_circle.xml" value="0.2612227447627191" />
         <entry key="app/src/main/res/layout/add_setting_profile_fragment.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/analytics_dialog_view.xml" value="0.25" />
         <entry key="app/src/main/res/layout/authenticated_account_fragment.xml" value="0.25" />
@@ -79,6 +80,7 @@
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.1" />
         <entry key="app/src/main/res/layout/create_post_fragment.xml" value="0.22076155938349953" />
+        <entry key="app/src/main/res/layout/create_subreddit_tracker_fragment.xml" value="0.26036767849508335" />
         <entry key="app/src/main/res/layout/fab_rail_header.xml" value="0.2413793103448276" />
         <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
@@ -101,7 +103,7 @@
         <entry key="app/src/main/res/layout/search_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/self_text_list_item.xml" value="0.22" />
         <entry key="app/src/main/res/layout/setting_profile_list_item.xml" value="0.20098684210526316" />
-        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/share_as_image_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_comment_collapsed_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/submission_comment_list_item.xml" value="0.2222222222222222" />

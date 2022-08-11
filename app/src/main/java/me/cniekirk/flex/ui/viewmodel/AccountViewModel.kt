@@ -8,8 +8,8 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.GetMeUseCase
 import me.cniekirk.flex.domain.usecase.GetSelfPostsUseCase
-import me.cniekirk.flex.ui.state.AccountViewSideEffect
-import me.cniekirk.flex.ui.state.AccountViewState
+import me.cniekirk.flex.ui.auth.state.AccountViewSideEffect
+import me.cniekirk.flex.ui.auth.state.AccountViewState
 import me.cniekirk.flex.util.condense
 import me.cniekirk.flex.util.getElapsedTime
 import org.orbitmvi.orbit.ContainerHost

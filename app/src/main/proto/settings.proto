@@ -9,6 +9,17 @@ message FlexSettings {
     bool selected = 2;
     bool show_previews = 3;
     bool blur_nsfw = 4;
+    bool personal_notifications = 5;
+    repeated SubredditTracker trackers = 6;
+  }
+  message SubredditTracker {
+    string tracker_name = 1;
+    string subreddit_name = 2;
+    string title_matcher = 3;
+    string author_matcher = 4;
+    string link_matcher = 5;
+    string flair_matcher = 6;
+    int32 min_upvote_matcher = 7;
   }
   repeated Profile profiles = 1;
   string download_location = 2;

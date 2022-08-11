@@ -11,8 +11,8 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.AuthenticatedAccountFragmentBinding
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubmissionListAdapter
-import me.cniekirk.flex.ui.state.AccountViewSideEffect
-import me.cniekirk.flex.ui.state.AccountViewState
+import me.cniekirk.flex.ui.auth.state.AccountViewSideEffect
+import me.cniekirk.flex.ui.auth.state.AccountViewState
 import me.cniekirk.flex.ui.viewmodel.AccountViewModel
 import me.cniekirk.flex.util.viewBinding
 import org.orbitmvi.orbit.viewmodel.observe

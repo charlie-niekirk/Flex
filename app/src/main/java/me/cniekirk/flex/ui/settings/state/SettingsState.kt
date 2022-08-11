@@ -1,4 +1,4 @@
-package me.cniekirk.flex.ui.state
+package me.cniekirk.flex.ui.settings.state
 
 import me.cniekirk.flex.FlexSettings
 

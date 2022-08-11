@@ -1,4 +1,4 @@
-package me.cniekirk.flex.ui.state
+package me.cniekirk.flex.ui.auth.state
 
 import androidx.annotation.StringRes
 import androidx.paging.PagingData
