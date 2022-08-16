@@ -5,8 +5,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.data.local.repo.LocalDataRepositoryImpl
+import me.cniekirk.flex.data.remote.repo.FlexDataRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
 import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
+import me.cniekirk.flex.domain.FlexDataRepository
 import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.domain.LocalDataRepository
 import me.cniekirk.flex.domain.RedditDataRepository
@@ -30,4 +32,9 @@ class RepositoryModule {
     @Singleton
     fun provideImgurDataRepo(imgurDataRepositoryImpl: ImgurDataRepositoryImpl)
             : ImgurDataRepository = imgurDataRepositoryImpl
+
+    @Provides
+    @Singleton
+    fun provideFlexDataRepo(flexDataRepositoryImpl: FlexDataRepositoryImpl)
+            : FlexDataRepository = flexDataRepositoryImpl
 }

@@ -21,7 +21,6 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.SubredditSearchRequest
 import me.cniekirk.flex.domain.usecase.GetSubredditInfoUseCase
 import me.cniekirk.flex.domain.usecase.SearchSubredditsUseCase
-import me.cniekirk.flex.ui.model.UserPreferences
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import timber.log.Timber
 import java.io.IOException

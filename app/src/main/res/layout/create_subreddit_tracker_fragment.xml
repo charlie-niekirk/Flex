@@ -26,6 +26,8 @@
         android:layout_marginHorizontal="@dimen/spacing_l"
         android:textSize="22sp"
         android:textStyle="bold"
+        android:lineSpacingExtra="20dp"
+        android:paddingBottom="10dp"
         tools:text="Track posts in r/???" />
 
     <Button

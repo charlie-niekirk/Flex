@@ -39,17 +39,12 @@ class SubredditInformationDialog : BottomSheetDialogFragment() {
         observe(viewModel.singleActionState) {
             when (it) {
                 is RedditResult.Error -> {
-                    Timber.e(it.errorMessage)
                     dismiss()
                 }
                 RedditResult.Loading -> {}
                 is RedditResult.Success -> {
                     Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT)
                         .show()
-                    dismiss()
-                }
-                RedditResult.UnAuthenticated -> {
-                    Timber.e("Unauthenticated!")
                     dismiss()
                 }
             }

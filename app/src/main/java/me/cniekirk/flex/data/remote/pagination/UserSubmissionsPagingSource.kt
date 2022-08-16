@@ -2,7 +2,6 @@ package me.cniekirk.flex.data.remote.pagination
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
@@ -102,7 +101,7 @@ class UserSubmissionsPagingSource(
                 response.data.children.map { it.data },
                 before,
                 after)
-        } catch (exception: Exception) {
+        } catch (exception: java.lang.Exception) {
             Timber.e(exception)
             LoadResult.Error(exception)
         }

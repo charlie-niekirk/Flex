@@ -7,12 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.transition.MaterialSharedAxis
-import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.flair.UserFlairItem
@@ -52,14 +49,10 @@ class SubredditUserFlairFragment : BaseFragment(R.layout.subreddit_user_flair_se
             observe(viewModel.userFlairs) {
                 when (it) {
                     is RedditResult.Error -> {
-                        Timber.e(it.errorMessage)
                     }
                     RedditResult.Loading -> {}
                     is RedditResult.Success -> {
                         adapter.submitList(it.data)
-                    }
-                    RedditResult.UnAuthenticated -> {
-                        Toast.makeText(requireContext(), R.string.action_error_aunauthenticated, Toast.LENGTH_SHORT).show()
                     }
                 }
             }

@@ -4,6 +4,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
+import android.os.Build
+import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -40,6 +42,7 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
+import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 import kotlin.math.ceil
@@ -166,6 +169,28 @@ class SubmissionDetailHeaderAdapter(
         return viewType
     }
 
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val bundle = payloads[0] as? Bundle
+            val newVoteState: VoteState? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle?.getParcelable("VOTE_STATE", VoteState::class.java)
+            } else {
+                bundle?.getParcelable("VOTE_STATE") as VoteState?
+            }
+            val voteHolder = holder as? VoteViewHolder
+
+            if (newVoteState != null && voteHolder != null) {
+                voteHolder.updateVoteState(newVoteState)
+            }
+        }
+    }
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         getItem(position)?.let { post ->
             if (post.pollData != null) {
@@ -243,9 +268,23 @@ class SubmissionDetailHeaderAdapter(
     }
 
     inner class SelfTextSubmissionViewHolder(
-        private val binding: SelfTextListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        private val binding: SelfTextListItemBinding): RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -354,13 +393,47 @@ class SubmissionDetailHeaderAdapter(
 
                 }
             }
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
     inner class ImageSubmissionViewHolder(
-        private val binding: ImageListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        private val binding: ImageListItemBinding): RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission, imageUrl: String) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.imagePreview.submissionImage.setOnClickListener { submissionsActionListener.onImageClicked(post) }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
@@ -463,17 +536,52 @@ class SubmissionDetailHeaderAdapter(
             } else {
                 binding.imagePreview.submissionImage.loadImage(imageUrl, post.over18)
             }
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
     inner class VideoSubmissionViewHolder(
         private val binding: VideoListItemBinding,
-        private val exoCreator: ExoCreator): RecyclerView.ViewHolder(binding.root), ToroPlayer {
+        private val exoCreator: ExoCreator): RecyclerView.ViewHolder(binding.root), ToroPlayer, VoteViewHolder {
 
         private var mediaUri: Uri? = null
         private var exoPlayerViewHelper: ExoPlayerViewHelper? = null
 
         fun bind(post: AuthedSubmission, videoUrl: String) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
+
             mediaUri = Uri.parse(videoUrl)
 
             // Load the thumbnail
@@ -579,6 +687,26 @@ class SubmissionDetailHeaderAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
 
         override fun getPlayerView() = binding.videoPlayer
@@ -635,9 +763,23 @@ class SubmissionDetailHeaderAdapter(
     }
 
     inner class GallerySubmissionViewHolder(
-        private val binding: GalleryListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        private val binding: GalleryListItemBinding): RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.mediaGalleryPreview.galleryGrid.setOnClickListener { submissionsActionListener.onGalleryClicked(post) }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
@@ -760,13 +902,47 @@ class SubmissionDetailHeaderAdapter(
             binding.mediaGalleryPreview.root.setOnClickListener {
                 submissionsActionListener.onGalleryClicked(post)
             }
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
     inner class ExternalLinkSubmissionViewHolder(
-        private val binding: LinkListItemBinding): RecyclerView.ViewHolder(binding.root) {
+        private val binding: LinkListItemBinding): RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.externalLinkPreview.externalLinkContainer.setOnClickListener { submissionsActionListener.onLinkClicked(post) }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
@@ -870,12 +1046,46 @@ class SubmissionDetailHeaderAdapter(
                     0F
                 ))
                 .into(binding.externalLinkPreview.linkImage)
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
-    inner class PollViewHolder(private val binding: PollListItemBinding): RecyclerView.ViewHolder(binding.root) {
+    inner class PollViewHolder(private val binding: PollListItemBinding): RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -972,13 +1182,47 @@ class SubmissionDetailHeaderAdapter(
             adapter.submitList(post.pollData!!.options)
             binding.pollPreview.voteCount.text = "${post.pollData.totalVoteCount?.condense()} votes"
             binding.pollPreview.timeRemaining.text = "${post.pollData.votingEndTimestamp!!.getElapsedTime(false)} remaining"
+
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
     inner class YoutubeViewHolder(private val binding: YoutubeListItemBinding)
-        : RecyclerView.ViewHolder(binding.root) {
+        : RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission, videoId: String) {
+            when (post.voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
             binding.textSubmissionTitle.text = post.title
             binding.textSubredditName.text = post.subreddit
             binding.textCommentsCount.text = post.numComments?.condense()
@@ -1074,12 +1318,30 @@ class SubmissionDetailHeaderAdapter(
             binding.videoPlayer.setOnClickListener {
                 submissionsActionListener.onYoutubeVideoClicked(videoId)
             }
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
         }
 
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
+        }
     }
 
     inner class TwitterViewHolder(private val binding: TweetListItemBinding)
-        : RecyclerView.ViewHolder(binding.root) {
+        : RecyclerView.ViewHolder(binding.root), VoteViewHolder {
 
         fun bind(post: AuthedSubmission) {
             binding.textSubmissionTitle.text = post.title
@@ -1198,6 +1460,25 @@ class SubmissionDetailHeaderAdapter(
                     binding.tweetPreview.tweetBody.text = tweet.data?.text
                 }
             }
+            binding.actions.buttonUpvoteAction.setOnClickListener { submissionsActionListener.onUpvoteClicked(post.name) }
+            binding.actions.buttonDownvoteAction.setOnClickListener { submissionsActionListener.onDownvoteClicked(post.name) }
+        }
+
+        override fun updateVoteState(voteState: VoteState) {
+            when (voteState) {
+                VoteState.Downvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = true
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.NoVote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = false
+                }
+                VoteState.Upvote -> {
+                    binding.actions.buttonDownvoteAction.isSelected = false
+                    binding.actions.buttonUpvoteAction.isSelected = true
+                }
+            }
         }
     }
 
@@ -1227,6 +1508,17 @@ class SubmissionDetailHeaderAdapter(
     object SubmissionComparator : DiffUtil.ItemCallback<AuthedSubmission>() {
         override fun areItemsTheSame(oldItem: AuthedSubmission, newItem: AuthedSubmission) = oldItem.id == newItem.id
         override fun areContentsTheSame(oldItem: AuthedSubmission, newItem: AuthedSubmission) = oldItem == newItem
+        override fun getChangePayload(oldItem: AuthedSubmission, newItem: AuthedSubmission): Bundle {
+            val bundle = Bundle()
+            if (oldItem.voteState != newItem.voteState) {
+                bundle.putParcelable("VOTE_STATE", newItem.voteState)
+            }
+            return bundle
+        }
+    }
+
+    interface VoteViewHolder {
+        fun updateVoteState(voteState: VoteState)
     }
 
     interface SubmissionActionListener {
@@ -1235,5 +1527,7 @@ class SubmissionDetailHeaderAdapter(
         fun onVideoClicked(post: AuthedSubmission)
         fun onLinkClicked(post: AuthedSubmission)
         fun onYoutubeVideoClicked(videoId: String)
+        fun onUpvoteClicked(thingId: String)
+        fun onDownvoteClicked(thingId: String)
     }
 }

@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.settings
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,8 +34,12 @@ class NotificationSettingsFragment : BaseFragment(R.layout.notification_settings
 
         viewModel.observe(viewLifecycleOwner, ::render, ::react)
 
-        binding.personalNotificationsSwitch.setOnCheckedChangeListener { _, _ ->
+        binding.personalNotificationsSwitch.setOnClickListener {
             viewModel.togglePersonalNotifications()
+        }
+
+        binding.addSubredditTrackerText.setOnClickListener {
+            viewModel.addTrackerClicked()
         }
     }
 
@@ -46,6 +51,9 @@ class NotificationSettingsFragment : BaseFragment(R.layout.notification_settings
         when (effect) {
             NotificationSettingsSideEffect.NavigateToCreateSubredditTracker -> {
                 // Navigate to create subreddit tracker page
+                findNavController().navigate(
+                    NotificationSettingsFragmentDirections.actionNotificationSettingsFragmentToCreateSubredditTrackerFragment()
+                )
             }
         }
     }

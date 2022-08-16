@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import me.cniekirk.flex.domain.usecase.AddTrackerUseCase
+import me.cniekirk.flex.domain.usecase.AddTrackerUseCaseImpl
 import me.cniekirk.flex.domain.usecase.GetSelfPostsUseCase
 import me.cniekirk.flex.domain.usecase.GetSelfPostsUseCaseImpl
 import javax.inject.Singleton
@@ -16,4 +18,9 @@ class UseCaseModule {
     @Singleton
     fun provideGetSelfPostsUseCase(getSelfPostsUseCaseImpl: GetSelfPostsUseCaseImpl): GetSelfPostsUseCase
         = getSelfPostsUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideAddTrackerUseCase(addTrackerUseCaseImpl: AddTrackerUseCaseImpl): AddTrackerUseCase
+        = addTrackerUseCaseImpl
 }

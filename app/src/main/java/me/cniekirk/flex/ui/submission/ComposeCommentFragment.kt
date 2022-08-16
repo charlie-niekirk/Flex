@@ -196,7 +196,6 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                 when (it) {
                     is RedditResult.Error -> {
                         uploadingSnackbar?.dismiss()
-                        Timber.e(it.errorMessage)
                         Snackbar.make(binding.root, R.string.unknown_error, Snackbar.LENGTH_SHORT).show()
                     }
                     RedditResult.Loading -> {
@@ -245,14 +244,9 @@ class ComposeCommentFragment : BaseFragment(R.layout.compose_comment_fragment) {
                         findNavController().navigateUp()
                     }
                     is RedditResult.Error -> {
-                        Timber.e(it.errorMessage)
                         binding.submitLoadingIndicator.isVisible = false
                         binding.submitButton.isVisible = true
                         Toast.makeText(requireContext(), R.string.submit_comment_error, Toast.LENGTH_SHORT).show()
-                    }
-                    RedditResult.UnAuthenticated -> {
-                        // Should never happen as you shouldn't be able to get to this screen
-                        Toast.makeText(requireContext(), R.string.unknown_error, Toast.LENGTH_SHORT).show()
                     }
                 }
             }

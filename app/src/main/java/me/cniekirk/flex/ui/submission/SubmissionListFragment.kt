@@ -9,10 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -29,7 +26,6 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
-import io.noties.markwon.linkify.LinkifyPlugin
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -177,16 +173,13 @@ class SubmissionListFragment
         observe(viewModel.subredditInfo) {
             when (it) {
                 is RedditResult.Error -> {
-                    Timber.e(it.errorMessage)
+
                 }
                 RedditResult.Loading -> { }
                 is RedditResult.Success -> {
                     val action = SubmissionListFragmentDirections
                         .actionSubmissionListFragmentToSubredditInformationDialog(it.data)
                     findNavController().navigate(action)
-                }
-                RedditResult.UnAuthenticated -> {
-                    Timber.e("Unauthenticated!")
                 }
             }
         }

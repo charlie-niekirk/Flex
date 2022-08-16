@@ -114,6 +114,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_addSettingsProfileFragment"
             app:destination="@id/addSettingsProfileFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_notificationSettingsFragment"
+            app:destination="@id/notificationSettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -244,4 +247,16 @@
             android:name="me.cniekirk.flex.ui.auth.AuthenticatedAccountFragment"
             android:label="AuthenticatedAccountFragment" />
     </navigation>
+    <fragment
+        android:id="@+id/notificationSettingsFragment"
+        android:name="me.cniekirk.flex.ui.settings.NotificationSettingsFragment"
+        android:label="NotificationSettingsFragment" >
+        <action
+            android:id="@+id/action_notificationSettingsFragment_to_createSubredditTrackerFragment"
+            app:destination="@id/createSubredditTrackerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createSubredditTrackerFragment"
+        android:name="me.cniekirk.flex.ui.settings.CreateSubredditTrackerFragment"
+        android:label="CreateSubredditTrackerFragment" />
 </navigation>

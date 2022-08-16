@@ -1,8 +1,9 @@
 package me.cniekirk.flex.domain
 
-sealed class RedditResult<out T> {
-    data class Success<out T>(val data: T): RedditResult<T>()
-    data class Error(val errorMessage: Throwable): RedditResult<Nothing>()
+import me.cniekirk.flex.data.Cause
+
+sealed class RedditResult<out S> {
+    data class Success<out S>(val data: S): RedditResult<S>()
+    data class Error(val cause: Cause): RedditResult<Nothing>()
     object Loading : RedditResult<Nothing>()
-    object UnAuthenticated : RedditResult<Nothing>()
 }

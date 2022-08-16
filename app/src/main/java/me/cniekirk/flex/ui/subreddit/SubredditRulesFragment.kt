@@ -2,17 +2,13 @@ package me.cniekirk.flex.ui.subreddit
 
 import android.os.Bundle
 import android.view.View
-import androidx.core.content.ContentProviderCompat
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.transition.MaterialSharedAxis
-import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import io.noties.markwon.Markwon
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
@@ -70,10 +66,6 @@ class SubredditRulesFragment : BaseFragment(R.layout.subreddit_rules_fragment) {
                         // Show spinner
                     }
                     is RedditResult.Error -> {
-                        Timber.e(it.errorMessage)
-                    }
-                    RedditResult.UnAuthenticated -> {
-                        Timber.e("Unauthenticated!")
                     }
                 }
             }

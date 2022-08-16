@@ -1,13 +1,17 @@
 package me.cniekirk.flex.ui.adapter
 
+import android.text.Spannable
+import android.text.SpannableString
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.databinding.SettingProfileListItemBinding
+import me.cniekirk.flex.ui.util.WavyUnderlineSpan
 
 class SettingProfilesAdapter : ListAdapter<FlexSettings.Profile, SettingProfilesAdapter.ProfileViewHolder>(ProfileDiffer) {
 

@@ -23,4 +23,5 @@ message FlexSettings {
   }
   repeated Profile profiles = 1;
   string download_location = 2;
+  string device_token = 3;
 }

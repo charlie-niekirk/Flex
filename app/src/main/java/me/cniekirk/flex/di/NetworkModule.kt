@@ -272,6 +272,17 @@ class NetworkModule {
     }
 
     @Provides
+    @Named("flexRetrofit")
+    @Singleton
+    fun provideFlexRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(BuildConfig.SERVER_URL)
+            .build()
+    }
+
+    @Provides
     @Named("preAuthApi")
     @Singleton
     fun providePreAuthRedditApi(@Named("userlessRetrofit") retrofit: Retrofit): RedditApi
@@ -329,5 +340,11 @@ class NetworkModule {
     @Singleton
     fun provideTwitterApi(@Named("twitter") retrofit: Retrofit): TwitterApi {
         return retrofit.create(TwitterApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFlexApi(@Named("flexRetrofit") retrofit: Retrofit): FlexApi {
+        return retrofit.create(FlexApi::class.java)
     }
 }

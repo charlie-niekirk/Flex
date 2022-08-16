@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,6 +17,7 @@ import me.cniekirk.flex.ui.settings.state.SettingsState
 import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
 import me.cniekirk.flex.util.viewBinding
 import org.orbitmvi.orbit.viewmodel.observe
+import timber.log.Timber
 
 /**
  * Fragment to show the possible settings the user can change within the application
@@ -48,6 +50,11 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
         binding.nsfwBlurEnabled.setOnClickListener {
             viewModel.setBlurNsfw()
         }
+
+        binding.notificationsSection.setOnClickListener {
+            Timber.d("HELLO?")
+            viewModel.notificationsClicked()
+        }
     }
 
     private fun render(settingsState: SettingsState) {
@@ -68,7 +75,10 @@ class SettingsFragment : BaseFragment(R.layout.settings_fragment) {
     private fun react(settingsSideEffect: SettingsSideEffect) {
         when (settingsSideEffect) {
             SettingsSideEffect.NotificationsClicked -> {
-
+                Timber.d("GOT HERE")
+                findNavController().navigate(
+                    SettingsFragmentDirections.actionSettingsFragmentToNotificationSettingsFragment()
+                )
             }
         }
     }

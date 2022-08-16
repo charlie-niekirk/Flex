@@ -10,11 +10,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.Cause
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.local.db.entity.User
@@ -104,10 +104,8 @@ class RedditDataRepositoryImpl @Inject constructor(
                     }
                     emit(RedditResult.Success(DownloadState.Success))
                 } ?: run {
-                    emit(RedditResult.Error(Exception("Unknown!")))
+                    emit(RedditResult.Error(Cause.Unknown))
                 }
-            } else {
-                emit(RedditResult.Error(IOException(response.message())))
             }
         } ?: run { emit(RedditResult.Success(DownloadState.NoDefinedLocation)) }
     }
@@ -117,7 +115,7 @@ class RedditDataRepositoryImpl @Inject constructor(
             val response = authRedditApi.getMe("Bearer ${it.accessToken}")
             emit(RedditResult.Success(response))
         } ?: run {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         }
     }
 
@@ -154,7 +152,7 @@ class RedditDataRepositoryImpl @Inject constructor(
             authRedditApi.vote("Bearer ${it.accessToken}", thingId, direction)
             emit(RedditResult.Success(true))
         } ?: run {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         }
     }
 
@@ -182,7 +180,7 @@ class RedditDataRepositoryImpl @Inject constructor(
             val commentTree = response.json.data.things as List<EnvelopedCommentData>
             emit(RedditResult.Success(commentTree.map { it.data }))
         } else {
-            emit(RedditResult.Error(RuntimeException("Unknown error!")))
+            emit(RedditResult.Error(Cause.Unknown))
         }
     }
 
@@ -227,7 +225,7 @@ class RedditDataRepositoryImpl @Inject constructor(
 
     override fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.getSubredditModerators(accessToken, subreddit)
@@ -237,63 +235,63 @@ class RedditDataRepositoryImpl @Inject constructor(
 
     override fun subscribeSubreddit(subredditId: String): Flow<RedditResult<Int>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.subscribeAction(accessToken, "sub", subredditId)
             if (response.isSuccessful) {
                 emit(RedditResult.Success(R.string.subreddit_subscribe_success))
             } else {
-                emit(RedditResult.Error(RuntimeException("Unknown!")))
+                emit(RedditResult.Error(Cause.Unknown))
             }
         }
     }
 
     override fun unsubscribeSubreddit(subredditId: String): Flow<RedditResult<Int>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.subscribeAction(accessToken, "unsub", subredditId)
             if (response.isSuccessful) {
                 emit(RedditResult.Success(R.string.subreddit_unsubscribe_success))
             } else {
-                emit(RedditResult.Error(RuntimeException("Unknown!")))
+                emit(RedditResult.Error(Cause.Unknown))
             }
         }
     }
 
     override fun favoriteSubreddit(subreddit: String): Flow<RedditResult<Int>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.favoriteAction(accessToken, true, subreddit)
             if (response.isSuccessful) {
                 emit(RedditResult.Success(R.string.subreddit_favorite_success))
             } else {
-                emit(RedditResult.Error(RuntimeException("Unknown!")))
+                emit(RedditResult.Error(Cause.Unknown))
             }
         }
     }
 
     override fun unfavoriteSubreddit(subreddit: String): Flow<RedditResult<Int>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.favoriteAction(accessToken, false, subreddit)
             if (response.isSuccessful) {
                 emit(RedditResult.Success(R.string.subreddit_unfavorite_success))
             } else {
-                emit(RedditResult.Error(RuntimeException("Unknown!")))
+                emit(RedditResult.Error(Cause.Unknown))
             }
         }
     }
 
     override fun getAvailableUserFlairs(subreddit: String): Flow<RedditResult<List<UserFlairItem>>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.getAvailableUserFlairs(accessToken, subreddit)
@@ -303,7 +301,7 @@ class RedditDataRepositoryImpl @Inject constructor(
 
     override fun submitComment(markdown: String, parentThing: String): Flow<RedditResult<CommentData>> = flow {
         if (userDao.getAll().isEmpty()) {
-            emit(RedditResult.UnAuthenticated)
+            emit(RedditResult.Error(Cause.Unauthenticated))
         } else {
             val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
             val response = authRedditApi.submitComment(accessToken, markdown, parentThing)

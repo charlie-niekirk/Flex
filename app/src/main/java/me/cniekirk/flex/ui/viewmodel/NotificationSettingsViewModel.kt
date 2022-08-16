@@ -9,6 +9,7 @@ import me.cniekirk.flex.ui.settings.state.NotificationSettingsSideEffect
 import me.cniekirk.flex.ui.settings.state.NotificationSettingsState
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
@@ -53,5 +54,9 @@ class NotificationSettingsViewModel @Inject constructor(
         }
         val profile = updated.profilesList.first { it.selected }
         reduce { state.copy(personalNotifications = profile.personalNotifications) }
+    }
+
+    fun addTrackerClicked() = intent {
+        postSideEffect(NotificationSettingsSideEffect.NavigateToCreateSubredditTracker)
     }
 }

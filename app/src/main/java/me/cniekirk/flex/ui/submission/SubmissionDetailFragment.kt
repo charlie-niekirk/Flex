@@ -6,9 +6,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavOptions
@@ -19,30 +16,19 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.transition.MaterialSharedAxis
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
 import io.noties.markwon.*
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.ext.tables.TablePlugin
-import io.noties.markwon.image.DefaultMediaDecoder
-import io.noties.markwon.image.ImagesPlugin
-import io.noties.markwon.image.ImagesPlugin.ImagesConfigure
-import io.noties.markwon.image.glide.GlideImagesPlugin
-import io.noties.markwon.image.network.OkHttpNetworkSchemeHandler
-import io.noties.markwon.linkify.LinkifyPlugin
 import io.noties.markwon.recycler.MarkwonAdapter
-import io.noties.markwon.recycler.table.TableEntry
 import io.noties.markwon.recycler.table.TableEntryPlugin
 import io.noties.markwon.utils.Dip
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.Cause
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Comment
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
@@ -51,11 +37,13 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
+import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
+import me.cniekirk.flex.ui.submission.state.SubmissionDetailState
 import me.cniekirk.flex.ui.text.FlexLinkifyPlugin
 import me.cniekirk.flex.ui.text.RedditLinkifyTextAddedListener
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import me.cniekirk.flex.util.*
-import org.commonmark.ext.gfm.tables.TableBlock
+import org.orbitmvi.orbit.viewmodel.observe
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -76,6 +64,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
         }
     }
     private var adapter: CommentTreeAdapter? = null
+    private var headerAdapter: SubmissionDetailHeaderAdapter? = null
 
     private val markwon by lazy(LazyThreadSafetyMode.NONE) {
         Markwon.builder(requireContext())
@@ -150,14 +139,21 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        if (false) {
-            val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-            val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-            if (!actionButton.isOrWillBeHidden) {
-                actionButton.visibility = View.GONE
-                bottomBar.visibility = View.GONE
-            }
-//        }
+        viewModel.observe(viewLifecycleOwner, ::render, ::react)
+
+        args.post?.let {
+            viewModel.getComments(it, "")
+        }
+    }
+
+    private fun render(state: SubmissionDetailState) {
+
+        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        if (!actionButton.isOrWillBeHidden) {
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
+        }
 
         binding.apply {
             backButton.setOnClickListener { it.findNavController().popBackStack() }
@@ -171,10 +167,10 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
             loading.start()
 
             args.post?.let {
-                val headerAdapter = SubmissionDetailHeaderAdapter(this@SubmissionDetailFragment, null, exoCreator, markwon, markwonAdapter)
+                headerAdapter = SubmissionDetailHeaderAdapter(this@SubmissionDetailFragment, null, exoCreator, markwon, markwonAdapter)
                 adapter = CommentTreeAdapter(it, markwon, this@SubmissionDetailFragment)
                 commentsTreeList.adapter = ConcatAdapter(headerAdapter, adapter)
-                headerAdapter.submitList(listOf(args.post))
+                headerAdapter!!.submitList(listOf(args.post))
 
                 nextTopCommentButton.setOnClickListener {
                     val start = (commentsTreeList.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() - 1
@@ -185,73 +181,31 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
                     commentsTreeList.layoutManager?.startSmoothScroll(smoothScroller)
                 }
             }
-        }
 
-        observe(viewModel.voteState) {
-            when (it) {
-                is RedditResult.Error -> {
-                    Timber.e(it.errorMessage)
-                }
-                RedditResult.UnAuthenticated -> {
-                    //binding.buttonUpvoteAction.isSelected = !binding.buttonUpvoteAction.isSelected
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.action_error_aunauthenticated,
-                        Toast.LENGTH_SHORT).show()
-                }
-                else -> {}
+            if (state.comments.isEmpty()) {
+                binding.emptyCommentEasterEgg.visibility = View.VISIBLE
+                binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post!!.subreddit)
+            } else {
+                adapter?.submitList(state.comments)
+                binding.emptyCommentEasterEgg.visibility = View.GONE
+                binding.commentsTreeList.visibility = View.VISIBLE
             }
-        }
 
-        observe(viewModel.commentsTree) { comments ->
-            when (comments) {
-                is RedditResult.Error -> {
-                    Timber.e(comments.errorMessage)
-                }
-                RedditResult.Loading -> {
-                    // Do nothing for now
-                }
-                is RedditResult.Success -> {
-                    if (comments.data.isNullOrEmpty()) {
-                        binding.emptyCommentEasterEgg.visibility = View.VISIBLE
-                        binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post!!.subreddit)
-                    } else {
-                        adapter?.submitList(comments.data)
-                        binding.emptyCommentEasterEgg.visibility = View.GONE
-                        binding.commentsTreeList.visibility = View.VISIBLE
-                    }
-                    binding.loadingIndicator.visibility = View.GONE
-                    loading.reset()
-                }
-                RedditResult.UnAuthenticated -> {
-                    Toast.makeText(
-                        requireContext(),
-                        R.string.action_error_aunauthenticated,
-                        Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-
-        args.post?.let {
-            viewModel.getComments(it, "")
+            binding.loadingIndicator.visibility = View.GONE
+            loading.reset()
         }
     }
 
-//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-//        val anim: Animation = loadAnimation(activity, nextAnim)
-//        anim.setAnimationListener(object : Animation.AnimationListener {
-//            override fun onAnimationStart(animation: Animation?) {}
-//            override fun onAnimationRepeat(animation: Animation?) {}
-//            override fun onAnimationEnd(animation: Animation?) {
-//                if (enter) {
-//                    args.post?.let {
-//                        viewModel.getComments(it, "")
-//                    }
-//                }
-//            }
-//        })
-//        return anim
-//    }
+    private fun react(effect: SubmissionDetailEffect) {
+        when (effect) {
+            is SubmissionDetailEffect.ShowError -> {
+                Toast.makeText(requireContext(), effect.message, Toast.LENGTH_SHORT).show()
+            }
+            is SubmissionDetailEffect.UpdateVoteState -> {
+                headerAdapter?.submitList(listOf(args.post?.copy(voteState = effect.voteState)))
+            }
+        }
+    }
 
     override fun onLoadMore(moreComments: MoreComments) {
         viewModel.getMoreComments(moreComments, args.post!!.name)
@@ -294,6 +248,14 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
         val action = SubmissionDetailFragmentDirections
             .actionSubmissionDetailFragmentToYoutubePlayer(videoId)
         binding.root.findNavController().navigate(action)
+    }
+
+    override fun onUpvoteClicked(thingId: String) {
+        viewModel.upvoteClicked(thingId)
+    }
+
+    override fun onDownvoteClicked(thingId: String) {
+        viewModel.downvoteClicked(thingId)
     }
 
     override fun onLinkClicked(post: AuthedSubmission) {

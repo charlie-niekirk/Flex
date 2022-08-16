@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import me.cniekirk.flex.data.provideMappedComments
 import me.cniekirk.flex.data.provideUnmappedComments
 import me.cniekirk.flex.domain.RedditDataRepository
@@ -44,7 +45,7 @@ class GetCommentsTest {
 
     @ExperimentalTime
     @Test
-    fun `get comments mapped data and state emitted correctly`() = coroutineDispatcher.runBlockingTest {
+    fun `get comments mapped data and state emitted correctly`() = runTest {
         underTest(request).test {
             assertEquals(RedditResult.Loading, awaitItem())
             assertEquals(RedditResult.Success(useCaseResponse), awaitItem())

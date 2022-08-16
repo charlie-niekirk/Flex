@@ -6,10 +6,10 @@ import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
-import me.cniekirk.flex.domain.ImgurDataRepository
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLinkInternal
 import timber.log.Timber
+import java.lang.Exception
 
 class SubredditSubmissionsPagingSource(
     private val redditApi: RedditApi,

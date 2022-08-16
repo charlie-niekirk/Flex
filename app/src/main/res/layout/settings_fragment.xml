@@ -89,7 +89,9 @@
         android:layout_marginTop="@dimen/spacing_l"
         app:section_title="Notifications"
         app:section_subtitle="Customise notification settings"
-        app:section_icon="@drawable/notifications" />
+        app:section_icon="@drawable/notifications"
+        android:clickable="true"
+        android:focusable="true" />
 
     <me.cniekirk.flex.ui.view.SettingsSectionItem
         android:layout_width="match_parent"

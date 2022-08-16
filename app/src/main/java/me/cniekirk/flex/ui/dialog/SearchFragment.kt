@@ -3,15 +3,12 @@ package me.cniekirk.flex.ui.dialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +19,6 @@ import me.cniekirk.flex.databinding.SearchFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubredditResultAdapter
-import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.textChanges
 import me.cniekirk.flex.util.viewBinding
@@ -83,7 +79,6 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
                         }
                         is RedditResult.Error -> {
                             // Display error
-                            Timber.e(it.errorMessage)
                         }
                         else -> {
                             // Display unknown error

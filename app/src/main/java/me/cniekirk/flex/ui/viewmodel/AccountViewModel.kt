@@ -52,9 +52,6 @@ class AccountViewModel @Inject constructor(
                     }
                     loadPosts(it.data.name!!)
                 }
-                RedditResult.UnAuthenticated -> {
-                    postSideEffect(AccountViewSideEffect.Toast(R.string.action_error_aunauthenticated))
-                }
             }
         }
     }
