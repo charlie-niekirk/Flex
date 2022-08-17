@@ -95,6 +95,7 @@ class SubmissionListViewModel @Inject constructor(
                         when (it) {
                             is RedditResult.Success -> {
                                 it.data.displayName?.let { name ->
+                                    Timber.d("NAME: $name")
                                     _subredditFlow.value = name
                                 } ?: run {
                                     //TODO: Emit another error

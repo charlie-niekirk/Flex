@@ -69,11 +69,16 @@ class SubmissionListFragment
         setHasOptionsMenu(true)
 
         if (!arguments?.getString("subreddit").isNullOrEmpty()) {
-            viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(arguments?.getString("subreddit")!!))
+            val subreddit = arguments?.getString("subreddit")!!
+            if (subreddit.equals("random", true) || subreddit.equals("randnsfw", true)) {
+                Timber.d("RANDOM")
+                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected(subreddit))
+            } else {
+                viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(subreddit))
+            }
         }
 
         findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<String>("selected_subreddit")?.observe(viewLifecycleOwner) { result ->
-            Timber.d("RESULT: $result")
             if (result?.equals("random", true) == true ||
                 result?.equals("randnsfw", true) == true) {
                 viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected(result))
@@ -167,6 +172,7 @@ class SubmissionListFragment
 
         // Keep the submission source updated
         observe(viewModel.subredditFlow) {
+            Timber.d("NAME here: $it")
             binding.textSubmissionSource.text = it
         }
 
