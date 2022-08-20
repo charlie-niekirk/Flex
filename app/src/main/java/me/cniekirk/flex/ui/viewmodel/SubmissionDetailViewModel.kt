@@ -44,9 +44,9 @@ class SubmissionDetailViewModel @Inject constructor(
         SubmissionDetailState()
     )
 
-    fun getComments(submission: AuthedSubmission, sortType: String) = intent {
+    fun getComments(submissionId: String, sortType: String) = intent {
         viewModelScope.launch {
-            getCommentsUseCase(CommentRequest(submission.id, sortType))
+            getCommentsUseCase(CommentRequest(submissionId, sortType))
                 .collect { response ->
                     when (response) {
                         is RedditResult.Error -> {
@@ -88,7 +88,7 @@ class SubmissionDetailViewModel @Inject constructor(
                             val replaceIndex = existing.indexOf(moreComments)
                             newComments.removeAt(replaceIndex)
                             newComments.addAll(replaceIndex, commentsTree.data)
-                            reduce { state.copy(comments =  newComments) }
+                            reduce { state.copy(comments = newComments) }
                         }
                         RedditResult.Loading -> {}
                     }

@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.adapter
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -24,6 +25,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
 import im.ene.toro.exoplayer.ExoCreator
@@ -43,6 +47,7 @@ import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
 import me.cniekirk.flex.ui.submission.state.VoteState
+import me.cniekirk.flex.ui.util.Size2
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 import kotlin.math.ceil
@@ -54,6 +59,12 @@ class SubmissionDetailHeaderAdapter(
     private val markwon: Markwon,
     private val markwonAdapter: MarkwonAdapter)
     : ListAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
+
+    private val sizeOptions by lazy(LazyThreadSafetyMode.NONE) {
+        RequestOptions()
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.DATA)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -530,6 +541,17 @@ class SubmissionDetailHeaderAdapter(
             if (post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
+                    Glide.with(binding.imagePreview.submissionImage)
+                        .`as`(Size2::class.java)
+                        .apply(sizeOptions)
+                        .load(resolution.url)
+                        .into(object : SimpleTarget<Size2>() {
+                            override fun onResourceReady(size: Size2, glideAnimation: Transition<in Size2>?) {
+                                binding.imagePreview.submissionImage.ratio = size.height.toFloat() / size.width.toFloat()
+                                binding.imagePreview.submissionImage.loadImage(resolution.url, settings?.getProfiles(0)?.blurNsfw == true && post.over18)
+                            }
+                            override fun onLoadFailed(errorDrawable: Drawable?) {}
+                        })
                     binding.imagePreview.submissionImage.ratio = resolution.height.toFloat() / resolution.width.toFloat()
                     binding.imagePreview.submissionImage.loadImage(resolution.url, post.over18)
                 }

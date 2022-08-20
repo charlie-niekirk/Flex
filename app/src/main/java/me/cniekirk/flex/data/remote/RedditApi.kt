@@ -128,6 +128,12 @@ interface RedditApi {
         @Path("subreddit") subreddit: String
     ): RedditResponse<Subreddit>
 
+    @GET("api/info.json?raw_json=1")
+    suspend fun getPostInfo(
+        @Header("Authorization") authorization: String,
+        @Query("id") id: String
+    ): RedditResponse<Listing<AuthedSubmission>>
+
     @GET("r/{subreddit}/about/moderators.json?raw_json=1")
     suspend fun getSubredditModerators(
         @Header("Authorization") authorization: String,

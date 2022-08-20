@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.workDataOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -18,12 +21,15 @@ import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit
 import me.cniekirk.flex.data.remote.pagination.SubredditSubmissionsPagingSource
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.domain.WorkerRepository
 import me.cniekirk.flex.domain.model.SubredditSearchRequest
 import me.cniekirk.flex.domain.usecase.GetSubredditInfoUseCase
 import me.cniekirk.flex.domain.usecase.SearchSubredditsUseCase
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
+import me.cniekirk.flex.worker.ScheduledNotificationWorker
 import timber.log.Timber
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -41,7 +47,8 @@ class SubmissionListViewModel @Inject constructor(
     private val flexSettings: DataStore<FlexSettings>,
     private val userDao: UserDao,
     private val searchSubredditsUseCase: SearchSubredditsUseCase,
-    private val getSubredditInfoUseCase: GetSubredditInfoUseCase
+    private val getSubredditInfoUseCase: GetSubredditInfoUseCase,
+    private val workerRepository: WorkerRepository
 ) : ViewModel() {
 
     private val _subredditFlow = MutableStateFlow(value = "apolloapp")
@@ -110,6 +117,13 @@ class SubmissionListViewModel @Inject constructor(
                         }
                     }
                 }
+            }
+            is SubmissionListEvent.PostReminderSet -> {
+                val request = OneTimeWorkRequestBuilder<ScheduledNotificationWorker>()
+                    .setInitialDelay(10, TimeUnit.SECONDS)
+                    .setInputData(workDataOf("THING_ID" to submissionListEvent.postId))
+                    .build()
+                workerRepository.scheduleOneTimeWork(request)
             }
         }
     }

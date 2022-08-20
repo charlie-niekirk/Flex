@@ -1,13 +1,18 @@
 package me.cniekirk.flex.ui.submission
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +44,7 @@ import me.cniekirk.flex.ui.adapter.SubmissionListLoadingStateAdapter
 import me.cniekirk.flex.ui.util.onDialogResult
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.observe
+import me.cniekirk.flex.util.requestPermission
 import me.cniekirk.flex.util.viewBinding
 import timber.log.Timber
 import javax.inject.Inject
@@ -57,6 +63,19 @@ class SubmissionListFragment
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val binding by viewBinding(SubmissionListFragmentBinding::bind)
     private var adapter: SubmissionListAdapter? = null
+    private var reminderPost: String? = null
+
+    val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                reminderPost?.let {
+                    viewModel.onUiEvent(SubmissionListEvent.PostReminderSet(it))
+                }
+            } else {
+
+            }
+        }
 
     @Inject lateinit var exoCreator: ExoCreator
 
@@ -227,9 +246,17 @@ class SubmissionListFragment
     }
 
     override fun onPostLongClicked(post: AuthedSubmission) {
-        val action = SubmissionListFragmentDirections
-            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
-        binding.root.findNavController().navigate(action)
+//        val action = SubmissionListFragmentDirections
+//            .actionSubmissionListFragmentToSharePostAsImageDialog(post)
+//        binding.root.findNavController().navigate(action)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), POST_NOTIFICATIONS) != PERMISSION_GRANTED) {
+                reminderPost = post.name
+                requestPermissionLauncher.launch(POST_NOTIFICATIONS)
+            } else {
+                viewModel.onUiEvent(SubmissionListEvent.PostReminderSet(post.name))
+            }
+        }
     }
 
     override fun onGalleryClicked(post: AuthedSubmission) {
@@ -255,5 +282,9 @@ class SubmissionListFragment
     override fun onPause() {
         viewModel.resetSubredditInfo()
         super.onPause()
+    }
+
+    companion object {
+        const val NOTIFICATIONS_CODE = 76549
     }
 }

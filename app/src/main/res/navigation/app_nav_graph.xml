@@ -72,6 +72,9 @@
         android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"
         android:label="SubmissionDetailFragment"
         tools:layout="@layout/submission_detail_fragment" >
+        <deepLink
+            android:id="@+id/submissionListDeeplink"
+            app:uri="flex://?post" />
         <argument
             android:name="post"
             app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />

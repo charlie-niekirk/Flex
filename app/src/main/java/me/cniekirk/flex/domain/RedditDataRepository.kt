@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import me.cniekirk.flex.data.remote.model.pushshift.DeletedComment
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
+import me.cniekirk.flex.data.remote.model.reddit.Listing
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
@@ -37,6 +38,8 @@ interface RedditDataRepository {
     fun getSubredditRules(subreddit: String): Flow<RedditResult<Rules>>
 
     fun getSubredditInfo(subreddit: String): Flow<RedditResult<Subreddit>>
+
+    fun getPostInfo(postId: String): Flow<RedditResult<AuthedSubmission>>
 
     fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>>
 

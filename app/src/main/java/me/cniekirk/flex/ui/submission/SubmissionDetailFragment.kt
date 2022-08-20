@@ -142,7 +142,7 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
         viewModel.observe(viewLifecycleOwner, ::render, ::react)
 
         args.post?.let {
-            viewModel.getComments(it, "")
+            viewModel.getComments(it.id, "")
         }
     }
 

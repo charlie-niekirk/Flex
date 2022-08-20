@@ -223,6 +223,17 @@ class RedditDataRepositoryImpl @Inject constructor(
         emit(RedditResult.Success(response.data))
     }
 
+    override fun getPostInfo(postId: String): Flow<RedditResult<AuthedSubmission>> = flow {
+        val response = if (userDao.getAll().isEmpty()) {
+            val accessToken = "Bearer ${preLoginUserDao.getAll().firstOrNull()?.accessToken}"
+            preLoginRedditApi.getPostInfo(accessToken, postId)
+        } else {
+            val accessToken = "Bearer ${userDao.getAll().first().accessToken}"
+            authRedditApi.getPostInfo(accessToken, postId)
+        }
+        emit(RedditResult.Success(response.data.children.first().data))
+    }
+
     override fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>> = flow {
         if (userDao.getAll().isEmpty()) {
             emit(RedditResult.Error(Cause.Unauthenticated))

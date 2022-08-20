@@ -8,4 +8,5 @@ sealed class SubmissionListEvent {
     data class SubredditUpdated(val subreddit: String) : SubmissionListEvent()
     object SubredditOptions : SubmissionListEvent()
     data class RandomSubredditSelected(val randomType: String) : SubmissionListEvent()
+    data class PostReminderSet(val postId: String) : SubmissionListEvent()
 }
