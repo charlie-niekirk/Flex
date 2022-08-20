@@ -21,6 +21,7 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.GetThingInfoUseCase
 import me.cniekirk.flex.ui.submission.SubmissionDetailFragmentArgs
 import me.cniekirk.flex.util.isAllowedByUser
+import timber.log.Timber
 import java.security.SecureRandom
 
 @HiltWorker
@@ -40,7 +41,10 @@ class ScheduledNotificationWorker @AssistedInject constructor(
         getThingInfoUseCase(thingId).
                 collect { response ->
                     when (response) {
-                        is RedditResult.Error, RedditResult.Loading -> {}
+                        is RedditResult.Error -> {
+
+                        }
+                        RedditResult.Loading -> {}
                         is RedditResult.Success -> {
                             postNotification(response.data)
                         }
