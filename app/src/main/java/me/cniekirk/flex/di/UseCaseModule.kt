@@ -20,4 +20,29 @@ class UseCaseModule {
     @Singleton
     fun provideThingInfoUseCase(getThingInfoUseCaseImpl: GetThingInfoUseCaseImpl): GetThingInfoUseCase
         = getThingInfoUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideGetCommentsUseCase(getCommentsUseCaseImpl: GetCommentsUseCaseImpl): GetCommentsUseCase
+        = getCommentsUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideGetMoreCommentsUseCase(getMoreCommentsUseCaseImpl: GetMoreCommentsUseCaseImpl): GetMoreCommentsUseCase
+        = getMoreCommentsUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideUpvoteThingUseCase(upvoteThingUseCaseImpl: UpvoteThingUseCaseImpl): UpvoteThingUseCase
+        = upvoteThingUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideDownvoteThingUseCase(downvoteThingUseCaseImpl: DownvoteThingUseCaseImpl): DownvoteThingUseCase
+        = downvoteThingUseCaseImpl
+
+    @Provides
+    @Singleton
+    fun provideRemoveVoteThingUseCase(removeVoteThingUseCaseImpl: RemoveVoteThingUseCaseImpl): RemoveVoteThingUseCase
+        = removeVoteThingUseCaseImpl
 }

@@ -35,6 +35,7 @@ import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
+import me.cniekirk.flex.ui.activity.ContainerActivity
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
@@ -51,7 +52,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment), CommentTreeAdapter.CommentActionListener, SubmissionDetailHeaderAdapter.SubmissionActionListener {
 
-    private var player: ExoPlayer? = null
     private val args by navArgs<SubmissionDetailFragmentArgs>()
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }
     private val viewModel by viewModels<SubmissionDetailViewModel>()
@@ -148,11 +148,13 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
 
     private fun render(state: SubmissionDetailState) {
 
-        val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
-        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        if (!actionButton.isOrWillBeHidden) {
-            actionButton.visibility = View.GONE
-            bottomBar.visibility = View.GONE
+        if (requireActivity() is ContainerActivity) {
+            val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+            val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+            if (!actionButton.isOrWillBeHidden) {
+                actionButton.visibility = View.GONE
+                bottomBar.visibility = View.GONE
+            }
         }
 
         binding.apply {
@@ -224,7 +226,6 @@ class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragmen
     }
 
     override fun onDestroyView() {
-        player?.release()
         super.onDestroyView()
     }
 

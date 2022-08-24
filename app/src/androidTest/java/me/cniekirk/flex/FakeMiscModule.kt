@@ -1,17 +1,14 @@
-package me.cniekirk.flex.di
+package me.cniekirk.flex
 
 import android.content.Context
 import android.view.View
 import coil.ImageLoader
 import coil.request.ImageRequest
-import com.google.android.exoplayer2.database.ExoDatabaseProvider
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import im.ene.toro.exoplayer.Config
 import im.ene.toro.exoplayer.ExoCreator
 import im.ene.toro.exoplayer.MediaSourceBuilder
@@ -26,7 +23,7 @@ import io.noties.markwon.recycler.MarkwonAdapter
 import io.noties.markwon.recycler.table.TableEntry
 import io.noties.markwon.recycler.table.TableEntryPlugin
 import io.noties.markwon.utils.Dip
-import me.cniekirk.flex.R
+import me.cniekirk.flex.di.MiscModule
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLink
 import me.cniekirk.flex.util.video.LoopExoCreator
@@ -34,13 +31,14 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.commonmark.ext.gfm.tables.TableBlock
-import java.io.File
 import javax.inject.Singleton
 
-
 @Module
-@InstallIn(SingletonComponent::class)
-class MiscModule {
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [MiscModule::class]
+)
+class FakeMiscModule {
 
     @Provides
     @Singleton
@@ -76,18 +74,8 @@ class MiscModule {
 
     @Provides
     @Singleton
-    fun provideSimpleCache(@ApplicationContext context: Context): SimpleCache {
-        return SimpleCache(
-            File(context.cacheDir, "/exoplayer"),
-            LeastRecentlyUsedCacheEvictor(209715200L), ExoDatabaseProvider(context)
-        )
-    }
-
-    @Provides
-    @Singleton
-    fun provideExoCreator(@ApplicationContext context: Context, simpleCache: SimpleCache): ExoCreator {
+    fun provideExoCreator(@ApplicationContext context: Context): ExoCreator {
         val config = Config.Builder(context).setMediaSourceBuilder(MediaSourceBuilder.DEFAULT)
-            .setCache(simpleCache)
             .build()
         return LoopExoCreator(ToroExo.with(context), config)
     }
@@ -126,7 +114,6 @@ class MiscModule {
                     })
                 }
             })
-            //.usePlugin(SyntaxHighlightPlugin.create(Prism4j(GrammarLocatorDef()), Prism4jThemeDefault()))
             .build()
     }
 

@@ -1,4 +1,4 @@
-package me.cniekirk.flex.di.fakes
+package me.cniekirk.flex.di.fakes.repo
 
 import androidx.paging.PagingData
 import kotlinx.coroutines.flow.Flow
@@ -16,8 +16,9 @@ import me.cniekirk.flex.data.remote.model.wikipedia.WikiSummary
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.gallery.DownloadState
+import javax.inject.Inject
 
-class FakeRedditDataRepository : RedditDataRepository {
+class FakeRedditDataRepository @Inject constructor() : RedditDataRepository {
 
     override suspend fun getComments(
         submissionId: String,
@@ -70,6 +71,10 @@ class FakeRedditDataRepository : RedditDataRepository {
         return flowOf()
     }
 
+    override fun getPostInfo(postId: String): Flow<RedditResult<AuthedSubmission>> {
+        return flowOf()
+    }
+
     override fun getSubredditModerators(subreddit: String): Flow<RedditResult<List<ModUser>>> {
         return flowOf()
     }
@@ -118,9 +123,6 @@ class FakeRedditDataRepository : RedditDataRepository {
     }
 
     companion object {
-        val COMM = Comment(
-
-        )
         const val COMMENT = ""
     }
 }
