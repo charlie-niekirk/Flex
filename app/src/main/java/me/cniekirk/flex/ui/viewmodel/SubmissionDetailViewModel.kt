@@ -38,8 +38,6 @@ class SubmissionDetailViewModel @Inject constructor(
     private val downvoteThingUseCase: DownvoteThingUseCase
 ) : ViewModel(), ContainerHost<SubmissionDetailState, SubmissionDetailEffect> {
 
-    private var voteState: VoteState = VoteState.NoVote
-
     override val container = container<SubmissionDetailState, SubmissionDetailEffect>(
         SubmissionDetailState()
     )
@@ -97,7 +95,7 @@ class SubmissionDetailViewModel @Inject constructor(
     }
 
     fun upvoteClicked(thingId: String) = intent {
-        when (voteState) {
+        when (state.voteState) {
             VoteState.Upvote -> {
                 removeVoteThingUseCase(thingId)
                     .collect { result ->
@@ -112,8 +110,7 @@ class SubmissionDetailViewModel @Inject constructor(
                             }
                             RedditResult.Loading -> {}
                             is RedditResult.Success -> {
-                                voteState = VoteState.NoVote
-                                postSideEffect(SubmissionDetailEffect.UpdateVoteState(VoteState.NoVote))
+                                reduce { state.copy(voteState = VoteState.NoVote) }
                             }
                         }
                     }
@@ -132,8 +129,7 @@ class SubmissionDetailViewModel @Inject constructor(
                             }
                             RedditResult.Loading -> {}
                             is RedditResult.Success -> {
-                                voteState = VoteState.Upvote
-                                postSideEffect(SubmissionDetailEffect.UpdateVoteState(VoteState.Upvote))
+                                reduce { state.copy(voteState = VoteState.Upvote) }
                             }
                         }
                     }
@@ -142,7 +138,7 @@ class SubmissionDetailViewModel @Inject constructor(
     }
 
     fun downvoteClicked(thingId: String) = intent {
-        when (voteState) {
+        when (state.voteState) {
             VoteState.Downvote -> {
                 removeVoteThingUseCase(thingId)
                     .collect { result ->
@@ -157,8 +153,7 @@ class SubmissionDetailViewModel @Inject constructor(
                             }
                             RedditResult.Loading -> {}
                             is RedditResult.Success -> {
-                                voteState = VoteState.NoVote
-                               postSideEffect(SubmissionDetailEffect.UpdateVoteState(VoteState.NoVote))
+                                reduce { state.copy(voteState = VoteState.NoVote) }
                             }
                         }
                     }
@@ -177,8 +172,7 @@ class SubmissionDetailViewModel @Inject constructor(
                             }
                             RedditResult.Loading -> {}
                             is RedditResult.Success -> {
-                                voteState = VoteState.Downvote
-                                postSideEffect(SubmissionDetailEffect.UpdateVoteState(VoteState.Downvote))
+                                reduce { state.copy(voteState = VoteState.Downvote) }
                             }
                         }
                     }
