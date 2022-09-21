@@ -1,6 +1,8 @@
 package me.cniekirk.flex.ui.submission
 
+import android.graphics.drawable.Animatable2
 import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -10,8 +12,12 @@ import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.SmoothScroller
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import im.ene.toro.exoplayer.ExoCreator
 import io.noties.markwon.*
@@ -27,6 +33,7 @@ import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.databinding.SubmissionDetailFragmentBinding
 import me.cniekirk.flex.ui.BaseFragment
+import me.cniekirk.flex.ui.activity.ContainerActivity
 import me.cniekirk.flex.ui.adapter.CommentTreeAdapter
 import me.cniekirk.flex.ui.adapter.SubmissionDetailHeaderAdapter
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
@@ -35,9 +42,7 @@ import me.cniekirk.flex.ui.text.FlexLinkifyPlugin
 import me.cniekirk.flex.ui.text.RedditLinkifyTextAddedListener
 import me.cniekirk.flex.ui.util.diff
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
-import me.cniekirk.flex.util.Link
-import me.cniekirk.flex.util.processLink
-import me.cniekirk.flex.util.viewBinding
+import me.cniekirk.flex.util.*
 import org.orbitmvi.orbit.viewmodel.observe
 import javax.inject.Inject
 
@@ -137,6 +142,46 @@ class SubmissionDetailFragment : BaseFragment<SubmissionDetailState, SubmissionD
         args.post?.let {
             viewModel.getComments(it.id, "")
         }
+
+        if (requireActivity() is ContainerActivity) {
+            val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+            val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+            if (!actionButton.isOrWillBeHidden) {
+                actionButton.visibility = View.GONE
+                bottomBar.visibility = View.GONE
+            }
+        }
+
+        binding.apply {
+            backButton.setOnClickListener { it.findNavController().popBackStack() }
+
+            textCommentsTitle.text = getString(R.string.comments_title, args.post?.numComments?.condense())
+            loading.registerAnimationCallback(object : Animatable2.AnimationCallback() {
+                override fun onAnimationEnd(drawable: Drawable?) {
+                    loadingIndicator.post { loading.start() }
+                }
+            })
+            loading.start()
+
+            args.post?.let {
+                headerAdapter = SubmissionDetailHeaderAdapter(this@SubmissionDetailFragment, null, exoCreator, markwon, markwonAdapter)
+                adapter = CommentTreeAdapter(it, markwon, this@SubmissionDetailFragment)
+                commentsTreeList.adapter = ConcatAdapter(headerAdapter, adapter)
+                headerAdapter!!.submitList(listOf(args.post))
+
+                nextTopCommentButton.setOnClickListener {
+                    val start = (commentsTreeList.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition() - 1
+                    val nextItem = adapter?.currentList?.filterIndexed { index, item ->
+                        index > start && item.depth == 0
+                    }?.first()
+                    smoothScroller.targetPosition = adapter?.currentList?.indexOf(nextItem)?.plus(1) ?: 0
+                    commentsTreeList.layoutManager?.startSmoothScroll(smoothScroller)
+                }
+            }
+
+            binding.loadingIndicator.visibility = View.GONE
+            loading.reset()
+        }
     }
 
     private val renderer = diff<SubmissionDetailState> {
@@ -159,7 +204,14 @@ class SubmissionDetailFragment : BaseFragment<SubmissionDetailState, SubmissionD
     }
 
     private fun submitComments(comments: List<CommentData>) {
-
+        if (comments.isEmpty()) {
+            binding.emptyCommentEasterEgg.visibility = View.VISIBLE
+            binding.emptyCommentEasterEgg.text = requireContext().getEasterEggString(args.post!!.subreddit)
+        } else {
+            adapter?.submitList(comments)
+            binding.emptyCommentEasterEgg.visibility = View.GONE
+            binding.commentsTreeList.visibility = View.VISIBLE
+        }
     }
 
 //    private fun render(state: SubmissionDetailState) {
