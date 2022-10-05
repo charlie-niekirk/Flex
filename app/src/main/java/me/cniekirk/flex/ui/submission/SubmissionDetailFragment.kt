@@ -48,7 +48,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SubmissionDetailFragment : BaseFragment<SubmissionDetailState, SubmissionDetailEffect>(R.layout.submission_detail_fragment), CommentTreeAdapter.CommentActionListener, SubmissionDetailHeaderAdapter.SubmissionActionListener {
+class SubmissionDetailFragment : BaseFragment(R.layout.submission_detail_fragment), CommentTreeAdapter.CommentActionListener, SubmissionDetailHeaderAdapter.SubmissionActionListener {
 
     private val args by navArgs<SubmissionDetailFragmentArgs>()
     private val loading by lazy(LazyThreadSafetyMode.NONE) { binding.loadingIndicator.drawable as AnimatedVectorDrawable }

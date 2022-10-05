@@ -153,9 +153,9 @@ class SubmissionDetailViewModelTest {
 
         // Assert
         underTest.assert(SubmissionDetailState()) {
-            postedSideEffects(
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Upvote),
-                SubmissionDetailEffect.UpdateVoteState(VoteState.NoVote)
+            states(
+                { copy(voteState = VoteState.Upvote) },
+                { copy(voteState = VoteState.NoVote) }
             )
         }
     }
@@ -173,9 +173,9 @@ class SubmissionDetailViewModelTest {
 
         // Assert
         underTest.assert(SubmissionDetailState()) {
-            postedSideEffects(
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Downvote),
-                SubmissionDetailEffect.UpdateVoteState(VoteState.NoVote)
+            states(
+                { copy(voteState = VoteState.Downvote) },
+                { copy(voteState = VoteState.NoVote) }
             )
         }
     }
@@ -193,9 +193,9 @@ class SubmissionDetailViewModelTest {
 
         // Assert
         underTest.assert(SubmissionDetailState()) {
-            postedSideEffects(
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Downvote),
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Upvote)
+            states(
+                { copy(voteState = VoteState.Downvote) },
+                { copy(voteState = VoteState.Upvote) }
             )
         }
     }
@@ -213,9 +213,9 @@ class SubmissionDetailViewModelTest {
 
         // Assert
         underTest.assert(SubmissionDetailState()) {
-            postedSideEffects(
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Upvote),
-                SubmissionDetailEffect.UpdateVoteState(VoteState.Downvote)
+            states(
+                { copy(voteState = VoteState.Upvote) },
+                { copy(voteState = VoteState.Downvote) }
             )
         }
     }

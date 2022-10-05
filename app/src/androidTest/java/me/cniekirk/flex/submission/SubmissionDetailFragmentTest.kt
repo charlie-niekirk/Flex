@@ -57,9 +57,6 @@ class SubmissionDetailFragmentTest {
         }
     }
 
-//    @Test
-//    fun
-
     companion object {
         val fragmentDetailArgs = bundleOf(
             "post" to AuthedSubmission(

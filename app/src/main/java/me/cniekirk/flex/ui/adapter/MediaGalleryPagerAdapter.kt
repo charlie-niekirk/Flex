@@ -4,8 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import me.cniekirk.flex.R
-import me.cniekirk.flex.data.remote.model.imgur.ImageData
-import me.cniekirk.flex.data.remote.model.imgur.ImgurResponse
 import me.cniekirk.flex.data.remote.model.reddit.MetaDataItem
 import me.cniekirk.flex.ui.gallery.ImageItemFragment
 

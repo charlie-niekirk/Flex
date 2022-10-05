@@ -9,7 +9,7 @@ import me.cniekirk.flex.databinding.ImageItemFragmentBinding
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.util.viewBinding
 
-class ImageItemFragment(private val url: String) : BaseFragment(R.layout.image_item_fragment) {
+class ImageItemFragment(private val url: String) : BaseFragment<>(R.layout.image_item_fragment) {
 
     private val binding by viewBinding(ImageItemFragmentBinding::bind)
 
