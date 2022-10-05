@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 import me.cniekirk.flex.data.remote.model.reddit.subreddit.PollData
 import me.cniekirk.flex.data.remote.model.twitter.TweetResponse
+import me.cniekirk.flex.ui.submission.state.VoteState
 import java.io.Serializable
 
 @Parcelize
@@ -207,5 +208,7 @@ data class AuthedSubmission(
     @Transient
     var imgurGalleryLinks: List<String>? = null,
     @Transient
-    var tweetDetails: @RawValue TweetResponse? = null
+    var tweetDetails: @RawValue TweetResponse? = null,
+    @Transient
+    var voteState: VoteState = VoteState.NoVote
 ) : Parcelable

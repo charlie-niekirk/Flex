@@ -12,18 +12,12 @@ import dagger.hilt.components.SingletonComponent
 import me.cniekirk.flex.BuildConfig
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
-import me.cniekirk.flex.data.local.repo.LocalDataRepositoryImpl
 import me.cniekirk.flex.data.remote.*
 import me.cniekirk.flex.data.remote.model.reddit.auth.LoggedInAuthenticator
 import me.cniekirk.flex.data.remote.model.reddit.auth.PreLoginAuthenticator
 import me.cniekirk.flex.data.remote.model.reddit.base.EnvelopeKind
 import me.cniekirk.flex.data.remote.model.reddit.envelopes.*
 import me.cniekirk.flex.data.remote.model.reddit.util.ForceToBooleanJsonAdapter
-import me.cniekirk.flex.data.remote.repo.ImgurDataRepositoryImpl
-import me.cniekirk.flex.data.remote.repo.RedditDataRepositoryImpl
-import me.cniekirk.flex.domain.ImgurDataRepository
-import me.cniekirk.flex.domain.LocalDataRepository
-import me.cniekirk.flex.domain.RedditDataRepository
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -191,6 +185,17 @@ class NetworkModule {
     }
 
     @Provides
+    @Named("pushshiftRetrofit")
+    @Singleton
+    fun providePushshiftRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl("https://api.pushshift.io/")
+            .build()
+    }
+
+    @Provides
     @Named("userlessRetrofit")
     @Singleton
     fun provideRetrofit(@Named("preAuth") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
@@ -267,6 +272,17 @@ class NetworkModule {
     }
 
     @Provides
+    @Named("flexRetrofit")
+    @Singleton
+    fun provideFlexRetrofit(@Named("preLogin") okHttpClient: Lazy<OkHttpClient>, moshi: Moshi): Retrofit {
+        return Retrofit.Builder()
+            .callFactory { okHttpClient.get().newCall(it) }
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .baseUrl(BuildConfig.SERVER_URL)
+            .build()
+    }
+
+    @Provides
     @Named("preAuthApi")
     @Singleton
     fun providePreAuthRedditApi(@Named("userlessRetrofit") retrofit: Retrofit): RedditApi
@@ -317,22 +333,18 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRedditDataRepo(redditDataRepositoryImpl: RedditDataRepositoryImpl)
-            : RedditDataRepository = redditDataRepositoryImpl
-
-    @Provides
-    @Singleton
-    fun provideLocalDataRepo(localDataRepositoryImpl: LocalDataRepositoryImpl)
-            : LocalDataRepository = localDataRepositoryImpl
-
-    @Provides
-    @Singleton
-    fun provideImgurDataRepo(imgurDataRepositoryImpl: ImgurDataRepositoryImpl)
-            : ImgurDataRepository = imgurDataRepositoryImpl
+    fun providePushshiftApi(@Named("pushshiftRetrofit") retrofit: Retrofit): PushshiftApi
+            = retrofit.create(PushshiftApi::class.java)
 
     @Provides
     @Singleton
     fun provideTwitterApi(@Named("twitter") retrofit: Retrofit): TwitterApi {
         return retrofit.create(TwitterApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideFlexApi(@Named("flexRetrofit") retrofit: Retrofit): FlexApi {
+        return retrofit.create(FlexApi::class.java)
     }
 }

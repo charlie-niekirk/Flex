@@ -9,6 +9,9 @@
         android:name="me.cniekirk.flex.ui.submission.SubmissionListFragment"
         android:label="submission_list_fragment"
         tools:layout="@layout/submission_list_fragment" >
+        <deepLink
+            android:id="@+id/submissionListDeeplink"
+            app:uri="flex://?subreddit={subreddit}" />
         <action
             android:id="@+id/action_submissionListFragment_to_submissionListSortDialogFragment"
             app:destination="@id/submissionListSortDialogFragment" />
@@ -48,6 +51,16 @@
         <action
             android:id="@+id/action_submissionListFragment_to_youtubePlayer"
             app:destination="@id/youtubePlayer" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_authenticatedAccountFragment"
+            app:destination="@id/authenticatedAccountFragment" />
+        <action
+            android:id="@+id/action_submissionListFragment_to_createPostFragment"
+            app:destination="@id/createPostFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
     <dialog
         android:id="@+id/submissionListSortDialogFragment"
@@ -59,6 +72,9 @@
         android:name="me.cniekirk.flex.ui.submission.SubmissionDetailFragment"
         android:label="SubmissionDetailFragment"
         tools:layout="@layout/submission_detail_fragment" >
+        <deepLink
+            android:id="@+id/submissionListDeeplink"
+            app:uri="flex://?post" />
         <argument
             android:name="post"
             app:argType="me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission" />
@@ -101,6 +117,9 @@
         <action
             android:id="@+id/action_settingsFragment_to_addSettingsProfileFragment"
             app:destination="@id/addSettingsProfileFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_notificationSettingsFragment"
+            app:destination="@id/notificationSettingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -114,19 +133,35 @@
         tools:layout="@layout/subreddit_dialog" >
         <action
             android:id="@+id/action_subredditInformationDialog_to_subredditRulesFragment"
-            app:destination="@id/subredditRulesFragment" />
+            app:destination="@id/subredditRulesFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_subredditInformationDialog_to_subredditSidebarFragment"
-            app:destination="@id/subredditSidebarFragment" />
+            app:destination="@id/subredditSidebarFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <action
             android:id="@+id/action_subredditInformationDialog_to_subredditModeratorsFragment"
-            app:destination="@id/subredditModeratorsFragment" />
+            app:destination="@id/subredditModeratorsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
         <argument
             android:name="subreddit"
             app:argType="me.cniekirk.flex.data.remote.model.reddit.subreddit.Subreddit" />
         <action
             android:id="@+id/action_subredditInformationDialog_to_subredditUserFlairFragment"
-            app:destination="@id/subredditUserFlairFragment" />
+            app:destination="@id/subredditUserFlairFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </dialog>
     <fragment
         android:id="@+id/subredditRulesFragment"
@@ -194,4 +229,37 @@
         android:id="@+id/addSettingsProfileFragment"
         android:name="me.cniekirk.flex.ui.settings.AddSettingsProfileFragment"
         android:label="AddSettingsProfileFragment" />
+    <fragment
+        android:id="@+id/authenticatedAccountFragment"
+        android:name="me.cniekirk.flex.ui.auth.AuthenticatedAccountFragment"
+        android:label="AuthenticatedAccountFragment"
+        tools:layout="@layout/authenticated_account_fragment" />
+    <fragment
+        android:id="@+id/createPostFragment"
+        android:name="me.cniekirk.flex.ui.createpost.CreatePostFragment"
+        android:label="CreatePostFragment"
+        tools:layout="@layout/create_post_fragment" />
+    <navigation android:id="@+id/accountNavGraph"
+        app:startDestination="@id/loginWebviewFragment">
+        <dialog
+            android:id="@+id/loginWebviewFragment"
+            android:name="me.cniekirk.flex.ui.auth.LoginWebviewFragment"
+            android:label="LoginWebviewFragment" />
+        <fragment
+            android:id="@+id/authenticatedAccountFragment"
+            android:name="me.cniekirk.flex.ui.auth.AuthenticatedAccountFragment"
+            android:label="AuthenticatedAccountFragment" />
+    </navigation>
+    <fragment
+        android:id="@+id/notificationSettingsFragment"
+        android:name="me.cniekirk.flex.ui.settings.NotificationSettingsFragment"
+        android:label="NotificationSettingsFragment" >
+        <action
+            android:id="@+id/action_notificationSettingsFragment_to_createSubredditTrackerFragment"
+            app:destination="@id/createSubredditTrackerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createSubredditTrackerFragment"
+        android:name="me.cniekirk.flex.ui.settings.CreateSubredditTrackerFragment"
+        android:label="CreateSubredditTrackerFragment" />
 </navigation>

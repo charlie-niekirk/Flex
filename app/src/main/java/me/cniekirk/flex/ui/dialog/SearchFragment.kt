@@ -1,13 +1,14 @@
 package me.cniekirk.flex.ui.dialog
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +19,6 @@ import me.cniekirk.flex.databinding.SearchFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubredditResultAdapter
-import me.cniekirk.flex.ui.submission.SubmissionListEvent
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.textChanges
 import me.cniekirk.flex.util.viewBinding
@@ -30,7 +30,7 @@ import timber.log.Timber
 class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAdapter.SubredditResultListener {
 
     private val binding by viewBinding(SearchFragmentBinding::bind)
-    private val viewModel by activityViewModels<SubmissionListViewModel>()
+    private val viewModel by viewModels<SubmissionListViewModel>()
     private val adapter = SubredditResultAdapter(this)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,12 +48,22 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
             subredditResultList.adapter = adapter
 
             randomButton.setOnClickListener {
-                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("random"))
-                binding.root.findNavController().popBackStack()
+                val navOptions = NavOptions.Builder()
+                    .setEnterAnim(R.anim.fragment_open_enter)
+                    .setExitAnim(R.anim.fragment_open_exit)
+                    .setPopEnterAnim(R.anim.fragment_close_enter)
+                    .setPopExitAnim(R.anim.fragment_close_exit)
+                    .build()
+                findNavController().navigate(Uri.parse(getString(R.string.subreddit_link_prefix) + "random"), navOptions)
             }
             randomNsfwButton.setOnClickListener {
-                viewModel.onUiEvent(SubmissionListEvent.RandomSubredditSelected("randnsfw"))
-                binding.root.findNavController().popBackStack()
+                val navOptions = NavOptions.Builder()
+                    .setEnterAnim(R.anim.fragment_open_enter)
+                    .setExitAnim(R.anim.fragment_open_exit)
+                    .setPopEnterAnim(R.anim.fragment_close_enter)
+                    .setPopExitAnim(R.anim.fragment_close_exit)
+                    .build()
+                findNavController().navigate(Uri.parse(getString(R.string.subreddit_link_prefix) + "randnsfw"), navOptions)
             }
 
             inputSearch.textChanges()
@@ -69,7 +79,6 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
                         }
                         is RedditResult.Error -> {
                             // Display error
-                            Timber.e(it.errorMessage)
                         }
                         else -> {
                             // Display unknown error
@@ -82,7 +91,12 @@ class SearchFragment : BaseFragment(R.layout.search_fragment), SubredditResultAd
     }
 
     override fun onSubredditSelected(subreddit: String) {
-        viewModel.onUiEvent(SubmissionListEvent.SubredditUpdated(subreddit))
-        binding.root.findNavController().popBackStack()
+        val navOptions = NavOptions.Builder()
+            .setEnterAnim(R.anim.fragment_open_enter)
+            .setExitAnim(R.anim.fragment_open_exit)
+            .setPopEnterAnim(R.anim.fragment_close_enter)
+            .setPopExitAnim(R.anim.fragment_close_exit)
+            .build()
+        findNavController().navigate(Uri.parse(getString(R.string.subreddit_link_prefix) + subreddit), navOptions)
     }
 }

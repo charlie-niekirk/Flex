@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
     tools:context=".ui.submission.SubmissionListFragment">
 
     <TextView
@@ -19,6 +20,19 @@
         android:layout_marginTop="24dp"
         android:text="Home"
         tools:text="r/tommyinnit" />
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/button_subreddit_options"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/text_submission_source"
+        app:layout_constraintBottom_toBottomOf="@id/text_submission_source"
+        android:layout_marginEnd="16dp"
+        app:srcCompat="@drawable/more_horiz"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -79,6 +93,19 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/submission_list_item"
         tools:itemCount="12" />
+
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:id="@+id/list_submissions"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/loading_indicator"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        android:layout_marginTop="@dimen/spacing_m"-->
+<!--        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+<!--        tools:listitem="@layout/submission_list_item"-->
+<!--        tools:itemCount="12" />-->
 
     <View
         android:layout_width="match_parent"

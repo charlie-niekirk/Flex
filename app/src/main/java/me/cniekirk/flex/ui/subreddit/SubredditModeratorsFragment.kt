@@ -8,17 +8,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.transition.MaterialSharedAxis
-import com.google.android.material.transition.SlideDistanceProvider
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.R
 import me.cniekirk.flex.databinding.SubredditModeratorsFragmentBinding
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.ui.adapter.SubredditModeratorsAdapter
-import me.cniekirk.flex.ui.adapter.SubredditRulesAdapter
 import me.cniekirk.flex.ui.viewmodel.SubredditActionsViewModel
 import me.cniekirk.flex.util.observe
 import me.cniekirk.flex.util.viewBinding
@@ -32,24 +29,14 @@ class SubredditModeratorsFragment : BaseFragment(R.layout.subreddit_moderators_f
     private val args by navArgs<SubredditModeratorsFragmentArgs>()
     private val adapter = SubredditModeratorsAdapter()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
-            (primaryAnimatorProvider as SlideDistanceProvider).slideDistance =
-                requireContext().resources.getDimension(R.dimen.slide_distance).toInt()
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val actionButton = requireActivity().findViewById<FloatingActionButton>(R.id.floating_action_button)
+        val bottomBar = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
         if (!actionButton.isOrWillBeHidden) {
-            actionButton.hide()
+            actionButton.visibility = View.GONE
+            bottomBar.visibility = View.GONE
         }
 
         binding.apply {
@@ -67,10 +54,6 @@ class SubredditModeratorsFragment : BaseFragment(R.layout.subreddit_moderators_f
                         // Show spinner
                     }
                     is RedditResult.Error -> {
-                        Timber.e(it.errorMessage)
-                    }
-                    RedditResult.UnAuthenticated -> {
-                        Toast.makeText(requireContext(), "Unauthenticated!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

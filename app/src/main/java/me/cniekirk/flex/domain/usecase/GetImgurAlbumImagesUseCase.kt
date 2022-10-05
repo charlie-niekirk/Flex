@@ -15,5 +15,4 @@ class GetImgurAlbumImagesUseCase @Inject constructor(
 
     override suspend fun execute(parameters: String) =
         repository.getGalleryImages(parameters)
-
 }

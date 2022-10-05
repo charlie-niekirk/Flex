@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/settings_profiles_divider"
-        android:background="@color/accent"
+        android:background="?attr/colorSecondary"
         app:layout_constraintTop_toBottomOf="@id/text_settings_profiles_label"
         android:layout_marginTop="@dimen/spacing_l"
         android:alpha="0.2" />
@@ -64,10 +64,62 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_nsfw_settings_label"
+        android:id="@+id/text_general_settings_label"
         style="?attr/textAppearanceBodySmall"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_profile_button"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_marginStart="@dimen/spacing_l"
+        android:text="@string/general_title" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/general_settings_divider"
+        android:background="?attr/colorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/text_general_settings_label"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:alpha="0.2" />
+
+    <me.cniekirk.flex.ui.view.SettingsSectionItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/notifications_section"
+        app:layout_constraintTop_toBottomOf="@id/general_settings_divider"
+        android:layout_marginTop="@dimen/spacing_l"
+        app:section_title="Notifications"
+        app:section_subtitle="Customise notification settings"
+        app:section_icon="@drawable/notifications"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <me.cniekirk.flex.ui.view.SettingsSectionItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/post_section"
+        app:layout_constraintTop_toBottomOf="@id/notifications_section"
+        android:layout_marginTop="@dimen/spacing_m"
+        app:section_title="Post view"
+        app:section_subtitle="Feed size, preview style and more"
+        app:section_icon="@drawable/view_list" />
+
+    <me.cniekirk.flex.ui.view.SettingsSectionItem
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/comment_section"
+        app:layout_constraintTop_toBottomOf="@id/post_section"
+        android:layout_marginTop="@dimen/spacing_m"
+        app:section_title="Comment view"
+        app:section_subtitle="Font size, style and more"
+        app:section_icon="@drawable/ic_comment" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/text_nsfw_settings_label"
+        style="?attr/textAppearanceBodySmall"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/comment_section"
         android:layout_marginTop="@dimen/spacing_xl"
         android:layout_marginStart="@dimen/spacing_l"
         android:text="@string/nsfw_title" />
@@ -76,15 +128,16 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/nsfw_settings_divider"
-        android:background="@color/accent"
+        android:background="?attr/colorSecondary"
         app:layout_constraintTop_toBottomOf="@id/text_nsfw_settings_label"
         android:layout_marginTop="@dimen/spacing_l"
         android:alpha="0.2" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/nsfw_blur_enabled"
+        style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
         app:layout_constraintTop_toBottomOf="@id/nsfw_settings_divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,15 +162,16 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/posts_settings_divider"
-        android:background="@color/accent"
+        android:background="?attr/colorSecondary"
         app:layout_constraintTop_toBottomOf="@id/text_media_settings_label"
         android:layout_marginTop="@dimen/spacing_l"
         android:alpha="0.2" />
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/post_previews_enabled"
+        style="@style/Widget.Material3.CompoundButton.MaterialSwitch"
         app:layout_constraintTop_toBottomOf="@id/posts_settings_divider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

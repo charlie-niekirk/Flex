@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/colorSurface">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/notification_settings_toolbar"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/Bold.H2"
+        app:title="@string/title_create_subreddit_tracker"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tracker_builder_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notification_settings_toolbar"
+        android:layout_marginTop="@dimen/spacing_xl"
+        android:layout_marginHorizontal="@dimen/spacing_l"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:lineSpacingExtra="20dp"
+        android:paddingBottom="10dp"
+        tools:text="Track posts in r/???" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_logic_button"
+        app:layout_constraintTop_toBottomOf="@id/tracker_builder_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="@dimen/spacing_l"
+        android:layout_marginHorizontal="@dimen/spacing_l"
+        style="@style/Widget.App.Button.Icon"
+        app:icon="@drawable/add_circle"
+        app:iconGravity="textStart"
+        android:text="Add Filter" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

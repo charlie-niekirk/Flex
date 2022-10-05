@@ -9,5 +9,4 @@ interface StreamableApi {
 
     @GET("videos/{shortcode}")
     suspend fun getStreamableDetails(@Path("shortcode") shortcode: String): Response<StreamableVideo>
-
 }

@@ -7,6 +7,7 @@ import androidx.documentfile.provider.DocumentFile
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import me.cniekirk.flex.data.Cause
 import me.cniekirk.flex.domain.LocalDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.ui.gallery.DownloadState
@@ -40,7 +41,7 @@ class LocalDataRepositoryImpl @Inject constructor(
                 }
                 emit(RedditResult.Success(DownloadState.Success))
             } ?: run {
-                emit(RedditResult.Error(Exception("Unknown!")))
+                emit(RedditResult.Error(Cause.Unknown))
             }
         } ?: run { emit(RedditResult.Success(DownloadState.NoDefinedLocation)) }
     }

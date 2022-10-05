@@ -1,17 +1,18 @@
 package me.cniekirk.flex.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
-import me.cniekirk.flex.di.IoDispatcher
-import me.cniekirk.flex.domain.FlowUseCase
+import kotlinx.coroutines.flow.Flow
 import me.cniekirk.flex.domain.RedditDataRepository
+import me.cniekirk.flex.domain.RedditResult
 import javax.inject.Inject
 
-class UpvoteThingUseCase @Inject constructor(
-    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
+interface UpvoteThingUseCase {
+    operator fun invoke(thingId: String): Flow<RedditResult<Boolean>>
+}
+
+class UpvoteThingUseCaseImpl @Inject constructor(
     private val redditDataRepository: RedditDataRepository
-) : FlowUseCase<String, Boolean>(coroutineDispatcher) {
+) : UpvoteThingUseCase {
 
-    override suspend fun execute(parameters: String) =
-        redditDataRepository.upvoteThing(parameters)
-
+    override fun invoke(thingId: String) =
+        redditDataRepository.upvoteThing(thingId)
 }

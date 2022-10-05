@@ -22,7 +22,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import im.ene.toro.ToroPlayer
 import im.ene.toro.ToroUtil
@@ -37,6 +39,9 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.databinding.*
+import me.cniekirk.flex.ui.text.getBionikSpanForText
+import me.cniekirk.flex.ui.util.Size2
+import me.cniekirk.flex.ui.view.CenteredImageSpan
 import me.cniekirk.flex.util.*
 import timber.log.Timber
 
@@ -55,8 +60,14 @@ enum class ViewType {
 class SubmissionListAdapter(
     private val submissionsActionListener: SubmissionActionListener,
     private val settings: FlexSettings,
-    private val exoCreator: ExoCreator)
-    : PagingDataAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
+    private val exoCreator: ExoCreator
+) : PagingDataAdapter<AuthedSubmission, RecyclerView.ViewHolder>(SubmissionComparator) {
+
+    private val sizeOptions by lazy(LazyThreadSafetyMode.NONE) {
+        RequestOptions()
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.DATA)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -66,7 +77,8 @@ class SubmissionListAdapter(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
-                    ))
+                    )
+                )
             }
             ViewType.VIDEO.ordinal -> {
                 VideoSubmissionViewHolder(
@@ -255,7 +267,9 @@ class SubmissionListAdapter(
 
         fun bind(post: AuthedSubmission) {
             binding.actions.root.visibility = View.GONE
-            binding.root.setOnClickListener { submissionsActionListener.onPostClicked(post) }
+            binding.root.setOnClickListener {
+                submissionsActionListener.onPostClicked(post)
+            }
             binding.root.setOnLongClickListener {
                 submissionsActionListener.onPostLongClicked(post)
                 true
@@ -302,7 +316,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -315,7 +329,7 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -381,7 +395,12 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
-            binding.selftextPreview.textSubmissionContentPreview.text = post.selftext?.selfTextPreview()
+            if (post.selftext?.isEmpty() == true) {
+                binding.selftextPreview.textSubmissionContentPreview.visibility = View.GONE
+            } else {
+                binding.selftextPreview.textSubmissionContentPreview.visibility = View.VISIBLE
+                binding.selftextPreview.textSubmissionContentPreview.text = post.selftext?.selfTextPreview()
+            }
         }
     }
 
@@ -437,7 +456,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -450,9 +469,8 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
-                }
-                else {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
+                } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
                 if (post.authorFlairTextColor.equals("dark", true)) {
@@ -517,14 +535,24 @@ class SubmissionListAdapter(
                 binding.awards.imageThirdAward.visibility = View.GONE
                 binding.awards.textTotalAwardCount.visibility = View.GONE
             }
+            val hideNsfw = settings.profilesList.first().blurNsfw
             if (post.preview != null) {
                 val resolution = binding.imagePreview.submissionImage.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
-                    binding.imagePreview.submissionImage.ratio = resolution.height.toFloat() / resolution.width.toFloat()
-                    binding.imagePreview.submissionImage.loadImage(resolution.url, post.over18)
+                    Glide.with(binding.imagePreview.submissionImage)
+                        .`as`(Size2::class.java)
+                        .apply(sizeOptions)
+                        .load(resolution.url)
+                        .into(object : SimpleTarget<Size2>() {
+                            override fun onResourceReady(size: Size2, glideAnimation: Transition<in Size2>?) {
+                                binding.imagePreview.submissionImage.ratio = size.height.toFloat() / size.width.toFloat()
+                                binding.imagePreview.submissionImage.loadImage(resolution.url, hideNsfw && post.over18)
+                            }
+                            override fun onLoadFailed(errorDrawable: Drawable?) {}
+                        })
                 }
             } else {
-                binding.imagePreview.submissionImage.loadImage(imageUrl, post.over18)
+                binding.imagePreview.submissionImage.loadImage(imageUrl, hideNsfw && post.over18)
             }
         }
     }
@@ -541,14 +569,13 @@ class SubmissionListAdapter(
 
             mediaUri = Uri.parse(videoUrl)
 
+            val hideNsfw = settings.profilesList.first().blurNsfw
             // Load the thumbnail
             post.preview?.let {
                 val resolution = binding.videoThumbnail.getSuitablePreview(post.preview.images[0].resolutions)
                 resolution?.let {
                     binding.videoThumbnail.visibility = View.VISIBLE
-                    Glide.with(binding.root.context)
-                        .load(resolution.url)
-                        .into(binding.videoThumbnail)
+                    binding.videoThumbnail.loadImage(resolution.url, hideNsfw && post.over18)
                 }
             }
 
@@ -599,7 +626,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -611,8 +638,8 @@ class SubmissionListAdapter(
                 }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
-                } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -786,7 +813,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -798,8 +825,8 @@ class SubmissionListAdapter(
                 }
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
-                } else if (post.authorFlairBackgroundColor.equals("transparent", true))  {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -966,7 +993,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -979,7 +1006,7 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -1112,7 +1139,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -1125,7 +1152,7 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -1252,7 +1279,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -1265,7 +1292,7 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -1392,7 +1419,7 @@ class SubmissionListAdapter(
                                 .into(object : CustomTarget<Drawable>(){
                                     override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
                                         resource.setBounds(0, 0, binding.textAuthorFlair.lineHeight, binding.textAuthorFlair.lineHeight)
-                                        val image = ImageSpan(resource, ImageSpan.ALIGN_BOTTOM)
+                                        val image = CenteredImageSpan(resource)
                                         spannable.setSpan(image, spannable.indexOf(it.a!!), spannable.indexOf(it.a) + it.a.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
                                         binding.textAuthorFlair.text = spannable
                                     }
@@ -1404,7 +1431,7 @@ class SubmissionListAdapter(
                 if (post.authorFlairBackgroundColor.isNullOrEmpty()) {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else if (post.authorFlairBackgroundColor.equals("transparent", true)) {
-                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
+                    binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.LTGRAY)
                 } else {
                     binding.textAuthorFlair.backgroundTintList = ColorStateList.valueOf(Color.parseColor(post.authorFlairBackgroundColor))
                 }
@@ -1536,5 +1563,7 @@ class SubmissionListAdapter(
         fun onPostLongClicked(post: AuthedSubmission)
         fun onGalleryClicked(post: AuthedSubmission)
         fun onYoutubeVideoClicked(videoId: String)
+        fun onSubredditClicked(subreddit: String)
+        fun onUserClicked(username: String)
     }
 }

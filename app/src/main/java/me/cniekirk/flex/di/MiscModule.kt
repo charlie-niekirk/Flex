@@ -139,5 +139,4 @@ class MiscModule {
                     .textLayoutIsRoot(R.layout.view_table_entry_cell)
             }).build()
     }
-
 }

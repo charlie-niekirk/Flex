@@ -72,11 +72,20 @@ fun Int.condense(): String {
     return cdf.format(this)
 }
 
+fun Long.condense(): String {
+    val cdf = CompactDecimalFormat.getInstance(ULocale.getDefault(), CompactDecimalFormat.CompactStyle.SHORT)
+    return cdf.format(this)
+}
+
 fun String.selfTextPreview(): String {
     return replace("&amp;#x200B;", "").
     replace("&#x200B;", "").
     replace("#", "").
     replace("\n", " ").trim(' ')
+}
+
+fun String.clean(): String {
+    return replace("&amp;", "&")
 }
 
 private const val SECOND_MILLIS: Long = 1000
@@ -327,9 +336,9 @@ fun ImageView.loadImage(imageUrl: String, over18: Boolean) {
     if (over18) {
         Glide.with(this)
             .load(imageUrl)
+            .centerInside()
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 7)))
             .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .centerInside()
             .transition(withCrossFade())
             .into(this)
     } else {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import me.cniekirk.flex.R
+import timber.log.Timber
 
 class AspectRatioImageView @JvmOverloads constructor(
     context: Context,
@@ -27,9 +28,10 @@ class AspectRatioImageView @JvmOverloads constructor(
         var width = measuredWidth
         var height = measuredHeight
 
+        Timber.d("SETTING HEIGHT: ${(width * ratio).toInt()}")
         when {
             width > 0 -> height = (width * ratio).toInt()
-            height > 0 -> width = (height / ratio).toInt()
+//            height > 0 -> width = (height / ratio).toInt()
             else -> return
         }
 

@@ -7,5 +7,4 @@ import me.cniekirk.flex.ui.gallery.DownloadState
 interface LocalDataRepository {
 
     fun saveImage(subredditName: String, image: Bitmap): Flow<RedditResult<DownloadState>>
-
 }

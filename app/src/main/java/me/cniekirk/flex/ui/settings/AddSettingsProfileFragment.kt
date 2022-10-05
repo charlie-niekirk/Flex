@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.settings
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Circle
 import com.google.android.gms.maps.model.CircleOptions
@@ -16,7 +17,7 @@ import me.cniekirk.flex.ui.BaseFragment
 import me.cniekirk.flex.util.viewBinding
 
 /**
- * Fragment that allows the user to add a new settings profile e.g. "Work", "Commute" and "Home" etc.
+ * Fragment that allows the user to add a new settings profile e.g. "Work", "Commute", "Home" etc.
  *
  * @author Charlie Niekirk
  */
@@ -69,17 +70,23 @@ class AddSettingsProfileFragment : BaseFragment(R.layout.add_setting_profile_fra
 
     override fun onPause() {
         super.onPause()
-        binding.geofenceMap.onPause()
+        if (binding.geofenceMap.isVisible) {
+            binding.geofenceMap.onPause()
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        binding.geofenceMap.onStop()
+        if (binding.geofenceMap.isVisible) {
+            binding.geofenceMap.onStop()
+        }
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        binding.geofenceMap.onLowMemory()
+        if (binding.geofenceMap.isVisible) {
+            binding.geofenceMap.onLowMemory()
+        }
     }
 
     private fun addCircle(googleMap: GoogleMap, location: LatLng) {
@@ -92,5 +99,4 @@ class AddSettingsProfileFragment : BaseFragment(R.layout.add_setting_profile_fra
                 .fillColor(ContextCompat.getColor(requireContext(), R.color.circle_fill))
         )
     }
-
 }

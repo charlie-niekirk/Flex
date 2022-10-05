@@ -103,6 +103,7 @@
     <string name="cancel">Cancel</string>
     <string name="unknown_error">Unkown error occured</string>
     <string name="uploading_image">Uploading image...</string>
+    <string name="generic_network_error">Network error!</string>
     <string name="upload_image_success">Successfully uploaded image!</string>
     <string name="set_image_name_title">Set image name</string>
     <string name="submit_button_cd">Submit comment button</string>
@@ -131,4 +132,18 @@
     <string name="title_add_profile">Add Profile</string>
     <string name="geofence_slider_desc">Geofence Radius Slider</string>
     <string name="image_save_success">Image saved successfully!</string>
+    <string name="subreddit_link_prefix">flex://?subreddit=</string>
+    <string name="general_title">General</string>
+    <string name="settings_section_icon_cd">Settings section icon</string>
+    <string name="title_notification_settings">Notifications</string>
+    <string name="subreddit_trackers_title">Subreddit Trackers</string>
+    <string name="subreddit_trackers_description">Get notified when posts matching your criteria are created</string>
+    <string name="add_subreddit_tracker">Add Subreddit Tracker</string>
+    <string name="title_subreddit_tracker">Add Tracker</string>
+    <string name="personal_notifications_switch">Personal notifications</string>
+    <string name="personal_notifications_title">Personal notifications</string>
+    <string name="personal_notifications_description">Private messages, comment replies and mentions</string>
+    <string name="title_create_subreddit_tracker">Create Tracker</string>
+    <string name="reminder_channel_name">Remind me</string>
+    <string name="reminder_channel_description">Post/Comment reminder notifications</string>
 </resources>

@@ -32,7 +32,10 @@
         app:layout_constraintTop_toTopOf="@id/text_subreddit_name"
         app:layout_constraintBottom_toBottomOf="@id/text_subreddit_name"
         android:layout_marginStart="8dp"
-        android:padding="3dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         tools:text="Tanboo"
         tools:textColor="@color/white" />
 
@@ -182,7 +185,10 @@
         app:layout_constraintTop_toTopOf="@id/text_submission_author"
         app:layout_constraintBottom_toBottomOf="@id/text_submission_author"
         android:layout_marginStart="@dimen/spacing_m"
-        android:padding="3dp"
+        android:paddingTop="0dp"
+        android:paddingBottom="0dp"
+        android:paddingStart="3dp"
+        android:paddingEnd="3dp"
         tools:text="Someone" />
 
     <include

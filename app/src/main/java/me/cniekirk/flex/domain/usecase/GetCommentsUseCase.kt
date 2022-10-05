@@ -1,19 +1,20 @@
 package me.cniekirk.flex.domain.usecase
 
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import me.cniekirk.flex.data.remote.model.reddit.Comment
 import me.cniekirk.flex.data.remote.model.reddit.CommentData
 import me.cniekirk.flex.data.remote.model.reddit.base.Listing
 import me.cniekirk.flex.data.remote.model.reddit.envelopes.EnvelopedCommentData
-import me.cniekirk.flex.di.IoDispatcher
-import me.cniekirk.flex.domain.FlowUseCase
 import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
 import me.cniekirk.flex.util.ContentLink
 import javax.inject.Inject
+
+interface GetCommentsUseCase {
+    operator fun invoke(commentRequest: CommentRequest): Flow<RedditResult<List<CommentData>>>
+}
 
 /**
  * Use case that fetches comment data from the repository and builds a flattened tree of
@@ -21,23 +22,24 @@ import javax.inject.Inject
  * or how it is displayed, it just wraps the business logic
  *
  * @param repository the repository from which to fetch the data
- * @param coroutineDispatcher the dispatcher on which to launch the coroutine
  *
  * @author Charlie Niekirk
  */
-class GetCommentsUseCase @Inject constructor(
-    private val repository: RedditDataRepository,
-    @IoDispatcher coroutineDispatcher: CoroutineDispatcher
-) : FlowUseCase<CommentRequest, List<CommentData>>(coroutineDispatcher) {
+class GetCommentsUseCaseImpl @Inject constructor(
+    private val repository: RedditDataRepository
+) : GetCommentsUseCase {
 
     @Suppress("UNCHECKED_CAST")
-    override suspend fun execute(parameters: CommentRequest): Flow<RedditResult<List<CommentData>>> = flow {
-        val response = repository.getComments(parameters.submissionId, parameters.sortType)
+    override fun invoke(commentRequest: CommentRequest): Flow<RedditResult<List<CommentData>>> = flow {
+        val response = repository.getComments(commentRequest.submissionId, commentRequest.sortType)
         val commentTree = response.lastOrNull()?.data as Listing<EnvelopedCommentData>
         val comments = mutableListOf<CommentData>()
         buildTree(commentTree, comments)
 
         comments.forEach {
+            if (it is Comment && it.author?.equals("AutoModerator", true) == true) {
+                it.isCollapsed = true
+            }
             it.contentLinks?.forEach { link ->
                 when (link) {
                     is ContentLink.WikipediaLink -> {

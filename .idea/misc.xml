@@ -28,6 +28,8 @@
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/wikipedia_link_preview_view.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_link_preview_view.xml" value="0.5541666666666667" />
         <entry key="..\:/Users/cniek/StudioProjects/Flex/app/src/main/res/layout/youtube_list_item.xml" value="0.3307291666666667" />
+        <entry key="app/src/main/res/drawable/account_circle.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/account_stat_bg.xml" value="0.2755" />
         <entry key="app/src/main/res/drawable/action_sheet_bg.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/attribute_container.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/avd_loading_line.xml" value="0.5507692307692308" />
@@ -37,6 +39,7 @@
         <entry key="app/src/main/res/drawable/downvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/downvote_selected.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/external_link_bg.xml" value="0.5507692307692308" />
+        <entry key="app/src/main/res/drawable/file_download.xml" value="0.2225" />
         <entry key="app/src/main/res/drawable/flair_background.xml" value="0.3175925925925926" />
         <entry key="app/src/main/res/drawable/ic_arrow_downward.xml" value="0.3175925925925926" />
         <entry key="app/src/main/res/drawable/ic_arrow_expand.xml" value="0.5507692307692308" />
@@ -49,24 +52,36 @@
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.19358108108108107" />
         <entry key="app/src/main/res/drawable/image_link_preview_bg.xml" value="0.21118421052631578" />
         <entry key="app/src/main/res/drawable/link_preview_bg.xml" value="0.15763888888888888" />
+        <entry key="app/src/main/res/drawable/more_horiz.xml" value="0.2225" />
         <entry key="app/src/main/res/drawable/poll_option_bg.xml" value="0.15763888888888888" />
+        <entry key="app/src/main/res/drawable/search.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/selectable_downvote.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/selectable_upvote.xml" value="0.16944444444444445" />
+        <entry key="app/src/main/res/drawable/selftext_container.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/settings.xml" value="0.2225" />
         <entry key="app/src/main/res/drawable/shadow.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/shadow_down.xml" value="0.5507692307692308" />
         <entry key="app/src/main/res/drawable/share_as_image_shape.xml" value="0.231" />
         <entry key="app/src/main/res/drawable/upvote_bg.xml" value="0.2984375" />
         <entry key="app/src/main/res/drawable/upvote_selected.xml" value="0.2984375" />
+        <entry key="app/src/main/res/drawable/view_list.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/yt_background.xml" value="0.2235" />
         <entry key="app/src/main/res/font/rubik.xml" value="0.3125" />
+        <entry key="app/src/main/res/layout-w600dp/container_activity.xml" value="0.2413793103448276" />
+        <entry key="app/src/main/res/layout/account_stat_item.xml" value="0.375" />
         <entry key="app/src/main/res/layout/adapter_default_entry.xml" value="0.20526315789473684" />
         <entry key="app/src/main/res/layout/adapter_table_block.xml" value="0.20526315789473684" />
+        <entry key="app/src/main/res/layout/add_circle.xml" value="0.2612227447627191" />
         <entry key="app/src/main/res/layout/add_setting_profile_fragment.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/analytics_dialog_view.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/authenticated_account_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/compose_comment_fragment.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/container_activity.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/container_activity.xml" value="0.165" />
         <entry key="app/src/main/res/layout/content_awards_view.xml" value="0.1" />
         <entry key="app/src/main/res/layout/create_post_activty.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/create_post_fragment.xml" value="0.22076155938349953" />
+        <entry key="app/src/main/res/layout/create_subreddit_tracker_fragment.xml" value="0.26036767849508335" />
+        <entry key="app/src/main/res/layout/fab_rail_header.xml" value="0.2413793103448276" />
         <entry key="app/src/main/res/layout/gallery_list_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/gallery_slider_host_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/image_item_fragment.xml" value="0.28229166666666666" />
@@ -79,6 +94,7 @@
         <entry key="app/src/main/res/layout/login_webview_fragment.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/media_metadata_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/media_share_dialog.xml" value="0.10843373493975904" />
+        <entry key="app/src/main/res/layout/notification_settings_fragment.xml" value="0.26036767849508335" />
         <entry key="app/src/main/res/layout/options_dialog.xml" value="0.2128623188405797" />
         <entry key="app/src/main/res/layout/poll_list_item.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/poll_option_item.xml" value="0.335" />
@@ -88,6 +104,7 @@
         <entry key="app/src/main/res/layout/self_text_list_item.xml" value="0.22" />
         <entry key="app/src/main/res/layout/setting_profile_list_item.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/layout/settings_fragment.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/settings_section_item.xml" value="0.2612227447627191" />
         <entry key="app/src/main/res/layout/share_as_image_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_comment_collapsed_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/submission_comment_list_item.xml" value="0.2222222222222222" />
@@ -96,27 +113,30 @@
         <entry key="app/src/main/res/layout/submission_detail_action_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_detail_fragment.xml" value="0.22" />
         <entry key="app/src/main/res/layout/submission_detail_header_item.xml" value="0.20098684210526316" />
+        <entry key="app/src/main/res/layout/submission_detail_placeholder.xml" value="0.24217201743955608" />
         <entry key="app/src/main/res/layout/submission_gallery_preview.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_image_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_link_preview.xml" value="0.1" />
         <entry key="app/src/main/res/layout/submission_list_actions.xml" value="0.35592105263157897" />
         <entry key="app/src/main/res/layout/submission_list_fragment.xml" value="0.165" />
-        <entry key="app/src/main/res/layout/submission_list_item.xml" value="0.335" />
+        <entry key="app/src/main/res/layout/submission_list_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/submission_list_sort_dialog.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_markdown.xml" value="0.20098684210526316" />
+        <entry key="app/src/main/res/layout/submission_master_detail_pane.xml" value="0.15916955017301038" />
         <entry key="app/src/main/res/layout/submission_selftext.xml" value="0.28229166666666666" />
         <entry key="app/src/main/res/layout/submission_selftext_preview.xml" value="0.3234375" />
         <entry key="app/src/main/res/layout/submission_video_preview.xml" value="0.5348717948717949" />
         <entry key="app/src/main/res/layout/subreddit_dialog.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_flair_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_moderator_list_item.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/subreddit_moderators_fragment.xml" value="0.3182291666666667" />
+        <entry key="app/src/main/res/layout/subreddit_moderators_fragment.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_result_list_item.xml" value="0.3182291666666667" />
         <entry key="app/src/main/res/layout/subreddit_rule_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/subreddit_rules_fragment.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/subreddit_sidebar_fragment.xml" value="0.3182291666666667" />
+        <entry key="app/src/main/res/layout/subreddit_sidebar_fragment.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/subreddit_tracker_builder_fragment.xml" value="0.2612227447627191" />
         <entry key="app/src/main/res/layout/subreddit_user_flair_selection_fragment.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/tweet_list_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/tweet_list_item.xml" value="0.335" />
         <entry key="app/src/main/res/layout/tweet_media_preview.xml" value="0.1" />
         <entry key="app/src/main/res/layout/tweet_preview.xml" value="0.375" />
         <entry key="app/src/main/res/layout/user_flair_alert_dialog.xml" value="0.3182291666666667" />
@@ -129,16 +149,24 @@
         <entry key="app/src/main/res/layout/youtube_list_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/youtube_player_activity.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.5432291666666667" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_icon_round.xml" value="0.2755" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2984375" />
         <entry key="app/src/main/res/xml/submission_detail_scene.xml" value="0.20098684210526316" />
         <entry key="app/src/main/res/xml/submission_list_layout_description.xml" value="0.1831081081081081" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.165" />
+      </ProjectState>
+    </option>
   </component>
 </project>

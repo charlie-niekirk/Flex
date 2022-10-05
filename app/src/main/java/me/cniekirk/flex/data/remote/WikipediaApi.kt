@@ -10,5 +10,4 @@ interface WikipediaApi {
     suspend fun getWikiArticleDetails(
         @Path("article") article: String
     ) : WikiSummary
-
 }

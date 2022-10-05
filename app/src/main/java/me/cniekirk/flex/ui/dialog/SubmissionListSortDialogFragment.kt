@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import me.cniekirk.flex.databinding.SubmissionListSortDialogBinding
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
+import me.cniekirk.flex.ui.util.setResult
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.setCurrentScreen
 
 @AndroidEntryPoint
 class SubmissionListSortDialogFragment : BottomSheetDialogFragment() {
 
-    private val viewModel by activityViewModels<SubmissionListViewModel>()
     private var binding: SubmissionListSortDialogBinding? = null
 
     override fun onCreateView(
@@ -47,7 +48,7 @@ class SubmissionListSortDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun handleSelection(sort: String) {
-        viewModel.onUiEvent(SubmissionListEvent.SortUpdated(sort))
+        setResult("sort", sort)
         dismiss()
     }
 

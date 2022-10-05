@@ -49,7 +49,6 @@ class SlidingGalleryContainer : AppCompatActivity() {
         observe(viewModel.imgurGallery) {
             when (it) {
                 is RedditResult.Error -> {
-                    Timber.e(it.errorMessage)
                 }
                 RedditResult.Loading -> {
 

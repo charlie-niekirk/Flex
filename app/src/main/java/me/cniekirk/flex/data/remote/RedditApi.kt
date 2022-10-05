@@ -2,6 +2,7 @@ package me.cniekirk.flex.data.remote
 
 import android.util.Base64
 import me.cniekirk.flex.data.remote.model.reddit.*
+import me.cniekirk.flex.data.remote.model.reddit.auth.RedditUser
 import me.cniekirk.flex.data.remote.model.reddit.auth.ScopesWrapper
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.data.remote.model.reddit.base.UserList
@@ -27,18 +28,39 @@ interface RedditApi {
         @Query("before") before: String? = null,
         @Query("count") count: Int? = null,
         @Query("limit") limit: Int = 15,
-        @Header("Authorization") authorization: String? = null): RedditResponse<Listing<AuthedSubmission>>
+        @Header("Authorization") authorization: String? = null
+    ): RedditResponse<Listing<AuthedSubmission>>
+
+    @GET("user/{username}/submitted.json?raw_json=1")
+    suspend fun getUserPosts(
+        @Path("username") username: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int? = null,
+        @Query("limit") limit: Int = 15,
+        @Header("Authorization") authorization: String
+    ): RedditResponse<Listing<AuthedSubmission>>
+
+    @GET("user/{username}/comments.json?raw_json=1")
+    suspend fun getUserComments(
+        @Path("username") username: String,
+        @Query("after") after: String? = null,
+        @Query("before") before: String? = null,
+        @Query("count") count: Int? = null,
+        @Query("limit") limit: Int = 15,
+        @Header("Authorization") authorization: String
+    ): List<EnvelopedContributionListing>
 
     @GET("/{sort}.json?raw_json=1")
     suspend fun getFrontpagePosts(@Path("sort") sort: String): RedditResponse<Listing<Submission>>
 
-    @GET("/comments/{id}{sortType}.json?raw_json=1")
+    @GET("comments/{id}{sortType}.json?raw_json=1")
     suspend fun getCommentsForListing(
         @Path("id") id: String,
         @Path("sortType") sortType: String,
         @Header("Authorization") authorization: String? = null): List<EnvelopedContributionListing>
 
-    @GET("/api/morechildren")
+    @GET("api/morechildren")
     suspend fun getMoreComments(
         @Query("api_type") apiType: String = "json",
         @Query("link_id") linkId: String,
@@ -47,6 +69,11 @@ interface RedditApi {
 
     @GET("api/v1/scopes")
     suspend fun getScopes(): ScopesWrapper
+
+    @GET("api/v1/me")
+    suspend fun getMe(
+        @Header("Authorization") authorization: String? = null
+    ): RedditUser
 
     @FormUrlEncoded
     @POST("api/v1/access_token")
@@ -100,6 +127,12 @@ interface RedditApi {
         @Header("Authorization") authorization: String,
         @Path("subreddit") subreddit: String
     ): RedditResponse<Subreddit>
+
+    @GET("api/info.json?raw_json=1")
+    suspend fun getPostInfo(
+        @Header("Authorization") authorization: String,
+        @Query("id") id: String
+    ): RedditResponse<Listing<AuthedSubmission>>
 
     @GET("r/{subreddit}/about/moderators.json?raw_json=1")
     suspend fun getSubredditModerators(

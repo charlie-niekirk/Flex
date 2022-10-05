@@ -20,5 +20,4 @@ class SearchDialogFragment : BaseFragment(R.layout.settings_fragment) {
         super.onViewCreated(view, savedInstanceState)
 
     }
-
 }

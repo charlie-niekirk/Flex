@@ -11,5 +11,4 @@ interface ImgurDataRepository {
     fun uploadImage(image: MultipartBody.Part): Flow<RedditResult<ImgurResponse<Data>>>
 
     fun getGalleryImages(albumHash: String): Flow<RedditResult<ImgurResponse<List<ImageData>>>>
-
 }

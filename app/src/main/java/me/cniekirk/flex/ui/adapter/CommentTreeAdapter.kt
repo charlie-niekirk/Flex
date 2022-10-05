@@ -27,6 +27,7 @@ import me.cniekirk.flex.databinding.SubmissionCommentListItemBinding
 import me.cniekirk.flex.databinding.SubmissionCommentLoadMoreListItemBinding
 import me.cniekirk.flex.ui.gallery.SlidingGalleryContainer
 import me.cniekirk.flex.util.*
+import timber.log.Timber
 
 enum class CommentViewType {
     COMMENT,

@@ -12,22 +12,27 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 33
 
     defaultConfig {
         applicationId "me.cniekirk.flex"
         minSdk 24
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "me.cniekirk.flex.FlexTestRunner"
     }
 
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
+            buildConfigField "String", "SERVER_URL", "\"http://localhost:8080/\""
+        }
+        release {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "SERVER_URL", "\"https://cniekirk.me/\""
         }
     }
     compileOptions {
@@ -41,6 +46,7 @@ android {
         freeCompilerArgs += "-Xjvm-default=all"
     }
     buildFeatures {
+        compose true
         viewBinding true
     }
     hilt {
@@ -49,6 +55,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'me.cniekirk.flex'
     configurations.all {
         exclude group: 'org.jetbrains', module: 'annotations-java5'
     }
@@ -60,26 +67,32 @@ kapt {
 
 dependencies {
     // Core dependencies
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.7.0-alpha01'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
+    implementation "androidx.activity:activity-ktx:1.6.0"
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+    implementation "androidx.work:work-runtime-ktx:$work_version"
     implementation "androidx.datastore:datastore:1.0.0"
-    implementation  "com.google.protobuf:protobuf-javalite:3.18.0"
+    implementation "com.google.protobuf:protobuf-javalite:3.18.0"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
-    implementation 'com.google.android.gms:play-services-maps:18.0.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     // MVI
+    implementation 'org.orbit-mvi:orbit-core:4.3.2'
     implementation 'org.orbit-mvi:orbit-viewmodel:4.3.2'
+    implementation 'org.orbit-mvi:orbit-compose:4.3.2'
 
     // DI dependencies
     implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation 'androidx.hilt:hilt-work:1.0.0'
 
     // Navigation dependencies
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
@@ -91,10 +104,19 @@ dependencies {
     implementation "io.noties.markwon:ext-tables:$markwon_version"
     implementation "io.noties.markwon:recycler-table:$markwon_version"
     implementation "io.noties.markwon:syntax-highlight:$markwon_version"
-    implementation "io.noties.markwon:image-coil:$markwon_version"
+    implementation "io.noties.markwon:image-glide:$markwon_version"
+    implementation "io.noties.markwon:image:$markwon_version"
     implementation "io.noties.markwon:linkify:$markwon_version"
     implementation "io.noties.markwon:editor:$markwon_version"
     implementation "io.noties:prism4j:$prism_version"
+
+    implementation 'androidx.activity:activity-compose:1.6.0'
+    implementation 'androidx.compose.material:material:1.2.1'
+    implementation 'androidx.compose.animation:animation:1.2.1'
+    implementation 'androidx.compose.ui:ui-tooling:1.2.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
+
+    implementation "io.coil-kt:coil:2.1.0"
 
     // IO dependencies
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
@@ -120,8 +142,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:28.4.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
-    implementation "androidx.biometric:biometric-ktx:1.2.0-alpha04"
+    implementation "androidx.biometric:biometric-ktx:1.2.0-alpha05"
+
+    implementation 'co.infinum:retromock:1.1.1'
 
     // Annotation processors
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
@@ -129,6 +154,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     kapt "io.noties:prism4j-bundler:$prism_version"
+    kapt "androidx.hilt:hilt-compiler:1.0.0"
 
     // (Experimental) renderscript toolkit post Android 12
     implementation files('../libs/renderscript-toolkit-debug.aar')
@@ -137,13 +163,16 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito.kotlin:mockito-kotlin:2.2.11"
     testImplementation 'app.cash.turbine:turbine:0.6.1'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
+    testImplementation 'org.orbit-mvi:orbit-test:4.3.2'
+    testImplementation "io.mockk:mockk:1.12.5"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.4.0'
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.40.5'
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.38.1'
-    debugImplementation "androidx.fragment:fragment-testing:1.4.1"
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.41'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.2.1'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.41'
+    debugImplementation "androidx.fragment:fragment-testing:1.5.3"
 }
 
 protobuf {
