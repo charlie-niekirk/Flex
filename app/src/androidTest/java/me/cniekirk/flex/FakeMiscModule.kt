@@ -100,14 +100,12 @@ class FakeMiscModule {
                 override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
                     builder.linkResolver(object : LinkResolverDef() {
                         override fun resolve(view: View, link: String) {
-                            link.processLink {
-                                when (it) {
-                                    is Link.ImgurGalleryLink -> {
+                            when (link.processLink()) {
+                                is Link.ImgurGalleryLink -> {
 
-                                    }
-                                    else -> {
-                                        super.resolve(view, link)
-                                    }
+                                }
+                                else -> {
+                                    super.resolve(view, link)
                                 }
                             }
                         }
@@ -117,13 +115,13 @@ class FakeMiscModule {
             .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideMarkwonAdapter(): MarkwonAdapter {
-        return MarkwonAdapter.builder(R.layout.adapter_default_entry, R.id.text_default)
-            .include(TableBlock::class.java, TableEntry.create {
-                it.tableLayout(R.layout.adapter_table_block, R.id.table_layout)
-                    .textLayoutIsRoot(R.layout.view_table_entry_cell)
-            }).build()
-    }
+//    @Provides
+//    @Singleton
+//    fun provideMarkwonAdapter(): MarkwonAdapter {
+//        return MarkwonAdapter.builder(R.layout.adapter_default_entry, R.id.text_default)
+//            .include(TableBlock::class.java, TableEntry.create {
+//                it.tableLayout(R.layout.adapter_table_block, R.id.table_layout)
+//                    .textLayoutIsRoot(R.layout.view_table_entry_cell)
+//            }).build()
+//    }
 }

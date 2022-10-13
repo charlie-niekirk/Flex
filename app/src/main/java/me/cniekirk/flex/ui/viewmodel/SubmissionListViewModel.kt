@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import androidx.paging.map
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.workDataOf
@@ -26,7 +27,14 @@ import me.cniekirk.flex.domain.model.SubredditSearchRequest
 import me.cniekirk.flex.domain.usecase.GetSubredditInfoUseCase
 import me.cniekirk.flex.domain.usecase.SearchSubredditsUseCase
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
+import me.cniekirk.flex.ui.submission.state.SubmissionListSideEffect
+import me.cniekirk.flex.ui.submission.state.SubmissionListState
 import me.cniekirk.flex.worker.ScheduledNotificationWorker
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -49,7 +57,13 @@ class SubmissionListViewModel @Inject constructor(
     private val searchSubredditsUseCase: SearchSubredditsUseCase,
     private val getSubredditInfoUseCase: GetSubredditInfoUseCase,
     private val workerRepository: WorkerRepository
-) : ViewModel() {
+) : ViewModel(), ContainerHost<SubmissionListState, SubmissionListSideEffect> {
+
+    override val container = container<SubmissionListState, SubmissionListSideEffect>(
+        SubmissionListState()
+    ) {
+        loadSubmissions()
+    }
 
     private val _subredditFlow = MutableStateFlow(value = "apolloapp")
     val subredditFlow = _subredditFlow.asStateFlow()
@@ -71,15 +85,29 @@ class SubmissionListViewModel @Inject constructor(
             }
         }
 
-    @ExperimentalCoroutinesApi
-    val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
-        sortFlow.flatMapLatest { sort ->
-            Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
-                SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
-                    imgurApi, gfycatApi, redGifsApi, twitterApi, subreddit, sort, preLoginUserDao, userDao)
-            }.flow
+//    @ExperimentalCoroutinesApi
+//    val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
+//        sortFlow.flatMapLatest { sort ->
+//            Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
+//                SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
+//                    imgurApi, gfycatApi, redGifsApi, twitterApi, subreddit, sort, preLoginUserDao, userDao)
+//            }.flow
+//        }
+//    }.cachedIn(viewModelScope)
+
+    private fun loadSubmissions() = intent {
+        val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
+            SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
+                imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
+        }.flow
+            .map { pagingData ->
+                pagingData.map { submission -> UiSubmission() }
+            }
+            .cachedIn(viewModelScope)
+        reduce {
+            state.copy(submissions = pager)
         }
-    }.cachedIn(viewModelScope)
+    }
 
     fun onUiEvent(submissionListEvent: SubmissionListEvent) {
         when (submissionListEvent) {

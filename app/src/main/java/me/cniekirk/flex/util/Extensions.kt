@@ -49,6 +49,7 @@ import timber.log.Timber
 
 import io.noties.markwon.core.spans.*
 import androidx.annotation.NonNull
+import androidx.compose.runtime.Composable
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 
 import io.noties.markwon.core.spans.HeadingSpan
@@ -139,40 +140,40 @@ fun Long.getElapsedTime(adjust: Boolean = true): String {
     }
 }
 
-fun String.processLink(block: (Link) -> Unit) {
-    when {
+fun String.processLink(): Link {
+    return when {
         imageRegex.matches(this) -> {
-            block(Link.ImageLink(this))
+            Link.ImageLink(this)
         }
         this.startsWith("https://v.redd.it") -> {
-            block(Link.RedditVideo)
+            Link.RedditVideo
         }
         this.startsWith("https://redgifs.com") -> {
-            block(Link.RedGifLink)
+            Link.RedGifLink
         }
         this.startsWith("https://gfycat.com") -> {
-            block(Link.GfycatLink)
+            Link.GfycatLink
         }
         this.startsWith("https://streamable.com") -> {
-            block(Link.StreamableLink)
+            Link.StreamableLink
         }
         videoRegex.matches(this) -> {
-            block(Link.VideoLink(this))
+            Link.VideoLink(this)
         }
         this.contains("reddit.com/gallery") -> {
-            block(Link.RedditGallery)
+            Link.RedditGallery
         }
         imgurGalleryRegex.matches(this) -> {
-            block(Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(4) ?: ""))
+            Link.ImgurGalleryLink(imgurGalleryRegex.matchEntire(this)?.groupValues?.get(4) ?: "")
         }
         twitterRegex.matches(this) -> {
-            block(Link.TwitterLink(this))
+            Link.TwitterLink(this)
         }
         youtubeRegex.matches(this) -> {
-            block(Link.YoutubeLink(youtubeRegex.matchEntire(this)?.groupValues?.get(1) ?: ""))
+            Link.YoutubeLink(youtubeRegex.matchEntire(this)?.groupValues?.get(1) ?: "")
         }
         else -> {
-            block(Link.ExternalLink)
+            Link.ExternalLink
         }
     }
 }

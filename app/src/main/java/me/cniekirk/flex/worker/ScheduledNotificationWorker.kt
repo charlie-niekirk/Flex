@@ -8,12 +8,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.withContext
 import me.cniekirk.flex.FlexApp.Companion.CHANNEL_ID
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
@@ -21,7 +18,6 @@ import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.GetThingInfoUseCase
 import me.cniekirk.flex.ui.submission.SubmissionDetailFragmentArgs
 import me.cniekirk.flex.util.isAllowedByUser
-import timber.log.Timber
 import java.security.SecureRandom
 
 @HiltWorker
@@ -63,7 +59,7 @@ class ScheduledNotificationWorker @AssistedInject constructor(
                 .createPendingIntent()
 
             val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
-                .setSmallIcon(R.drawable.account_circle)
+//                .setSmallIcon(R.drawable.account_circle)
                 .setContentTitle("Reminder: ${post.title}")
                 .setContentText("by ${post.authorFullname}")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="AspectRatioImageView">
-        <attr format="float" name="ari_ratio"/>
-    </declare-styleable>
+<!--    <declare-styleable name="AspectRatioImageView">-->
+<!--        <attr format="float" name="ari_ratio"/>-->
+<!--    </declare-styleable>-->
 
-    <declare-styleable name="AccountStatItem">
-        <attr name="stat_name" format="string" />
-        <attr name="stat_value" format="string" />
-    </declare-styleable>
+<!--    <declare-styleable name="AccountStatItem">-->
+<!--        <attr name="stat_name" format="string" />-->
+<!--        <attr name="stat_value" format="string" />-->
+<!--    </declare-styleable>-->
 
-    <declare-styleable name="SettingsSectionItem">
-        <attr name="section_title" format="string" />
-        <attr name="section_subtitle" format="string" />
-        <attr name="section_icon" format="reference" />
-    </declare-styleable>
+<!--    <declare-styleable name="SettingsSectionItem">-->
+<!--        <attr name="section_title" format="string" />-->
+<!--        <attr name="section_subtitle" format="string" />-->
+<!--        <attr name="section_icon" format="reference" />-->
+<!--    </declare-styleable>-->
 </resources>

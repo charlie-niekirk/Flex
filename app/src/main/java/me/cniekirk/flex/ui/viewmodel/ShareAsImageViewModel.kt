@@ -32,6 +32,9 @@ class ShareAsImageViewModel @Inject constructor(
                         is RedditResult.Error -> {
 
                         }
+                        RedditResult.Loading -> {
+
+                        }
                     }
                 }
         }

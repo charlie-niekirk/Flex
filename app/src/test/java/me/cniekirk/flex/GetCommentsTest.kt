@@ -11,6 +11,7 @@ import me.cniekirk.flex.domain.RedditDataRepository
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.model.CommentRequest
 import me.cniekirk.flex.domain.usecase.GetCommentsUseCase
+import me.cniekirk.flex.domain.usecase.GetCommentsUseCaseImpl
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +25,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalCoroutinesApi
 class GetCommentsTest {
 
-    private val coroutineDispatcher = TestCoroutineDispatcher()
+//    private val coroutineDispatcher = TestCoroutineDispatcher()
     private lateinit var underTest: GetCommentsUseCase
 
     private val request = CommentRequest("123", "top")
@@ -40,7 +41,7 @@ class GetCommentsTest {
 
     @Before
     fun setup() {
-        underTest = GetCommentsUseCase(repository, coroutineDispatcher)
+        underTest = GetCommentsUseCaseImpl(repository)
     }
 
     @ExperimentalTime

@@ -146,4 +146,5 @@
     <string name="title_create_subreddit_tracker">Create Tracker</string>
     <string name="reminder_channel_name">Remind me</string>
     <string name="reminder_channel_description">Post/Comment reminder notifications</string>
+    <string name="reminder_set_message">Reminder has been set!</string>
 </resources>

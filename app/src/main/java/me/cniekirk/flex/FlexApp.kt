@@ -7,7 +7,7 @@ import android.content.Context
 import android.os.Build
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.google.android.material.color.DynamicColors
+//import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class FlexApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        DynamicColors.applyToActivitiesIfAvailable(this)
+//        DynamicColors.applyToActivitiesIfAvailable(this)
         createNotificationChannel()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())

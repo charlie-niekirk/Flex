@@ -1,8 +1,8 @@
 package me.cniekirk.flex.ui.compose.styles
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -17,18 +17,25 @@ private val bold = Font(R.font.rubik_bold, FontWeight.W600)
 
 private val rubikFontFamily = FontFamily(light, regular, medium, bold)
 
-val rubikTypography = androidx.compose.material.Typography(
-    defaultFontFamily = rubikFontFamily,
-    h1 = TextStyle(
-        color = Color.Black,
-        fontSize = 48.sp,
-
+val rubikTypography = Typography(
+    bodyLarge = TextStyle(
+        fontFamily = rubikFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = rubikFontFamily,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp
+    ),
+    bodySmall = TextStyle(
+        fontFamily = rubikFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    ),
+    titleSmall = TextStyle(
+        fontFamily = rubikFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 12.sp
     )
 )
-
-@Composable
-fun FlexTheme(content: @Composable () -> Unit) {
-    MaterialTheme(typography = rubikTypography) {
-        content()
-    }
-}
