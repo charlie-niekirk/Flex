@@ -27,6 +27,7 @@ import me.cniekirk.flex.domain.model.SubredditSearchRequest
 import me.cniekirk.flex.domain.usecase.GetSubredditInfoUseCase
 import me.cniekirk.flex.domain.usecase.SearchSubredditsUseCase
 import me.cniekirk.flex.ui.submission.SubmissionListEvent
+import me.cniekirk.flex.ui.submission.model.toUiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionListSideEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionListState
 import me.cniekirk.flex.worker.ScheduledNotificationWorker
@@ -65,7 +66,7 @@ class SubmissionListViewModel @Inject constructor(
         loadSubmissions()
     }
 
-    private val _subredditFlow = MutableStateFlow(value = "apolloapp")
+    private val _subredditFlow = MutableStateFlow(value = "ukpersonalfinance")
     val subredditFlow = _subredditFlow.asStateFlow()
     private val _sortFlow = MutableStateFlow(value = "")
     val sortFlow = _sortFlow.asStateFlow()
@@ -101,7 +102,7 @@ class SubmissionListViewModel @Inject constructor(
                 imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
         }.flow
             .map { pagingData ->
-                pagingData.map { submission -> UiSubmission() }
+                pagingData.map { submission -> submission.toUiSubmission() }
             }
             .cachedIn(viewModelScope)
         reduce {

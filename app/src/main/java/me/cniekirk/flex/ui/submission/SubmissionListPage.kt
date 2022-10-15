@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -15,6 +18,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,12 +33,13 @@ import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.*
 import me.cniekirk.flex.ui.compose.styles.FlexTheme
+import me.cniekirk.flex.ui.submission.model.UiSubmission
+import me.cniekirk.flex.ui.submission.model.toUiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionListSideEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionListState
 import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import me.cniekirk.flex.util.Link
-import me.cniekirk.flex.util.processLink
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -78,7 +83,7 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
                         item
                     ) { onClick() }
                 } else {
-                    when (item?.urlOverriddenByDest?.processLink()) {
+                    when (item?.linkType) {
                         Link.ExternalLink -> {
 
                         }
@@ -90,9 +95,9 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
                         Link.RedGifLink -> {  }
                         Link.RedditGallery -> {  }
                         is Link.ImgurGalleryLink -> {
-                            if (item.imgurGalleryLinks?.size!! > 1) {
-                            } else {
-                            }
+//                            if (item.imgurGalleryLinks?.size!! > 1) {
+//                            } else {
+//                            }
                         }
                         Link.RedditVideo -> {  }
                         is Link.TwitterLink -> {  }
@@ -122,42 +127,49 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
 @Composable
 fun SelfTextItem(
     modifier: Modifier = Modifier,
-    item: AuthedSubmission,
+    item: UiSubmission,
     onClick: () -> Unit) {
-    Card(
-        onClick = { onClick() },
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp)
+    Surface(
+        onClick = { onClick() }
     ) {
-        Text(
-            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
-            text = item.title,
-            style = MaterialTheme.typography.bodyMedium
-        )
-        Text(
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
-            text = item.selftext ?: "",
-            style = MaterialTheme.typography.bodySmall
-        )
-        ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.authorFullname ?: "", upvote = "${item.ups ?: "?"}")
+        Column(modifier = modifier.fillMaxWidth()) {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, end = 8.dp)
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                    text = item.title,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
+                    text = item.selfText,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+                ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.author, upvote = "${item.upVotes}", commentCount = item.numComments)
+            }
+            Divider()
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ImageItem(modifier: Modifier = Modifier, item: AuthedSubmission, onClick: () -> Unit) {
-    if (item.preview != null) {
-        val configuration = LocalConfiguration.current
-        val resolution = getSuitablePreview(configuration.screenWidthDp, item.preview.images[0].resolutions)
-        Card(
-            onClick = { onClick() },
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp)
-        ) {
+fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission, onClick: () -> Unit) {
+    val configuration = LocalConfiguration.current
+    val resolution = getSuitablePreview(configuration.screenWidthDp, item.previewImage)
+    Surface(
+        onClick = { onClick() },
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Column(modifier = modifier.fillMaxWidth()) {
             Text(
-                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                 text = item.title,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -167,7 +179,8 @@ fun ImageItem(modifier: Modifier = Modifier, item: AuthedSubmission, onClick: ()
                 contentDescription = "",
                 contentScale = ContentScale.FillWidth
             )
-            ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.authorFullname ?: "", upvote = "${item.ups ?: "?"}")
+            ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.author, upvote = "${item.upVotes}", commentCount = item.numComments)
+            Divider()
         }
     }
 }
@@ -177,6 +190,7 @@ fun ItemFooter(
     modifier: Modifier = Modifier,
     author: String,
     upvote: String,
+    commentCount: String
 ) {
     Column(
         modifier = modifier
@@ -185,9 +199,35 @@ fun ItemFooter(
             text = "by $author",
             style = MaterialTheme.typography.titleSmall
         )
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                Icons.Default.ArrowUpward,
+                contentDescription = "Upvote icon",
+                modifier = Modifier
+                    .width(20.dp)
+                    .height(20.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = upvote,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                Icons.Outlined.ModeComment,
+                contentDescription = "Comment icon",
+                modifier = Modifier
+                    .width(16.dp)
+                    .height(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = commentCount,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -217,6 +257,14 @@ private fun getSuitablePreview(width: Int, previews: List<Resolution>): Resoluti
     return null
 }
 
+@Preview(showBackground = true)
+@Composable
+fun ItemFooterPreview() {
+    FlexTheme {
+        ItemFooter(author = "exampleUser", upvote = "100", commentCount = "3.2K")
+    }
+}
+
 @SuppressLint("UnrememberedMutableState")
 @Preview(showBackground = true)
 @Composable
@@ -228,7 +276,7 @@ fun SubmissionListPreview() {
     }
 }
 
-private fun createFakeData(): List<AuthedSubmission> {
+private fun createFakeData(): List<UiSubmission> {
     val post = AuthedSubmission(
         null,
         false,
@@ -346,7 +394,7 @@ private fun createFakeData(): List<AuthedSubmission> {
         null,
         null,
         VoteState.NoVote
-    )
+    ).toUiSubmission()
     return listOf(post, post, post, post, post)
 }
 
