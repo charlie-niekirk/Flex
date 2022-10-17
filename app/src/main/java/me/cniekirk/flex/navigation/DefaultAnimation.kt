@@ -1,11 +1,8 @@
 package me.cniekirk.flex.navigation
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Path
-import android.view.animation.AnimationUtils
-import android.view.animation.PathInterpolator
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
