@@ -1,6 +1,7 @@
 package me.cniekirk.flex.ui.submission
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,10 +29,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.google.android.datatransport.cct.StringMerger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.*
+import me.cniekirk.flex.ui.compose.VideoPlayer
 import me.cniekirk.flex.ui.compose.styles.FlexTheme
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.model.toUiSubmission
@@ -52,6 +55,9 @@ fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), onClick: ()
         when (effect) {
             SubmissionListSideEffect.SubmissionReminderSet -> {
                 Toast.makeText(context, R.string.reminder_set_message, Toast.LENGTH_SHORT).show()
+            }
+            is SubmissionListSideEffect.Error -> {
+                Toast.makeText(context, effect.errorMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -99,9 +105,31 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
 //                            } else {
 //                            }
                         }
-                        Link.RedditVideo -> {  }
+                        Link.RedditVideo -> {
+                            val url = if (item.crosspostParentList.isNullOrEmpty()) {
+                                post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!
+                            } else {
+                                post.crosspostParentList[0].media?.redditVideo?.dashUrl
+                                    ?: post.crosspostParentList[0].media?.redditVideo?.fallbackUrl!!
+                            }
+                            VideoItem(
+                                modifier = Modifier.padding(top = 8.dp),
+                                item = item,
+                                videoUrl = ""
+                            ) {
+                                onClick()
+                            }
+                        }
                         is Link.TwitterLink -> {  }
-                        is Link.VideoLink -> {  }
+                        is Link.VideoLink -> {
+                            VideoItem(
+                                modifier = Modifier.padding(top = 8.dp),
+                                item = item,
+                                videoUrl = item.linkType.url
+                            ) {
+                                onClick()
+                            }
+                        }
                         is Link.YoutubeLink -> {  }
                         Link.StreamableLink -> {  }
                         Link.GfycatLink -> {  }
@@ -125,10 +153,15 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelfTextItem(
+fun SubmissionItem(
     modifier: Modifier = Modifier,
-    item: UiSubmission,
-    onClick: () -> Unit) {
+    title: String,
+    author: String,
+    upvote: Int,
+    numComments: String,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit,
+) {
     Surface(
         onClick = { onClick() }
     ) {
@@ -139,21 +172,64 @@ fun SelfTextItem(
                     .padding(start = 8.dp, end = 8.dp)
             ) {
                 Text(
-                    modifier = Modifier.padding(start = 8.dp, end = 8.dp),
-                    text = item.title,
+                    modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                    text = title,
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Text(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
-                    text = item.selfText,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
+                content()
+                ItemFooter(
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
+                    author = author,
+                    upvote = "$upvote",
+                    commentCount = numComments
                 )
-                ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.author, upvote = "${item.upVotes}", commentCount = item.numComments)
             }
             Divider()
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelfTextItem(
+    modifier: Modifier = Modifier,
+    item: UiSubmission,
+    onClick: () -> Unit) {
+    SubmissionItem(
+        modifier = modifier,
+        title = item.title,
+        author = item.author,
+        upvote = item.upVotes,
+        numComments = item.numComments,
+        onClick = { onClick() }) {
+        Text(
+            modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+            text = item.selfText,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VideoItem(
+    modifier: Modifier = Modifier,
+    item: UiSubmission,
+    videoUrl: String,
+    onClick: () -> Unit) {
+    SubmissionItem(
+        modifier = modifier,
+        title = item.title,
+        author = item.author,
+        upvote = item.upVotes,
+        numComments = item.numComments,
+        onClick = { onClick() }) {
+        VideoPlayer(
+            modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+            uri = Uri.parse(videoUrl)
+        )
     }
 }
 
@@ -179,7 +255,12 @@ fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission, onClick: () -> 
                 contentDescription = "",
                 contentScale = ContentScale.FillWidth
             )
-            ItemFooter(modifier = Modifier.padding(start = 8.dp, bottom = 8.dp), author = item.author, upvote = "${item.upVotes}", commentCount = item.numComments)
+            ItemFooter(
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
+                author = item.author,
+                upvote = "${item.upVotes}",
+                commentCount = item.numComments
+            )
             Divider()
         }
     }

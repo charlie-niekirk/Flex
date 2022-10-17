@@ -16,6 +16,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.FlexSettings
+import me.cniekirk.flex.R
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
 import me.cniekirk.flex.data.remote.*
@@ -34,6 +35,7 @@ import me.cniekirk.flex.worker.ScheduledNotificationWorker
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
@@ -66,16 +68,6 @@ class SubmissionListViewModel @Inject constructor(
         loadSubmissions()
     }
 
-    private val _subredditFlow = MutableStateFlow(value = "ukpersonalfinance")
-    val subredditFlow = _subredditFlow.asStateFlow()
-    private val _sortFlow = MutableStateFlow(value = "")
-    val sortFlow = _sortFlow.asStateFlow()
-    private val _subredditInfo = MutableSharedFlow<RedditResult<Subreddit>>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val subredditInfo: Flow<RedditResult<Subreddit>> = _subredditInfo.distinctUntilChanged()
-
     val settingsFlow: Flow<FlexSettings> = flexSettings.data
         .catch { exception ->
             if (exception is IOException) {
@@ -85,16 +77,6 @@ class SubmissionListViewModel @Inject constructor(
                 throw exception
             }
         }
-
-//    @ExperimentalCoroutinesApi
-//    val pagingSubmissionFlow = subredditFlow.flatMapLatest { subreddit ->
-//        sortFlow.flatMapLatest { sort ->
-//            Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
-//                SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
-//                    imgurApi, gfycatApi, redGifsApi, twitterApi, subreddit, sort, preLoginUserDao, userDao)
-//            }.flow
-//        }
-//    }.cachedIn(viewModelScope)
 
     private fun loadSubmissions() = intent {
         val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
@@ -110,51 +92,39 @@ class SubmissionListViewModel @Inject constructor(
         }
     }
 
-    fun onUiEvent(submissionListEvent: SubmissionListEvent) {
-        when (submissionListEvent) {
-            is SubmissionListEvent.SortUpdated -> {
-                _sortFlow.value = "/${submissionListEvent.sort}"
-            }
-            is SubmissionListEvent.SubredditUpdated -> {
-                _subredditFlow.value = submissionListEvent.subreddit
-            }
-            SubmissionListEvent.SubredditOptions -> {
-                viewModelScope.launch {
-                    getSubredditInfoUseCase(subredditFlow.value).collect {
-                        _subredditInfo.emit(it)
+    fun updateSubreddit(subreddit: String) = intent {
+        reduce { state.copy(subreddit = subreddit) }
+        loadSubmissions()
+    }
+
+    fun randomSubredditSelected(randomType: String) = intent {
+        getSubredditInfoUseCase(randomType).collect { result ->
+            when (result) {
+                is RedditResult.Success -> {
+                    result.data.displayName?.let { name ->
+                        reduce { state.copy(subreddit = name) }
+                        loadSubmissions()
+                    } ?: run {
+                        postSideEffect(SubmissionListSideEffect.Error(R.string.generic_network_error))
                     }
                 }
-            }
-            is SubmissionListEvent.RandomSubredditSelected -> {
-                viewModelScope.launch {
-                    getSubredditInfoUseCase(submissionListEvent.randomType).collect {
-                        when (it) {
-                            is RedditResult.Success -> {
-                                it.data.displayName?.let { name ->
-                                    Timber.d("NAME: $name")
-                                    _subredditFlow.value = name
-                                } ?: run {
-                                    //TODO: Emit another error
-                                }
-                            }
-                            is RedditResult.Error -> {
-                                //TODO: Emit error
-                            }
-                            else -> {
-                                //TODO: Emit generic error state
-                            }
-                        }
-                    }
+                is RedditResult.Error -> {
+                    postSideEffect(SubmissionListSideEffect.Error(R.string.generic_network_error))
                 }
-            }
-            is SubmissionListEvent.PostReminderSet -> {
-                val request = OneTimeWorkRequestBuilder<ScheduledNotificationWorker>()
-                    .setInitialDelay(10, TimeUnit.SECONDS)
-                    .setInputData(workDataOf("THING_ID" to submissionListEvent.postId))
-                    .build()
-                workerRepository.scheduleOneTimeWork(request)
+                else -> {
+                    postSideEffect(SubmissionListSideEffect.Error(R.string.generic_network_error))
+                }
             }
         }
+    }
+
+    fun postReminderSet(postId: String) = intent {
+        val request = OneTimeWorkRequestBuilder<ScheduledNotificationWorker>()
+            .setInitialDelay(10, TimeUnit.SECONDS)
+            .setInputData(workDataOf("THING_ID" to postId))
+            .build()
+        workerRepository.scheduleOneTimeWork(request)
+        postSideEffect(SubmissionListSideEffect.SubmissionReminderSet)
     }
 
     suspend fun searchSubreddit(query: String): Flow<RedditResult<List<Subreddit>>> =
@@ -167,9 +137,5 @@ class SubmissionListViewModel @Inject constructor(
             .setShowPreviews(true)
             .setSelected(true)
         flexSettings.updateData { it.toBuilder().addProfiles(defaultProfile).build() }
-    }
-
-    fun resetSubredditInfo() {
-        _subredditInfo.resetReplayCache()
     }
 }
