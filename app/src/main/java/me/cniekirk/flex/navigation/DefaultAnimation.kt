@@ -1,6 +1,11 @@
 package me.cniekirk.flex.navigation
 
+import android.animation.Animator
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Path
+import android.view.animation.AnimationUtils
+import android.view.animation.PathInterpolator
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -8,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.core.view.animation.PathInterpolatorCompat
 import com.bumble.appyx.core.navigation.transition.ModifierTransitionHandler
 import com.bumble.appyx.core.navigation.transition.TransitionDescriptor
 import com.bumble.appyx.core.navigation.transition.TransitionSpec
@@ -29,6 +35,7 @@ class DefaultAnimation<T>(
         transition: Transition<BackStack.State>,
         descriptor: TransitionDescriptor<T, BackStack.State>
     ): Modifier = modifier.composed {
+
         val scale = transition.animateFloat(
             transitionSpec = transitionSpec,
             targetValueByState = {
@@ -54,9 +61,25 @@ class DefaultAnimation<T>(
     }
 }
 
+// Default activity animation interpolator: fast_out_v_slow_in.xml
+private val path = Path().apply {
+    moveTo(0f, 0f)
+    cubicTo(0.05f, 0f, 0.133333f, 0.06f, 0.166666f, 0.4f)
+    cubicTo(0.208333f, 0.82f, 0.25f, 1f, 1f, 1f)
+}
+
 @Composable
 fun <T> rememberBackstackDefaultAnimation(
-    transitionSpec: TransitionSpec<BackStack.State, Float> = { spring() }
+    context: Context,
+    alphaSpec: TransitionSpec<BackStack.State, Float> = {
+        tween(50, 50, LinearEasing)
+    },
+    transitionSpec: TransitionSpec<BackStack.State, Float> = {
+        val easing = Easing {
+            PathInterpolatorCompat.create(path).getInterpolation(it)
+        }
+        tween(300, 0, easing)
+    }
 ): ModifierTransitionHandler<T, BackStack.State> = remember {
-    DefaultAnimation(transitionSpec = transitionSpec)
+    DefaultAnimation(transitionSpec = transitionSpec, alphaSpec = alphaSpec)
 }

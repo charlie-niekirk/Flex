@@ -147,4 +147,7 @@
     <string name="reminder_channel_name">Remind me</string>
     <string name="reminder_channel_description">Post/Comment reminder notifications</string>
     <string name="reminder_set_message">Reminder has been set!</string>
+    <string name="twitter_verified_badge">Twitter verified badge</string>
+    <string name="twitter_logo">Twitter logo</string>
+    <string name="tweet_image">Tweet image</string>
 </resources>

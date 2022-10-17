@@ -9,7 +9,7 @@ import me.cniekirk.flex.ui.submission.model.UiSubmission
 
 data class SubmissionListState(
     val submissions: Flow<PagingData<UiSubmission>> = flowOf(),
-    val subreddit: String = "mechanicalkeyboards",
+    val subreddit: String = "nfl",
     val sort: String = "best"
 )
 

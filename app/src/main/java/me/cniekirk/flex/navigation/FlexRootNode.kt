@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.bumble.appyx.core.composable.Children
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -13,6 +14,7 @@ import com.bumble.appyx.core.node.node
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.ui.submission.SubmissionDetail
 import me.cniekirk.flex.ui.submission.SubmissionList
@@ -27,6 +29,7 @@ class FlexRootNode(
     navModel = backStack,
     buildContext = buildContext
 ) {
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             NavTarget.SubmissionDetail -> node(buildContext) {
@@ -35,7 +38,9 @@ class FlexRootNode(
                 }
             }
             NavTarget.SubmissionsList -> node(buildContext) {
-                SubmissionList {}
+                SubmissionList {
+                    backStack.push(NavTarget.SubmissionDetail)
+                }
             }
         }
     }
@@ -47,7 +52,7 @@ class FlexRootNode(
             Children(
                 modifier = Modifier.fillMaxSize(),
                 navModel = backStack,
-                transitionHandler = rememberBackstackDefaultAnimation()
+                transitionHandler = rememberBackstackDefaultAnimation(LocalContext.current)
             )
         }
     }

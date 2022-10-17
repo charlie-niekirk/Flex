@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.outlined.ModeComment
@@ -14,10 +15,14 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,7 +34,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.google.android.datatransport.cct.StringMerger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.R
@@ -42,9 +46,9 @@ import me.cniekirk.flex.ui.submission.state.SubmissionListSideEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionListState
 import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
-import me.cniekirk.flex.util.Link
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
+import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
@@ -83,58 +87,26 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
             .padding(top = 16.dp)
             .testTag("submission_list")) {
             itemsIndexed(pagingItems) { _, item ->
-                if (item?.isSelf == true) {
-                    SelfTextItem(
-                        modifier = Modifier.padding(top = 8.dp),
-                        item
-                    ) { onClick() }
-                } else {
-                    when (item?.linkType) {
-                        Link.ExternalLink -> {
-
+                when (item) {
+                    is UiSubmission.ImageSubmission -> {
+                        ImageItem(modifier = Modifier.padding(top = 8.dp), item) {
+                            onClick()
                         }
-                        is Link.ImageLink -> {
-                            ImageItem(modifier = Modifier.padding(top = 8.dp), item) {
-                                onClick()
-                            }
-                        }
-                        Link.RedGifLink -> {  }
-                        Link.RedditGallery -> {  }
-                        is Link.ImgurGalleryLink -> {
-//                            if (item.imgurGalleryLinks?.size!! > 1) {
-//                            } else {
-//                            }
-                        }
-                        Link.RedditVideo -> {
-                            val url = if (item.crosspostParentList.isNullOrEmpty()) {
-                                post.media?.redditVideo?.dashUrl ?: post.media?.redditVideo?.fallbackUrl!!
-                            } else {
-                                post.crosspostParentList[0].media?.redditVideo?.dashUrl
-                                    ?: post.crosspostParentList[0].media?.redditVideo?.fallbackUrl!!
-                            }
-                            VideoItem(
-                                modifier = Modifier.padding(top = 8.dp),
-                                item = item,
-                                videoUrl = ""
-                            ) {
-                                onClick()
-                            }
-                        }
-                        is Link.TwitterLink -> {  }
-                        is Link.VideoLink -> {
-                            VideoItem(
-                                modifier = Modifier.padding(top = 8.dp),
-                                item = item,
-                                videoUrl = item.linkType.url
-                            ) {
-                                onClick()
-                            }
-                        }
-                        is Link.YoutubeLink -> {  }
-                        Link.StreamableLink -> {  }
-                        Link.GfycatLink -> {  }
-                        else -> {}
                     }
+                    is UiSubmission.SelfTextSubmission -> {
+                        SelfTextItem(modifier = Modifier.padding(top = 8.dp), item) { onClick() }
+                    }
+                    is UiSubmission.VideoSubmission -> {
+                        VideoItem(modifier = Modifier.padding(top = 8.dp), item = item) {
+                            onClick()
+                        }
+                    }
+                    is UiSubmission.TwitterSubmission -> {
+                        TweetItem(modifier = Modifier.padding(top = 8.dp), item = item) {
+                            onClick()
+                        }
+                    }
+                    null -> {}
                 }
             }
 
@@ -193,7 +165,7 @@ fun SubmissionItem(
 @Composable
 fun SelfTextItem(
     modifier: Modifier = Modifier,
-    item: UiSubmission,
+    item: UiSubmission.SelfTextSubmission,
     onClick: () -> Unit) {
     SubmissionItem(
         modifier = modifier,
@@ -212,12 +184,11 @@ fun SelfTextItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun VideoItem(
+fun TweetItem(
     modifier: Modifier = Modifier,
-    item: UiSubmission,
-    videoUrl: String,
+    item: UiSubmission.TwitterSubmission,
     onClick: () -> Unit) {
     SubmissionItem(
         modifier = modifier,
@@ -226,16 +197,146 @@ fun VideoItem(
         upvote = item.upVotes,
         numComments = item.numComments,
         onClick = { onClick() }) {
+        item.tweetImageUrl?.let {
+            Column(modifier = Modifier.padding(all = 8.dp)) {
+                GlideImage(
+                    modifier = Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                    model = it,
+                    contentDescription = stringResource(id = R.string.tweet_image)
+                )
+                Card(
+                    shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(end = 4.dp),
+                                text = item.tweetAuthor,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            if (item.tweetAuthorVerified) {
+                                Icon(
+                                    modifier = Modifier
+                                        .width(12.dp)
+                                        .height(12.dp),
+                                    painter = painterResource(id = R.drawable.twitter_verified_badge),
+                                    contentDescription = stringResource(id = R.string.twitter_verified_badge)
+                                )
+                                Text(
+                                    modifier = Modifier.padding(start = 8.dp),
+                                    text = "@${item.tweetAuthorHandle}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            } else {
+                                Text(
+                                    text = "@${item.tweetAuthorHandle}",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            Icon(
+                                modifier = Modifier
+                                    .padding(end = 4.dp)
+                                    .width(12.dp),
+                                painter = painterResource(id = R.drawable.twitter_bird_logo_2012),
+                                contentDescription = stringResource(id = R.string.twitter_logo)
+                            )
+                        }
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(all = 8.dp),
+                            text = item.tweetBody,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+        } ?: run {
+            Card(
+                modifier = Modifier.padding(all = 8.dp),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(end = 4.dp),
+                            text = item.tweetAuthor,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (item.tweetAuthorVerified) {
+                            Icon(
+                                modifier = Modifier
+                                    .width(12.dp)
+                                    .height(12.dp),
+                                painter = painterResource(id = R.drawable.twitter_verified_badge),
+                                contentDescription = stringResource(id = R.string.twitter_verified_badge)
+                            )
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = "@${item.tweetAuthorHandle}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        } else {
+                            Text(
+                                text = "@${item.tweetAuthorHandle}",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .width(12.dp),
+                            painter = painterResource(id = R.drawable.twitter_bird_logo_2012),
+                            contentDescription = stringResource(id = R.string.twitter_logo)
+                        )
+                    }
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 8.dp),
+                        text = item.tweetBody,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun VideoItem(
+    modifier: Modifier = Modifier,
+    item: UiSubmission.VideoSubmission,
+    onClick: () -> Unit) {
+    SubmissionItem(
+        modifier = modifier,
+        title = item.title,
+        author = item.author,
+        upvote = item.upVotes,
+        numComments = item.numComments,
+        onClick = { onClick() }) {
+        Timber.d("Video link: ${item.videoLink}")
         VideoPlayer(
-            modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-            uri = Uri.parse(videoUrl)
+            modifier = modifier.padding(bottom = 8.dp),
+            uri = Uri.parse(item.videoLink)
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission, onClick: () -> Unit) {
+fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission.ImageSubmission, onClick: () -> Unit) {
     val configuration = LocalConfiguration.current
     val resolution = getSuitablePreview(configuration.screenWidthDp, item.previewImage)
     Surface(
