@@ -17,12 +17,8 @@ import com.bumble.appyx.core.navigation.transition.TransitionSpec
 import com.bumble.appyx.navmodel.backstack.BackStack
 
 class DefaultAnimation<T>(
-    private val alphaSpec: TransitionSpec<BackStack.State, Float> = {
-        tween(50, 50, LinearEasing)
-    },
-    private val transitionSpec: TransitionSpec<BackStack.State, Float> = {
-        tween(400, 0, FastOutSlowInEasing)
-    },
+    private val alphaSpec: TransitionSpec<BackStack.State, Float>,
+    private val transitionSpec: TransitionSpec<BackStack.State, Float>,
     override val clipToBounds: Boolean = false
 ) : ModifierTransitionHandler<T, BackStack.State>() {
 
@@ -32,7 +28,6 @@ class DefaultAnimation<T>(
         transition: Transition<BackStack.State>,
         descriptor: TransitionDescriptor<T, BackStack.State>
     ): Modifier = modifier.composed {
-
         val scale = transition.animateFloat(
             transitionSpec = transitionSpec,
             targetValueByState = {
@@ -67,7 +62,6 @@ private val path = Path().apply {
 
 @Composable
 fun <T> rememberBackstackDefaultAnimation(
-    context: Context,
     alphaSpec: TransitionSpec<BackStack.State, Float> = {
         tween(50, 50, LinearEasing)
     },
