@@ -5,6 +5,8 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -13,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -39,6 +43,7 @@ import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.*
 import me.cniekirk.flex.ui.compose.VideoPlayer
+import me.cniekirk.flex.ui.compose.rememberLazyListState
 import me.cniekirk.flex.ui.compose.styles.FlexTheme
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.model.toUiSubmission
@@ -83,9 +88,12 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
         )
-        LazyColumn(modifier = Modifier
-            .padding(top = 16.dp)
-            .testTag("submission_list")) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .testTag("submission_list"),
+            state = pagingItems.rememberLazyListState()
+        ) {
             itemsIndexed(pagingItems) { _, item ->
                 when (item) {
                     is UiSubmission.ImageSubmission -> {
@@ -110,12 +118,25 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
                 }
             }
 
+            if (pagingItems.loadState.refresh == LoadState.Loading) {
+                item {
+                    Column(
+                        modifier = Modifier.fillParentMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
             if (pagingItems.loadState.append == LoadState.Loading) {
                 item {
                     CircularProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentWidth(Alignment.CenterHorizontally)
+                            .padding(top = 8.dp, end = 8.dp)
                     )
                 }
             }
@@ -141,7 +162,6 @@ fun SubmissionItem(
             Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp)
             ) {
                 Text(
                     modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
@@ -200,7 +220,9 @@ fun TweetItem(
         item.tweetImageUrl?.let {
             Column(modifier = Modifier.padding(all = 8.dp)) {
                 GlideImage(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                     model = it,
                     contentScale = ContentScale.FillWidth,
                     contentDescription = stringResource(id = R.string.tweet_image)
@@ -314,7 +336,6 @@ fun TweetItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VideoItem(
     modifier: Modifier = Modifier,
@@ -327,9 +348,8 @@ fun VideoItem(
         upvote = item.upVotes,
         numComments = item.numComments,
         onClick = { onClick() }) {
-        Timber.d("Video link: ${item.videoLink}")
         VideoPlayer(
-            modifier = modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = 8.dp),
             uri = Uri.parse(item.videoLink)
         )
     }

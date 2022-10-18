@@ -3,9 +3,10 @@ package me.cniekirk.flex.navigation
 import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import com.bumble.appyx.core.children.ChildEntry
 import com.bumble.appyx.core.composable.Children
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -14,6 +15,7 @@ import com.bumble.appyx.core.node.node
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.pop
 import com.bumble.appyx.navmodel.backstack.operation.push
+import com.bumble.appyx.navmodel.backstack.operation.replace
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.ui.submission.SubmissionDetail
@@ -39,6 +41,7 @@ class FlexRootNode(
             }
             NavTarget.SubmissionsList -> node(buildContext) {
                 SubmissionList {
+//                    backStack.replace(NavTarget.SubmissionDetail)
                     backStack.push(NavTarget.SubmissionDetail)
                 }
             }

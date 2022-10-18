@@ -82,11 +82,9 @@ class SubmissionListViewModel @Inject constructor(
         val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
             SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
                 imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
-        }.flow
-            .map { pagingData ->
+        }.flow.map { pagingData ->
                 pagingData.map { submission -> submission.toUiSubmission() }
-            }
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
         reduce {
             state.copy(submissions = pager)
         }

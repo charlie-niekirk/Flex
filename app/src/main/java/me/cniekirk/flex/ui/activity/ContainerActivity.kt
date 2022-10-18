@@ -16,7 +16,7 @@ class ContainerActivity : NodeActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FlexTheme {
-                NodeHost(integrationPoint = integrationPoint) {
+                NodeHost(integrationPoint = appyxIntegrationPoint) {
                     FlexRootNode(buildContext = it)
                 }
             }
