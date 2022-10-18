@@ -52,7 +52,7 @@ class FlexRootNode(
             Children(
                 modifier = Modifier.fillMaxSize(),
                 navModel = backStack,
-                transitionHandler = rememberBackstackDefaultAnimation(LocalContext.current)
+                transitionHandler = rememberBackstackDefaultAnimation()
             )
         }
     }

@@ -200,8 +200,9 @@ fun TweetItem(
         item.tweetImageUrl?.let {
             Column(modifier = Modifier.padding(all = 8.dp)) {
                 GlideImage(
-                    modifier = Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                     model = it,
+                    contentScale = ContentScale.FillWidth,
                     contentDescription = stringResource(id = R.string.tweet_image)
                 )
                 Card(
