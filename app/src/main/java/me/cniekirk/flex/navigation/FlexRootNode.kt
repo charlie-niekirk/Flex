@@ -35,9 +35,7 @@ class FlexRootNode(
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             NavTarget.SubmissionDetail -> node(buildContext) {
-                SubmissionDetail {
-                    backStack.pop()
-                }
+                SubmissionDetail()
             }
             NavTarget.SubmissionsList -> node(buildContext) {
                 SubmissionList {

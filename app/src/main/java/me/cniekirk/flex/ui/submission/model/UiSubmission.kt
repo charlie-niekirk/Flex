@@ -56,9 +56,18 @@ sealed class UiSubmission {
         val timeSincePost: String,
         val submissionId: String
     ) : UiSubmission()
+
+    data class ExternalLinkSubmission(
+        val title: String,
+        val author: String,
+        val selfText: String,
+        val upVotes: Int,
+        val upVotePercentage: Int,
+        val numComments: String,
+        val timeSincePost: String,
+        val submissionId: String
+    ) : UiSubmission()
 }
-
-
 
 fun AuthedSubmission.toUiSubmission(): UiSubmission {
     val linkType = this.urlOverriddenByDest?.processLink() ?: Link.ExternalLink

@@ -5,8 +5,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -15,7 +13,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.LoadState
 import androidx.paging.PagingData
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -53,7 +49,6 @@ import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
-import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
@@ -113,6 +108,9 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
                         TweetItem(modifier = Modifier.padding(top = 8.dp), item = item) {
                             onClick()
                         }
+                    }
+                    is UiSubmission.ExternalLinkSubmission -> {
+
                     }
                     null -> {}
                 }
@@ -599,33 +597,4 @@ private fun createFakeData(): List<UiSubmission> {
         VoteState.NoVote
     ).toUiSubmission()
     return listOf(post, post, post, post, post)
-}
-
-@Composable
-fun SubmissionDetail(onBack: () -> Unit) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            modifier = Modifier.padding(top = 16.dp),
-            text = "Submission detail title",
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Text(
-            modifier = Modifier.padding(top = 16.dp),
-            textAlign = TextAlign.Center,
-            text = "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello",
-            style = MaterialTheme.typography.bodySmall
-        )
-        Button(
-            modifier = Modifier.padding(top = 16.dp),
-            onClick = { onBack() }
-        ) {
-            Text(
-                text = "This is another button",
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-    }
 }
