@@ -1,72 +1,82 @@
 package me.cniekirk.flex.ui.submission.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.ui.util.getElapsedTime
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLink
 
-sealed class UiSubmission {
+@Parcelize
+sealed class UiSubmission : Parcelable {
+    abstract val numComments: String
+    abstract val submissionId: String
+    @Parcelize
     data class SelfTextSubmission(
         val title: String,
         val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
-        val numComments: String,
+        override val numComments: String,
         val timeSincePost: String,
-        val submissionId: String
-    ) : UiSubmission()
+        override val submissionId: String
+    ) : UiSubmission(), Parcelable
+    @Parcelize
     data class ImageSubmission(
         val title: String,
         val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
-        val numComments: String,
+        override val numComments: String,
         val previewImage: List<Resolution>,
         val timeSincePost: String,
-        val submissionId: String
-    ) : UiSubmission()
+        override val submissionId: String
+    ) : UiSubmission(), Parcelable
 
+    @Parcelize
     data class VideoSubmission(
         val title: String,
         val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
-        val numComments: String,
+        override val numComments: String,
         val videoLink: String,
         val timeSincePost: String,
-        val submissionId: String
-    ) : UiSubmission()
+        override val submissionId: String
+    ) : UiSubmission(), Parcelable
 
+    @Parcelize
     data class TwitterSubmission(
         val title: String,
         val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
-        val numComments: String,
+        override val numComments: String,
         val tweetAuthor: String,
         val tweetAuthorHandle: String,
         val tweetAuthorVerified: Boolean,
         val tweetBody: String,
         val tweetImageUrl: String?,
         val timeSincePost: String,
-        val submissionId: String
-    ) : UiSubmission()
+        override val submissionId: String
+    ) : UiSubmission(), Parcelable
 
+    @Parcelize
     data class ExternalLinkSubmission(
         val title: String,
         val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
-        val numComments: String,
+        override val numComments: String,
         val timeSincePost: String,
-        val submissionId: String
-    ) : UiSubmission()
+        override val submissionId: String
+    ) : UiSubmission(), Parcelable
 }
 
 fun AuthedSubmission.toUiSubmission(): UiSubmission {

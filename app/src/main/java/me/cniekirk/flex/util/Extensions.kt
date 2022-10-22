@@ -28,15 +28,16 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.noties.markwon.Markwon
 import io.noties.markwon.core.MarkwonTheme
+import io.noties.markwon.core.spans.*
 import io.noties.markwon.editor.AbstractEditHandler
 import io.noties.markwon.editor.MarkwonEditor
 import io.noties.markwon.editor.MarkwonEditorUtils
 import io.noties.markwon.editor.PersistedSpans
-import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -46,13 +47,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import me.cniekirk.flex.R
 import timber.log.Timber
-
-import io.noties.markwon.core.spans.*
-import androidx.annotation.NonNull
-import androidx.compose.runtime.Composable
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
-
-import io.noties.markwon.core.spans.HeadingSpan
 import java.time.Duration
 import kotlin.math.absoluteValue
 
@@ -333,24 +327,24 @@ fun EditText.textChanges(): Flow<CharSequence?> {
     }.onStart { emit(text) }
 }
 
-fun ImageView.loadImage(imageUrl: String, over18: Boolean) {
-    if (over18) {
-        Glide.with(this)
-            .load(imageUrl)
-            .centerInside()
-            .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 7)))
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .transition(withCrossFade())
-            .into(this)
-    } else {
-        Glide.with(this)
-            .load(imageUrl)
-            .diskCacheStrategy(DiskCacheStrategy.ALL)
-            .centerInside()
-            .transition(withCrossFade())
-            .into(this)
-    }
-}
+//fun ImageView.loadImage(imageUrl: String, over18: Boolean) {
+//    if (over18) {
+//        Glide.with(this)
+//            .load(imageUrl)
+//            .centerInside()
+//            .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 7)))
+//            .diskCacheStrategy(DiskCacheStrategy.ALL)
+//            .transition(withCrossFade())
+//            .into(this)
+//    } else {
+//        Glide.with(this)
+//            .load(imageUrl)
+//            .diskCacheStrategy(DiskCacheStrategy.ALL)
+//            .centerInside()
+//            .transition(withCrossFade())
+//            .into(this)
+//    }
+//}
 
 @ColorInt
 fun Context.resolveColorAttr(@AttrRes colorAttr: Int): Int {

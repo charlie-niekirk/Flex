@@ -20,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.ui.submission.SubmissionDetail
 import me.cniekirk.flex.ui.submission.SubmissionList
+import me.cniekirk.flex.ui.submission.model.UiSubmission
 
 class FlexRootNode(
     buildContext: BuildContext,
@@ -34,13 +35,12 @@ class FlexRootNode(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
-            NavTarget.SubmissionDetail -> node(buildContext) {
-                SubmissionDetail()
+            is NavTarget.SubmissionDetail -> node(buildContext) {
+                SubmissionDetail(navTarget.submission)
             }
             NavTarget.SubmissionsList -> node(buildContext) {
-                SubmissionList {
-//                    backStack.replace(NavTarget.SubmissionDetail)
-                    backStack.push(NavTarget.SubmissionDetail)
+                SubmissionList { submission ->
+                    backStack.push(NavTarget.SubmissionDetail(submission))
                 }
             }
         }
@@ -64,5 +64,5 @@ sealed class NavTarget : Parcelable {
     object SubmissionsList : NavTarget()
 
     @Parcelize
-    object SubmissionDetail : NavTarget()
+    data class SubmissionDetail(val submission: UiSubmission) : NavTarget()
 }

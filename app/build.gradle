@@ -77,6 +77,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
     implementation "androidx.work:work-runtime-ktx:$work_version"
@@ -128,8 +129,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
-    implementation "io.coil-kt:coil:2.1.0"
-
     // IO dependencies
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
@@ -138,9 +137,8 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
 
     // Image loading dependencies
-    implementation 'com.github.bumptech.glide:glide:4.14.0'
-    implementation 'jp.wasabeef:glide-transformations:4.3.0'
-    implementation "com.github.bumptech.glide:compose:1.0.0-alpha.0"
+    implementation 'io.coil-kt:coil:2.2.2'
+    implementation 'io.coil-kt:coil-compose:2.2.2'
 
     // Video dependencies
     implementation 'com.github.charlie-niekirk:toro:3.7.5'

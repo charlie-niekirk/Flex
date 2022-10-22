@@ -3,6 +3,7 @@ package me.cniekirk.flex.ui.submission
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,9 +17,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -32,8 +35,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import me.cniekirk.flex.R
@@ -52,7 +55,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), onClick: () -> Unit) {
+fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), onClick: (UiSubmission) -> Unit) {
     val context = LocalContext.current
     val state = viewModel.collectAsState()
     viewModel.collectSideEffect { effect ->
@@ -69,7 +72,7 @@ fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), onClick: ()
 }
 
 @Composable
-fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit) {
+fun SubmissionListContent(state: State<SubmissionListState>, onClick: (UiSubmission) -> Unit) {
     val pagingItems = state.value.submissions.collectAsLazyPagingItems()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -93,20 +96,22 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: () -> Unit
                 when (item) {
                     is UiSubmission.ImageSubmission -> {
                         ImageItem(modifier = Modifier.padding(top = 8.dp), item) {
-                            onClick()
+                            onClick(item)
                         }
                     }
                     is UiSubmission.SelfTextSubmission -> {
-                        SelfTextItem(modifier = Modifier.padding(top = 8.dp), item) { onClick() }
+                        SelfTextItem(modifier = Modifier.padding(top = 8.dp), item) {
+                            onClick(item)
+                        }
                     }
                     is UiSubmission.VideoSubmission -> {
                         VideoItem(modifier = Modifier.padding(top = 8.dp), item = item) {
-                            onClick()
+                            onClick(item)
                         }
                     }
                     is UiSubmission.TwitterSubmission -> {
                         TweetItem(modifier = Modifier.padding(top = 8.dp), item = item) {
-                            onClick()
+                            onClick(item)
                         }
                     }
                     is UiSubmission.ExternalLinkSubmission -> {
@@ -202,7 +207,6 @@ fun SelfTextItem(
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun TweetItem(
     modifier: Modifier = Modifier,
@@ -217,10 +221,8 @@ fun TweetItem(
         onClick = { onClick() }) {
         item.tweetImageUrl?.let {
             Column(modifier = Modifier.padding(all = 8.dp)) {
-                GlideImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                AsyncImage(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                     model = it,
                     contentScale = ContentScale.FillWidth,
                     contentDescription = stringResource(id = R.string.tweet_image)
@@ -353,7 +355,7 @@ fun VideoItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission.ImageSubmission, onClick: () -> Unit) {
     val configuration = LocalConfiguration.current
@@ -363,18 +365,31 @@ fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission.ImageSubmission,
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Column(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                 text = item.title,
                 style = MaterialTheme.typography.bodyMedium
             )
-            GlideImage(
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                model = resolution?.url,
-                contentDescription = "",
-                contentScale = ContentScale.FillWidth
-            )
+            LocalDensity.current.run {
+                val widthPx = LocalConfiguration.current.screenWidthDp.dp.toPx()
+                val scale = widthPx / (resolution?.width ?: 0)
+                AsyncImage(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                        .fillMaxWidth()
+                        .height((resolution?.height?.times(scale))?.toDp() ?: 0.dp)
+                        .background(Color.DarkGray.copy(alpha = 0.5f)),
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(resolution?.url)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "",
+                    contentScale = ContentScale.FillHeight
+                )
+            }
             ItemFooter(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 author = item.author,
