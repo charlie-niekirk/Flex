@@ -55,7 +55,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), onClick: (UiSubmission) -> Unit) {
+fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), subreddit: String = "", onClick: (UiSubmission) -> Unit) {
     val context = LocalContext.current
     val state = viewModel.collectAsState()
     viewModel.collectSideEffect { effect ->

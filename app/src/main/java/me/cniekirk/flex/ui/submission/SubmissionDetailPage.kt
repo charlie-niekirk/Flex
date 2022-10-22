@@ -139,31 +139,43 @@ val colorArray = listOf(
 
 @Composable
 fun CommentItem(comment: Comment) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-    ) {
-        if (comment.depth > 0 && comment.depth < colorArray.size) {
-            Divider(
-                modifier = Modifier.width(2.dp),
-                color = colorArray[comment.depth]
-            )
-        }
-        Column(
-            modifier = Modifier.padding(start = (DEPTH_INCREMENT * comment.depth).dp)
+    Column {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
         ) {
-            Text(
-                text = comment.author ?: "?",
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = comment.body ?: "",
-                style = MaterialTheme.typography.bodySmall
-            )
+            if (comment.depth > 0 && comment.depth < colorArray.size) {
+                Divider(
+                    modifier = Modifier
+                        .padding(
+                            start = (DEPTH_INCREMENT * comment.depth).dp,
+                            top = 2.dp,
+                            bottom = 2.dp
+                        )
+                        .width(2.dp)
+                        .fillMaxHeight(),
+                    color = colorArray[comment.depth]
+                )
+            }
+            Column(
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Text(
+                    text = comment.author ?: "?",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = comment.body ?: "",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
+        val extra = if (comment.depth > 0) 8 else 0
+        Divider(modifier = Modifier.padding(start = (extra + (DEPTH_INCREMENT * comment.depth)).dp))
     }
 }
 

@@ -150,4 +150,5 @@
     <string name="twitter_verified_badge">Twitter verified badge</string>
     <string name="twitter_logo">Twitter logo</string>
     <string name="tweet_image">Tweet image</string>
+    <string name="search_title">Search</string>
 </resources>
