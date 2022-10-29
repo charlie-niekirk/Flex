@@ -86,7 +86,7 @@ class CoreNode(
                         label = { Text("Account") },
                         selected = selectedItem == 2,
                         onClick = {
-                            selectedItem = 3
+                            selectedItem = 2
                             backStack.replace(CoreTarget.Account)
                         }
                     )
