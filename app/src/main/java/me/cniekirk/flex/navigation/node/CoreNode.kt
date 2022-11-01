@@ -2,6 +2,7 @@ package me.cniekirk.flex.navigation.node
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.List
@@ -20,7 +21,9 @@ import com.bumble.appyx.navmodel.backstack.operation.replace
 import com.bumble.appyx.navmodel.backstack.transitionhandler.rememberBackstackFader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import me.cniekirk.flex.navigation.target.CoreTarget
+import me.cniekirk.flex.ui.auth.LoginPage
 import me.cniekirk.flex.ui.search.SearchPage
+import me.cniekirk.flex.ui.settings.SettingsPage
 import me.cniekirk.flex.ui.submission.SubmissionList
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 
@@ -39,7 +42,9 @@ class CoreNode(
     override fun resolve(navTarget: CoreTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             CoreTarget.Account -> node(buildContext) {
-
+                LoginPage {
+                    // replace with the authenticated page
+                }
             }
             CoreTarget.Search -> node(buildContext) {
                 SearchPage {
@@ -47,7 +52,7 @@ class CoreNode(
                 }
             }
             CoreTarget.Settings -> node(buildContext) {
-
+                SettingsPage()
             }
             is CoreTarget.SubmissionsList -> node(buildContext) {
                 SubmissionList(subreddit = navTarget.subreddit, onClick = { onSubmissionClick(it) })
@@ -86,7 +91,7 @@ class CoreNode(
                         label = { Text("Account") },
                         selected = selectedItem == 2,
                         onClick = {
-                            selectedItem = 3
+                            selectedItem = 2
                             backStack.replace(CoreTarget.Account)
                         }
                     )
@@ -101,9 +106,9 @@ class CoreNode(
                     )
                 }
             }
-        ) {
+        ) { paddingValues ->
             Children(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().padding(bottom = paddingValues.calculateBottomPadding()),
                 navModel = backStack,
                 transitionHandler = rememberBackstackFader()
             )

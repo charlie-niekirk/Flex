@@ -12,6 +12,8 @@ import me.cniekirk.flex.util.processLink
 sealed class UiSubmission : Parcelable {
     abstract val numComments: String
     abstract val submissionId: String
+    abstract val submissionName: String
+
     @Parcelize
     data class SelfTextSubmission(
         val title: String,
@@ -21,7 +23,8 @@ sealed class UiSubmission : Parcelable {
         val upVotePercentage: Int,
         override val numComments: String,
         val timeSincePost: String,
-        override val submissionId: String
+        override val submissionId: String,
+        override val submissionName: String
     ) : UiSubmission(), Parcelable
     @Parcelize
     data class ImageSubmission(
@@ -33,7 +36,8 @@ sealed class UiSubmission : Parcelable {
         override val numComments: String,
         val previewImage: List<Resolution>,
         val timeSincePost: String,
-        override val submissionId: String
+        override val submissionId: String,
+        override val submissionName: String
     ) : UiSubmission(), Parcelable
 
     @Parcelize
@@ -46,7 +50,8 @@ sealed class UiSubmission : Parcelable {
         override val numComments: String,
         val videoLink: String,
         val timeSincePost: String,
-        override val submissionId: String
+        override val submissionId: String,
+        override val submissionName: String
     ) : UiSubmission(), Parcelable
 
     @Parcelize
@@ -63,7 +68,8 @@ sealed class UiSubmission : Parcelable {
         val tweetBody: String,
         val tweetImageUrl: String?,
         val timeSincePost: String,
-        override val submissionId: String
+        override val submissionId: String,
+        override val submissionName: String
     ) : UiSubmission(), Parcelable
 
     @Parcelize
@@ -75,7 +81,8 @@ sealed class UiSubmission : Parcelable {
         val upVotePercentage: Int,
         override val numComments: String,
         val timeSincePost: String,
-        override val submissionId: String
+        override val submissionId: String,
+        override val submissionName: String
     ) : UiSubmission(), Parcelable
 }
 
@@ -91,7 +98,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             this.upvoteRatio.toInt(),
             this.numComments?.toString() ?: "?",
             this.createdUtc.toLong().getElapsedTime(),
-            this.id
+            this.id,
+            this.name
         )
     } else {
         when (linkType) {
@@ -104,7 +112,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             Link.GfycatLink -> {
@@ -116,7 +125,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             is Link.ImageLink -> {
@@ -129,7 +139,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.numComments?.toString() ?: "?",
                     this.preview?.images?.get(0)?.resolutions ?: listOf(),
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             is Link.ImgurGalleryLink -> {
@@ -141,7 +152,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             Link.RedGifLink -> {
@@ -153,7 +165,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             Link.RedditGallery -> {
@@ -165,7 +178,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             Link.RedditVideo -> {
@@ -185,7 +199,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.numComments?.toString() ?: "?",
                     url,
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             Link.StreamableLink -> {
@@ -198,7 +213,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.numComments?.toString() ?: "?",
                     url,
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             is Link.TwitterLink -> {
@@ -216,7 +232,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                         it.data?.text ?: "",
                         it.includes?.media?.first()?.previewImageUrl,
                         this.createdUtc.toLong().getElapsedTime(),
-                        this.id
+                        this.id,
+                        this.name
                     )
                 } ?: run {
                     UiSubmission.SelfTextSubmission(
@@ -227,7 +244,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                         this.upvoteRatio.toInt(),
                         this.numComments?.toString() ?: "?",
                         this.createdUtc.toLong().getElapsedTime(),
-                        this.id
+                        this.id,
+                        this.name
                     )
                 }
             }
@@ -241,7 +259,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.numComments?.toString() ?: "?",
                     linkType.url,
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
             is Link.YoutubeLink -> {
@@ -253,7 +272,8 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                     this.upvoteRatio.toInt(),
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
-                    this.id
+                    this.id,
+                    this.name
                 )
             }
         }

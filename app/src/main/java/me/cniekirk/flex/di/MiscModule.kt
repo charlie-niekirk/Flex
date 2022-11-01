@@ -16,16 +16,6 @@ import im.ene.toro.exoplayer.Config
 import im.ene.toro.exoplayer.ExoCreator
 import im.ene.toro.exoplayer.MediaSourceBuilder
 import im.ene.toro.exoplayer.ToroExo
-import io.noties.markwon.AbstractMarkwonPlugin
-import io.noties.markwon.LinkResolverDef
-import io.noties.markwon.Markwon
-import io.noties.markwon.MarkwonConfiguration
-import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
-import io.noties.markwon.linkify.LinkifyPlugin
-import io.noties.markwon.recycler.MarkwonAdapter
-import io.noties.markwon.recycler.table.TableEntry
-import io.noties.markwon.recycler.table.TableEntryPlugin
-import io.noties.markwon.utils.Dip
 import me.cniekirk.flex.R
 import me.cniekirk.flex.util.Link
 import me.cniekirk.flex.util.processLink
@@ -33,7 +23,6 @@ import me.cniekirk.flex.util.video.LoopExoCreator
 import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.commonmark.ext.gfm.tables.TableBlock
 import java.io.File
 import javax.inject.Singleton
 
@@ -92,41 +81,41 @@ class MiscModule {
         return LoopExoCreator(ToroExo.with(context), config)
     }
 
-    @Provides
-    @Singleton
-    fun provideMarkwon(@ApplicationContext context: Context): Markwon {
-        return Markwon
-            .builder(context)
-            .usePlugin(StrikethroughPlugin())
-            .usePlugin(LinkifyPlugin.create())
-            .usePlugin(TableEntryPlugin.create { builder ->
-                val dip = Dip.create(context)
-                builder
-                    .tableBorderColor(context.resources.getColor(R.color.table_border, null))
-                    .tableHeaderRowBackgroundColor(context.resources.getColor(R.color.table_border, null))
-                    .tableCellPadding(dip.toPx(4))
-                    .tableBorderWidth(dip.toPx(1))
-                    .build()
-            })
-            .usePlugin(object : AbstractMarkwonPlugin() {
-                override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
-                    builder.linkResolver(object : LinkResolverDef() {
-                        override fun resolve(view: View, link: String) {
-                            when (link.processLink()) {
-                                is Link.ImgurGalleryLink -> {
-
-                                }
-                                else -> {
-                                    super.resolve(view, link)
-                                }
-                            }
-                        }
-                    })
-                }
-            })
-            //.usePlugin(SyntaxHighlightPlugin.create(Prism4j(GrammarLocatorDef()), Prism4jThemeDefault()))
-            .build()
-    }
+//    @Provides
+//    @Singleton
+//    fun provideMarkwon(@ApplicationContext context: Context): Markwon {
+//        return Markwon
+//            .builder(context)
+//            .usePlugin(StrikethroughPlugin())
+//            .usePlugin(LinkifyPlugin.create())
+//            .usePlugin(TableEntryPlugin.create { builder ->
+//                val dip = Dip.create(context)
+//                builder
+//                    .tableBorderColor(context.resources.getColor(R.color.table_border, null))
+//                    .tableHeaderRowBackgroundColor(context.resources.getColor(R.color.table_border, null))
+//                    .tableCellPadding(dip.toPx(4))
+//                    .tableBorderWidth(dip.toPx(1))
+//                    .build()
+//            })
+//            .usePlugin(object : AbstractMarkwonPlugin() {
+//                override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
+//                    builder.linkResolver(object : LinkResolverDef() {
+//                        override fun resolve(view: View, link: String) {
+//                            when (link.processLink()) {
+//                                is Link.ImgurGalleryLink -> {
+//
+//                                }
+//                                else -> {
+//                                    super.resolve(view, link)
+//                                }
+//                            }
+//                        }
+//                    })
+//                }
+//            })
+//            //.usePlugin(SyntaxHighlightPlugin.create(Prism4j(GrammarLocatorDef()), Prism4jThemeDefault()))
+//            .build()
+//    }
 
 //    @Provides
 //    @Singleton

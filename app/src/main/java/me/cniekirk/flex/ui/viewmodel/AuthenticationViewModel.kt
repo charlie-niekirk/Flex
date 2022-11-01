@@ -7,22 +7,37 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.auth.Token
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.LoginUseCase
+import me.cniekirk.flex.ui.auth.state.LoginSideEffect
+import me.cniekirk.flex.ui.auth.state.LoginState
+import org.orbitmvi.orbit.Container
+import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase) : ViewModel() {
+    private val loginUseCase: LoginUseCase
+) : ViewModel(), ContainerHost<LoginState, LoginSideEffect> {
 
-    private val _loginState: MutableStateFlow<RedditResult<Token>>
-        = MutableStateFlow(RedditResult.Loading)
-    val loginState: StateFlow<RedditResult<Token>> = _loginState
+    override val container = container<LoginState, LoginSideEffect>(LoginState())
 
-    fun onCodeIntercepted(code: String) {
-        viewModelScope.launch {
-            loginUseCase(code).collect { result -> _loginState.value = result }
+    fun onCodeIntercept(code: String) = intent {
+        loginUseCase(code).collect { result ->
+            when (result) {
+                is RedditResult.Error -> {
+                    postSideEffect(LoginSideEffect.Error(R.string.generic_network_error))
+                }
+                RedditResult.Loading -> {}
+                is RedditResult.Success -> {
+                    postSideEffect(LoginSideEffect.LoginSuccess)
+                }
+            }
         }
     }
 }

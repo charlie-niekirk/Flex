@@ -17,9 +17,7 @@ import me.cniekirk.flex.domain.model.CommentRequest
 import me.cniekirk.flex.domain.model.MoreCommentsRequest
 import me.cniekirk.flex.domain.usecase.*
 import me.cniekirk.flex.ui.submission.SubmissionDetailEvent
-import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
-import me.cniekirk.flex.ui.submission.state.SubmissionDetailState
-import me.cniekirk.flex.ui.submission.state.VoteState
+import me.cniekirk.flex.ui.submission.state.*
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -59,38 +57,82 @@ class SubmissionDetailViewModel @Inject constructor(
                             // Show loading
                         }
                         is RedditResult.Success -> {
-                            reduce { state.copy(comments = response.data) }
+                            val uiComments = response.data.mapNotNull { it.toUiComment() }
+                            reduce { state.copy(comments = uiComments) }
                         }
                     }
                 }
         }
     }
 
-    fun getMoreComments(moreComments: MoreComments, parentId: String) = intent {
-        viewModelScope.launch {
-            getMoreCommentsUseCase(MoreCommentsRequest(moreComments, parentId))
-                .collect { commentsTree ->
-                    when (commentsTree) {
-                        is RedditResult.Error -> {
-                            val message = when (commentsTree.cause) {
-                                Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
-                                Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
-                                Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+//    fun getMoreComments(moreComments: MoreComments, parentId: String) = intent {
+//        viewModelScope.launch {
+//            getMoreCommentsUseCase(MoreCommentsRequest(moreComments, parentId))
+//                .collect { commentsTree ->
+//                    when (commentsTree) {
+//                        is RedditResult.Error -> {
+//                            val message = when (commentsTree.cause) {
+//                                Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+//                                Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+//                                Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+//                            }
+//                            postSideEffect(SubmissionDetailEffect.ShowError(message))
+//                        }
+//                        is RedditResult.Success -> {
+//                            val existing = state.comments
+//                            val newComments = mutableListOf<CommentData>()
+//                            newComments.addAll(existing)
+//                            val replaceIndex = existing.indexOf(moreComments)
+//                            newComments.removeAt(replaceIndex)
+//                            newComments.addAll(replaceIndex, commentsTree.data)
+//                            reduce { state.copy(comments = newComments) }
+//                        }
+//                        RedditResult.Loading -> {}
+//                    }
+//                }
+//        }
+//    }
+
+    fun collapseComment(comment: UiComment) = intent {
+        when (comment) {
+            is UiComment.Comment -> {
+                val currentComments = state.comments
+                val startIndex = currentComments.indexOf(comment) + 1
+                val endIndex = currentComments.indexOf(
+                    currentComments
+                        .filter { it.depth <= comment.depth && currentComments.indexOf(it) > startIndex }
+                        .minBy { currentComments.indexOf(it) }
+                )
+
+                // Map and mutate
+                val newList = currentComments.mapIndexed { index, comment ->
+                    when (comment) {
+                        is UiComment.Comment -> {
+                            if (index in startIndex until endIndex) {
+                                comment.copy(isCollapsed = !comment.isCollapsed)
+                            } else if (index == startIndex - 1) {
+                                comment.copy(parentCollapsed = !comment.parentCollapsed)
+                            } else {
+                                comment.copy()
                             }
-                            postSideEffect(SubmissionDetailEffect.ShowError(message))
                         }
-                        is RedditResult.Success -> {
-                            val existing = state.comments
-                            val newComments = mutableListOf<CommentData>()
-                            newComments.addAll(existing)
-                            val replaceIndex = existing.indexOf(moreComments)
-                            newComments.removeAt(replaceIndex)
-                            newComments.addAll(replaceIndex, commentsTree.data)
-                            reduce { state.copy(comments = newComments) }
+                        is UiComment.MoreComments -> {
+                            if (index in startIndex until endIndex) {
+                                comment.copy(isCollapsed = !comment.isCollapsed)
+                            } else if (index == startIndex - 1) {
+                                comment.copy()
+                            } else {
+                                comment.copy()
+                            }
                         }
-                        RedditResult.Loading -> {}
                     }
                 }
+
+                reduce { state.copy(comments = newList) }
+            }
+            is UiComment.MoreComments -> {
+                // TODO: Not yet required
+            }
         }
     }
 

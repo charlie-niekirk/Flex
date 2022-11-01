@@ -2,12 +2,17 @@ package me.cniekirk.flex.ui.submission
 
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.animation.*
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.ModeComment
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,6 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.halilibo.richtext.markdown.Markdown
+import com.halilibo.richtext.ui.RichText
+import com.halilibo.richtext.ui.RichTextStyle
+import com.halilibo.richtext.ui.TableStyle
+import com.halilibo.richtext.ui.material3.Material3RichText
+import com.halilibo.richtext.ui.string.RichTextStringStyle
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.Comment
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
@@ -37,6 +48,8 @@ import me.cniekirk.flex.ui.compose.VideoPlayer
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailState
+import me.cniekirk.flex.ui.submission.state.UiComment
+import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SubmissionDetailViewModel
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -57,7 +70,7 @@ fun SubmissionDetail(submission: UiSubmission, viewModel: SubmissionDetailViewMo
             }
         }
     }
-    SubmissionDetailContent(state, submission, viewModel::upvoteClicked, viewModel::downvoteClicked)
+    SubmissionDetailContent(state, submission, viewModel::upvoteClicked, viewModel::downvoteClicked, viewModel::collapseComment)
 }
 
 @Composable
@@ -65,7 +78,8 @@ fun SubmissionDetailContent(
     state: State<SubmissionDetailState>,
     submission: UiSubmission,
     onUpvote: (String) -> Unit,
-    onDownvote: (String) -> Unit
+    onDownvote: (String) -> Unit,
+    onCommentClick: (UiComment) -> Unit
 ) {
     val comments = state.value.comments
     Column(
@@ -113,17 +127,111 @@ fun SubmissionDetailContent(
                         )
                     }
                 }
+                SubmissionActions(
+                    state,
+                    onUpvote = { onUpvote(submission.submissionName) },
+                    onDownvote = { onDownvote(submission.submissionName) }
+                )
             }
             items(comments.size) { index ->
                 when (val comment = comments[index]) {
-                    is Comment -> {
-                        CommentItem(comment = comment)
+                    is UiComment.Comment -> {
+                        CommentItem(comment = comment) {
+                            onCommentClick(it)
+                        }
                     }
-                    is MoreComments -> {
-                        MoreCommentsItem(comment = comment)
+                    is UiComment.MoreComments -> {
+//                        MoreCommentsItem(comment = comment)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SubmissionActions(
+    state: State<SubmissionDetailState>,
+    onUpvote: () -> Unit,
+    onDownvote: () -> Unit
+) {
+    Divider(modifier = Modifier.fillMaxWidth())
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        UpvoteButton(voteState = state.value.voteState) { onUpvote() }
+        DownvoteButton(voteState = state.value.voteState) { onDownvote() }
+        Icon(
+            imageVector = Icons.Default.Share,
+            contentDescription = "Share button"
+        )
+        Icon(
+            imageVector = Icons.Default.Reply,
+            contentDescription = "Reply button"
+        )
+    }
+    Divider(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 16.dp))
+}
+
+@Composable
+fun DownvoteButton(
+    modifier: Modifier = Modifier,
+    voteState: VoteState,
+    onDownvote: () -> Unit
+) {
+    when (voteState) {
+        VoteState.Downvote -> {
+            Icon(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .background(Color.Red, shape = RoundedCornerShape(4.dp))
+                    .clickable { onDownvote() },
+                imageVector = Icons.Default.ArrowDownward,
+                contentDescription = "Downvote button"
+            )
+        }
+        VoteState.Upvote, VoteState.NoVote -> {
+            Icon(
+                modifier = modifier
+                    .padding(4.dp)
+                    .clickable { onDownvote() },
+                imageVector = Icons.Default.ArrowDownward,
+                contentDescription = "Downvote button"
+            )
+        }
+    }
+}
+
+@Composable
+fun UpvoteButton(
+    modifier: Modifier = Modifier,
+    voteState: VoteState,
+    onUpvote: () -> Unit
+) {
+    when (voteState) {
+        VoteState.Downvote, VoteState.NoVote -> {
+            Icon(
+                modifier = modifier
+                    .padding(4.dp)
+                    .clickable { onUpvote() },
+                imageVector = Icons.Default.ArrowUpward,
+                contentDescription = "Downvote button"
+            )
+        }
+        VoteState.Upvote -> {
+            Icon(
+                modifier = modifier
+                    .padding(4.dp)
+                    .background(Color.Blue, shape = RoundedCornerShape(4.dp))
+                    .clickable { onUpvote() },
+                imageVector = Icons.Default.ArrowUpward,
+                contentDescription = "Downvote button"
+            )
         }
     }
 }
@@ -138,44 +246,80 @@ val colorArray = listOf(
 )
 
 @Composable
-fun CommentItem(comment: Comment) {
-    Column {
-        Row(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
+fun CommentItem(
+    comment: UiComment.Comment,
+    onClick: (UiComment) -> Unit
+) {
+    AnimatedVisibility(
+        visible = !comment.isCollapsed,
+        enter = fadeIn(animationSpec = tween(150)) + expandVertically(animationSpec = tween(150)),
+        exit = shrinkVertically(animationSpec = tween(150)) + fadeOut(animationSpec = tween(150))
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick(comment) }
         ) {
-            if (comment.depth > 0 && comment.depth < colorArray.size) {
-                Divider(
-                    modifier = Modifier
-                        .padding(
-                            start = (DEPTH_INCREMENT * comment.depth).dp,
-                            top = 2.dp,
-                            bottom = 2.dp
-                        )
-                        .width(2.dp)
-                        .fillMaxHeight(),
-                    color = colorArray[comment.depth]
-                )
-            }
-            Column(
-                modifier = Modifier.padding(start = 8.dp)
+            Row(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
             ) {
-                Text(
-                    text = comment.author ?: "?",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = comment.body ?: "",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                if (comment.depth > 0 && comment.depth < colorArray.size) {
+                    Divider(
+                        modifier = Modifier
+                            .padding(
+                                start = (DEPTH_INCREMENT * comment.depth).dp,
+                                top = 2.dp,
+                                bottom = 2.dp
+                            )
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = colorArray[comment.depth]
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(11f)
+                ) {
+                    Text(
+                        text = comment.author,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    AnimatedVisibility(
+                        visible = !comment.parentCollapsed,
+                        enter = fadeIn(animationSpec = tween(150)) + expandVertically(animationSpec = tween(150)),
+                        exit = shrinkVertically(animationSpec = tween(150)) + fadeOut(animationSpec = tween(150))
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(top = 4.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            text = comment.body
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Crossfade(targetState = comment.parentCollapsed) { parentCollapsed ->
+                    if (parentCollapsed) {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Expand icon"
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(16.dp),
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = "Collapse icon"
+                        )
+                    }
+                }
             }
+            val extra = if (comment.depth > 0) 8 else 0
+            Divider(modifier = Modifier.padding(start = (extra + (DEPTH_INCREMENT * comment.depth)).dp))
         }
-        val extra = if (comment.depth > 0) 8 else 0
-        Divider(modifier = Modifier.padding(start = (extra + (DEPTH_INCREMENT * comment.depth)).dp))
     }
 }
 
@@ -227,7 +371,6 @@ fun SubmissionItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelfTextItem(
     modifier: Modifier = Modifier,
@@ -244,13 +387,12 @@ fun SelfTextItem(
         onUpvote = { onUpvote(it) },
         onDownvote = { onDownvote(it) }
     ) {
-        Text(
-            modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-            text = item.selfText,
-            style = MaterialTheme.typography.bodySmall,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
+        RichText(
+            modifier = modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+            style = RichTextStyle.Default
+        ) {
+            Markdown(content = item.selfText.trimIndent())
+        }
     }
 }
 
