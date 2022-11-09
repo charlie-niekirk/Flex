@@ -1,12 +1,11 @@
 package me.cniekirk.flex.navigation
 
 import android.os.Parcelable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.bumble.appyx.core.composable.Children
@@ -21,6 +20,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.navigation.animation.rememberBackstackDefaultAnimation
 import me.cniekirk.flex.navigation.node.CoreNode
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetScaffold
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetState
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetValue
+import me.cniekirk.flex.ui.compose.bottomsheet.rememberBottomSheetScaffoldState
 import me.cniekirk.flex.ui.submission.SubmissionDetail
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 
@@ -38,43 +41,42 @@ class FlexRootNode(
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             NavTarget.Core -> {
-                CoreNode(
-                    buildContext,
-                    onSubmissionClick = { submission ->
-                        backStack.push(NavTarget.SubmissionDetail(submission))
-                    },
-                    onSubmissionLongClick = { submission ->
-                        backStack.push(NavTarget.SubmissionActions(submission))
-                    }
-                )
+//                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+//                    bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
+//                )
+//                val scope = rememberCoroutineScope()
+//
+//                BottomSheetScaffold(
+//                    scaffoldState = bottomSheetScaffoldState,
+//                    sheetContent = {
+//                        Box(
+//                            Modifier
+//                                .fillMaxWidth()
+//                                .height(200.dp)
+//                        ) {
+//                            Text(text = "Hello from sheet")
+//                        }
+//                    }, sheetPeekHeight = 0.dp
+//                ) {
+                    CoreNode(
+                        buildContext,
+                        onSubmissionClick = { submission ->
+                            backStack.push(NavTarget.SubmissionDetail(submission))
+                        },
+                        onSubmissionLongClick = {
+
+                        }
+                    )
+//                }
             }
             is NavTarget.SubmissionDetail -> node(buildContext) {
                 SubmissionDetail(navTarget.submission)
             }
-            is NavTarget.SubmissionActions -> node(buildContext) {
-                // Bottom sheet
-                SheetExample()
-            }
-        }
-    }
-
-    @Composable
-    fun SheetExample() {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)) {
-
         }
     }
 
     @Composable
     override fun View(modifier: Modifier) {
-        LaunchedEffect(key1 = backStack.screenState) {
-            backStack.screenState.collect {
-                it.
-            }
-        }
-
         Column {
             Children(
                 modifier = Modifier.fillMaxSize(),
@@ -91,7 +93,4 @@ sealed class NavTarget : Parcelable {
 
     @Parcelize
     data class SubmissionDetail(val submission: UiSubmission) : NavTarget()
-
-    @Parcelize
-    data class SubmissionActions(val submission: UiSubmission) : NavTarget()
 }

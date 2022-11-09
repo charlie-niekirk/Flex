@@ -39,12 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.halilibo.richtext.markdown.Markdown
-import com.halilibo.richtext.ui.RichText
-import com.halilibo.richtext.ui.RichTextStyle
-import com.halilibo.richtext.ui.TableStyle
-import com.halilibo.richtext.ui.material3.Material3RichText
-import com.halilibo.richtext.ui.string.RichTextStringStyle
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.Comment
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
@@ -433,12 +427,17 @@ fun SelfTextItem(
         onUpvote = { onUpvote(it) },
         onDownvote = { onDownvote(it) }
     ) {
-        RichText(
+//        RichText(
+//            modifier = modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+//            style = RichTextStyle.Default
+//        ) {
+//            Markdown(content = item.selfText.trimIndent())
+//        }
+        Text(
             modifier = modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
-            style = RichTextStyle.Default
-        ) {
-            Markdown(content = item.selfText.trimIndent())
-        }
+            style = MaterialTheme.typography.bodySmall,
+            text = item.selfText
+        )
     }
 }
 

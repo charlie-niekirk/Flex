@@ -66,14 +66,14 @@ fun <T> rememberBackstackDefaultAnimation(
 }
 
 private data class Props(
-    val alpha: Float = 1f,
-    val scale: Float = 1f
+    val alpha: Float = 0f,
+    val scale: Float = 0f
 )
 
 private val created = Props()
 private val active = created.copy(alpha = 1f, scale = 1f)
 private val stashed = active.copy(alpha = 0f, scale = 1.1f)
-private val destroyed = stashed
+private val destroyed = stashed.copy(alpha = 0f, scale = 0.85f)
 
 private fun BackStack.State.toProps(): Props =
     when (this) {

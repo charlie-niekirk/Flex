@@ -1,8 +1,9 @@
 package me.cniekirk.flex.navigation.node
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.List
@@ -11,8 +12,10 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.bumble.appyx.core.composable.Child
 import com.bumble.appyx.core.composable.Children
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -21,10 +24,20 @@ import com.bumble.appyx.core.node.node
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.replace
 import com.bumble.appyx.navmodel.backstack.transitionhandler.rememberBackstackFader
+import com.bumble.appyx.navmodel.spotlight.Spotlight
+import com.bumble.appyx.navmodel.spotlight.activeIndex
+import com.bumble.appyx.navmodel.spotlight.operation.activate
+import com.bumble.appyx.navmodel.spotlight.transitionhandler.rememberSpotlightFader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.navigation.target.CoreTarget
 import me.cniekirk.flex.ui.auth.LoginPage
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetScaffold
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetState
+import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetValue
+import me.cniekirk.flex.ui.compose.bottomsheet.rememberBottomSheetScaffoldState
 import me.cniekirk.flex.ui.search.SearchPage
 import me.cniekirk.flex.ui.settings.SettingsPage
 import me.cniekirk.flex.ui.submission.SubmissionList
@@ -32,17 +45,25 @@ import me.cniekirk.flex.ui.submission.model.UiSubmission
 
 class CoreNode(
     buildContext: BuildContext,
-    private val backStack: BackStack<CoreTarget> = BackStack(
-        initialElement = CoreTarget.SubmissionsList(),
-        savedStateMap = buildContext.savedStateMap,
+    private val spotlight: Spotlight<CoreTarget> = Spotlight(
+        items = listOf(
+            CoreTarget.SubmissionsList(),
+            CoreTarget.Search,
+            CoreTarget.Account,
+            CoreTarget.Settings
+        ),
+        savedStateMap = buildContext.savedStateMap
     ),
     private val onSubmissionClick: (UiSubmission) -> Unit,
     private val onSubmissionLongClick: (UiSubmission) -> Unit
 ) : ParentNode<CoreTarget>(
-    navModel = backStack,
+    navModel = spotlight,
     buildContext = buildContext
 ) {
-    @OptIn(ExperimentalCoroutinesApi::class)
+    private var subreddit: String? = null
+    private val bottomSheetValue = MutableStateFlow(BottomSheetValue.Collapsed)
+
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalMaterial3Api::class)
     override fun resolve(navTarget: CoreTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             CoreTarget.Account -> node(buildContext) {
@@ -51,8 +72,9 @@ class CoreNode(
                 }
             }
             CoreTarget.Search -> node(buildContext) {
-                SearchPage {
-                    backStack.replace(CoreTarget.SubmissionsList(it))
+                SearchPage { searchResult ->
+                    subreddit = searchResult
+                    spotlight.activate(0)
                 }
             }
             CoreTarget.Settings -> node(buildContext) {
@@ -60,78 +82,98 @@ class CoreNode(
             }
             // TODO: Make it a parent node with it's own sheet animations
             is CoreTarget.SubmissionsList -> node(buildContext) {
+                val scope = rememberCoroutineScope()
                 SubmissionList(
-                    subreddit = navTarget.subreddit,
+                    subreddit = subreddit ?: "ukpersonalfinance",
                     onClick = { onSubmissionClick(it) },
-                    onLongClick = { onSubmissionLongClick(it) }
+                    onLongClick = {
+                        // I need to expand/contract the bottom sheet here...
+                        scope.launch {
+                            val state = when (bottomSheetValue.value) {
+                                BottomSheetValue.Collapsed -> { BottomSheetValue.Expanded }
+                                BottomSheetValue.Expanded -> { BottomSheetValue.Collapsed }
+                            }
+                            bottomSheetValue.emit(state)
+                        }
+                    }
                 )
             }
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
     @Composable
     override fun View(modifier: Modifier) {
-        var selectedItem by remember { mutableStateOf(0) }
 
-        val item = backStack.screenState.collectAsStateWithLifecycle()
-        selectedItem = when (item.value.onScreen.first().key.navTarget) {
-            CoreTarget.Account -> { 2 }
-            CoreTarget.Search -> { 1 }
-            CoreTarget.Settings -> { 3 }
-            is CoreTarget.SubmissionsList -> { 0 }
-        }
+        val bottomValue = bottomSheetValue.collectAsState()
+        val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+            bottomSheetState = BottomSheetState(bottomValue.value)
+        )
+        val currentlyActive = spotlight.activeIndex().collectAsState(initial = 0)
 
-        Scaffold(
-            bottomBar = {
-                NavigationBar {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.List, contentDescription = "Submission list") },
-                        label = { Text("Posts") },
-                        selected = selectedItem == 0,
-                        onClick = {
-                            selectedItem = 0
-                            backStack.replace(CoreTarget.SubmissionsList())
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
-                        label = { Text("Search") },
-                        selected = selectedItem == 1,
-                        onClick = {
-                            selectedItem = 1
-                            backStack.replace(CoreTarget.Search)
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Account") },
-                        label = { Text("Account") },
-                        selected = selectedItem == 2,
-                        onClick = {
-                            selectedItem = 2
-                            backStack.replace(CoreTarget.Account)
-                        }
-                    )
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
-                        label = { Text("Settings") },
-                        selected = selectedItem == 3,
-                        onClick = {
-                            selectedItem = 3
-                            backStack.replace(CoreTarget.Settings)
-                        }
-                    )
+        BottomSheetScaffold(
+            scaffoldState = bottomSheetScaffoldState,
+            sheetContent = {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(
+                        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                ) {
+                    Text(text = "Something crazy bro")
                 }
+            },
+            sheetPeekHeight = 0.dp
+        ) {
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Filled.List, contentDescription = "Submission list") },
+                            label = { Text("Posts") },
+                            selected = currentlyActive.value == 0,
+                            onClick = {
+                                spotlight.activate(0)
+                            }
+                        )
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Filled.Search, contentDescription = "Search") },
+                            label = { Text("Search") },
+                            selected = currentlyActive.value == 1,
+                            onClick = {
+                                spotlight.activate(1)
+                            }
+                        )
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Filled.AccountCircle, contentDescription = "Account") },
+                            label = { Text("Account") },
+                            selected = currentlyActive.value == 2,
+                            onClick = {
+                                spotlight.activate(2)
+                            }
+                        )
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
+                            label = { Text("Settings") },
+                            selected = currentlyActive.value == 3,
+                            onClick = {
+                                spotlight.activate(3)
+                            }
+                        )
+                    }
+                }
+            ) { paddingValues ->
+                Children(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = paddingValues.calculateBottomPadding()),
+                    navModel = spotlight,
+                    transitionHandler = rememberSpotlightFader()
+                )
             }
-        ) { paddingValues ->
-            Children(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = paddingValues.calculateBottomPadding()),
-                navModel = backStack,
-                transitionHandler = rememberBackstackFader()
-            )
         }
     }
 }
