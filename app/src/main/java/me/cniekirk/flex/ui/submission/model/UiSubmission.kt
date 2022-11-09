@@ -21,6 +21,7 @@ sealed class UiSubmission : Parcelable {
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
+        val url: String,
         override val numComments: String,
         val timeSincePost: String,
         override val submissionId: String,
@@ -62,6 +63,7 @@ sealed class UiSubmission : Parcelable {
         val upVotes: Int,
         val upVotePercentage: Int,
         override val numComments: String,
+        val tweetUrl: String,
         val tweetAuthor: String,
         val tweetAuthorHandle: String,
         val tweetAuthorVerified: Boolean,
@@ -79,6 +81,7 @@ sealed class UiSubmission : Parcelable {
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
+        val externalLink: String,
         override val numComments: String,
         val timeSincePost: String,
         override val submissionId: String,
@@ -92,10 +95,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
     return if (this.isSelf == true) {
         UiSubmission.SelfTextSubmission(
             this.title,
-            this.authorFullname ?: "unknown",
+            this.author,
             this.selftext ?: "",
             this.ups ?: 0,
             this.upvoteRatio.toInt(),
+            this.url,
             this.numComments?.toString() ?: "?",
             this.createdUtc.toLong().getElapsedTime(),
             this.id,
@@ -104,12 +108,13 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
     } else {
         when (linkType) {
             Link.ExternalLink -> {
-                UiSubmission.SelfTextSubmission(
+                UiSubmission.ExternalLinkSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.urlOverriddenByDest ?: "",
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,
@@ -119,10 +124,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             Link.GfycatLink -> {
                 UiSubmission.SelfTextSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.url,
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,
@@ -132,7 +138,7 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             is Link.ImageLink -> {
                 UiSubmission.ImageSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
@@ -146,10 +152,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             is Link.ImgurGalleryLink -> {
                 UiSubmission.SelfTextSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.url,
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,
@@ -159,10 +166,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             Link.RedGifLink -> {
                 UiSubmission.SelfTextSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.url,
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,
@@ -172,10 +180,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             Link.RedditGallery -> {
                 UiSubmission.SelfTextSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.url,
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,
@@ -192,7 +201,7 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
 
                 UiSubmission.VideoSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
@@ -206,7 +215,7 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             Link.StreamableLink -> {
                 UiSubmission.VideoSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
@@ -221,13 +230,14 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                 tweetDetails?.let {
                     UiSubmission.TwitterSubmission(
                         this.title,
-                        this.authorFullname ?: "unknown",
+                        this.author,
                         this.selftext ?: "",
                         this.ups ?: 0,
                         this.upvoteRatio.toInt(),
                         this.numComments?.toString() ?: "?",
                         it.includes?.users?.first()?.name ?: "",
                         it.includes?.users?.first()?.username ?: "",
+                        this.url,
                         it.includes?.users?.first()?.verified == true,
                         it.data?.text ?: "",
                         it.includes?.media?.first()?.previewImageUrl,
@@ -238,10 +248,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
                 } ?: run {
                     UiSubmission.SelfTextSubmission(
                         this.title,
-                        this.authorFullname ?: "unknown",
+                        this.author,
                         this.selftext ?: "",
                         this.ups ?: 0,
                         this.upvoteRatio.toInt(),
+                        this.url,
                         this.numComments?.toString() ?: "?",
                         this.createdUtc.toLong().getElapsedTime(),
                         this.id,
@@ -252,7 +263,7 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             is Link.VideoLink -> {
                 UiSubmission.VideoSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
@@ -266,10 +277,11 @@ fun AuthedSubmission.toUiSubmission(): UiSubmission {
             is Link.YoutubeLink -> {
                 UiSubmission.SelfTextSubmission(
                     this.title,
-                    this.authorFullname ?: "unknown",
+                    this.author,
                     this.selftext ?: "",
                     this.ups ?: 0,
                     this.upvoteRatio.toInt(),
+                    this.url,
                     this.numComments?.toString() ?: "?",
                     this.createdUtc.toLong().getElapsedTime(),
                     this.id,

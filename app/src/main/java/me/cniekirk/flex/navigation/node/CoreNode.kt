@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumble.appyx.core.composable.Children
 import com.bumble.appyx.core.modality.BuildContext
 import com.bumble.appyx.core.node.Node
@@ -20,6 +22,7 @@ import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.replace
 import com.bumble.appyx.navmodel.backstack.transitionhandler.rememberBackstackFader
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import me.cniekirk.flex.navigation.target.CoreTarget
 import me.cniekirk.flex.ui.auth.LoginPage
 import me.cniekirk.flex.ui.search.SearchPage
@@ -33,7 +36,8 @@ class CoreNode(
         initialElement = CoreTarget.SubmissionsList(),
         savedStateMap = buildContext.savedStateMap,
     ),
-    private val onSubmissionClick: (UiSubmission) -> Unit
+    private val onSubmissionClick: (UiSubmission) -> Unit,
+    private val onSubmissionLongClick: (UiSubmission) -> Unit
 ) : ParentNode<CoreTarget>(
     navModel = backStack,
     buildContext = buildContext
@@ -54,17 +58,31 @@ class CoreNode(
             CoreTarget.Settings -> node(buildContext) {
                 SettingsPage()
             }
+            // TODO: Make it a parent node with it's own sheet animations
             is CoreTarget.SubmissionsList -> node(buildContext) {
-                SubmissionList(subreddit = navTarget.subreddit, onClick = { onSubmissionClick(it) })
+                SubmissionList(
+                    subreddit = navTarget.subreddit,
+                    onClick = { onSubmissionClick(it) },
+                    onLongClick = { onSubmissionLongClick(it) }
+                )
             }
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalLifecycleComposeApi::class)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     override fun View(modifier: Modifier) {
         var selectedItem by remember { mutableStateOf(0) }
+
+        val item = backStack.screenState.collectAsStateWithLifecycle()
+        selectedItem = when (item.value.onScreen.first().key.navTarget) {
+            CoreTarget.Account -> { 2 }
+            CoreTarget.Search -> { 1 }
+            CoreTarget.Settings -> { 3 }
+            is CoreTarget.SubmissionsList -> { 0 }
+        }
+
         Scaffold(
             bottomBar = {
                 NavigationBar {
@@ -108,7 +126,9 @@ class CoreNode(
             }
         ) { paddingValues ->
             Children(
-                modifier = Modifier.fillMaxSize().padding(bottom = paddingValues.calculateBottomPadding()),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = paddingValues.calculateBottomPadding()),
                 navModel = backStack,
                 transitionHandler = rememberBackstackFader()
             )

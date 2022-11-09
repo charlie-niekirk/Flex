@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.FlexSettings
+import me.cniekirk.flex.FlexSettings.Profile
 import me.cniekirk.flex.ui.settings.state.SettingsSideEffect
 import me.cniekirk.flex.ui.settings.state.SettingsState
+import me.cniekirk.flex.ui.settings.state.toUiSettings
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -37,12 +39,22 @@ class SettingsViewModel @Inject constructor(
             .catch { exception ->
                 if (exception is IOException) {
                     Timber.e(exception)
-                    emit(FlexSettings.getDefaultInstance())
+                    val profile = Profile.newBuilder()
+                        .setBlurNsfw(true)
+                        .setSelected(true)
+                        .setName("Default")
+                        .setShowPreviews(true)
+                        .setPersonalNotifications(false)
+                        .build()
+                    val settings = FlexSettings.newBuilder().setProfiles(0, profile).build()
+                    emit(settings)
                 } else {
                     throw exception
                 }
             }
-            .collect { reduce { state.copy(settings = it) } }
+            .collect { flexSettings ->
+                reduce { state.copy(settings = flexSettings.toUiSettings()) }
+            }
     }
 
     fun setBlurNsfw() = intent {

@@ -1,7 +1,12 @@
 package me.cniekirk.flex.ui.submission
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.tween
@@ -70,7 +75,45 @@ fun SubmissionDetail(submission: UiSubmission, viewModel: SubmissionDetailViewMo
             }
         }
     }
+
     SubmissionDetailContent(state, submission, viewModel::upvoteClicked, viewModel::downvoteClicked, viewModel::collapseComment)
+}
+
+class ShareMedia : ActivityResultContract<Uri, Unit>() {
+
+    override fun createIntent(context: Context, input: Uri): Intent {
+        return Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+            type = context.contentResolver.getType(input)
+            putExtra(Intent.EXTRA_STREAM, input)
+        }, null)
+    }
+
+    override fun parseResult(resultCode: Int, intent: Intent?) {}
+}
+
+@Composable
+private fun ShareSubmission(submission: UiSubmission) {
+    val uri = when (submission) {
+        is UiSubmission.ExternalLinkSubmission -> {
+            Uri.parse(submission.externalLink)
+        }
+        is UiSubmission.ImageSubmission -> {
+            val configuration = LocalConfiguration.current
+            val resolution = getSuitablePreview(configuration.screenWidthDp, submission.previewImage)
+            Uri.parse(resolution?.url)
+        }
+        is UiSubmission.SelfTextSubmission -> {
+            Uri.parse(submission.url)
+        }
+        is UiSubmission.TwitterSubmission -> {
+            Uri.parse(submission.tweetUrl)
+        }
+        is UiSubmission.VideoSubmission -> {
+            Uri.parse(submission.videoLink)
+        }
+    }
+    val launcher = rememberLauncherForActivityResult(contract = ShareMedia(), onResult = {})
+    launcher.launch(uri)
 }
 
 @Composable
@@ -130,7 +173,8 @@ fun SubmissionDetailContent(
                 SubmissionActions(
                     state,
                     onUpvote = { onUpvote(submission.submissionName) },
-                    onDownvote = { onDownvote(submission.submissionName) }
+                    onDownvote = { onDownvote(submission.submissionName) },
+                    onShare = {}
                 )
             }
             items(comments.size) { index ->
@@ -153,7 +197,8 @@ fun SubmissionDetailContent(
 fun SubmissionActions(
     state: State<SubmissionDetailState>,
     onUpvote: () -> Unit,
-    onDownvote: () -> Unit
+    onDownvote: () -> Unit,
+    onShare: () -> Unit
 ) {
     Divider(modifier = Modifier.fillMaxWidth())
     Row(
@@ -165,6 +210,7 @@ fun SubmissionActions(
         UpvoteButton(voteState = state.value.voteState) { onUpvote() }
         DownvoteButton(voteState = state.value.voteState) { onDownvote() }
         Icon(
+            modifier = Modifier.clickable { onShare() },
             imageVector = Icons.Default.Share,
             contentDescription = "Share button"
         )

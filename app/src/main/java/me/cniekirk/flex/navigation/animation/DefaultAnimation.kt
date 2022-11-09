@@ -1,4 +1,4 @@
-package me.cniekirk.flex.navigation
+package me.cniekirk.flex.navigation.animation
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -18,7 +18,7 @@ import com.bumble.appyx.navmodel.backstack.BackStack
 
 class DefaultAnimation<T>(
     private val alphaSpec: TransitionSpec<BackStack.State, Float>,
-    private val transitionSpec: TransitionSpec<BackStack.State, Float>,
+    private val scaleSpec: TransitionSpec<BackStack.State, Float>,
     override val clipToBounds: Boolean = false
 ) : ModifierTransitionHandler<T, BackStack.State>() {
 
@@ -29,24 +29,14 @@ class DefaultAnimation<T>(
         descriptor: TransitionDescriptor<T, BackStack.State>
     ): Modifier = modifier.composed {
         val scale = transition.animateFloat(
-            transitionSpec = transitionSpec,
-            targetValueByState = {
-                when (it) {
-                    BackStack.State.ACTIVE -> 1f
-                    BackStack.State.STASHED -> 1.1f
-                    else -> 0.85f
-                }
-            }, label = ""
+            transitionSpec = scaleSpec,
+            targetValueByState = { it.toProps().scale },
+            label = ""
         )
 
         val alpha = transition.animateFloat(
             transitionSpec = alphaSpec,
-            targetValueByState = {
-                when (it) {
-                    BackStack.State.ACTIVE -> 1f
-                    else -> 0f
-                }
-            }, label = ""
+            targetValueByState = { it.toProps().alpha }, label = ""
         )
 
         alpha(alpha.value).scale(scale.value)
@@ -65,12 +55,30 @@ fun <T> rememberBackstackDefaultAnimation(
     alphaSpec: TransitionSpec<BackStack.State, Float> = {
         tween(50, 50, LinearEasing)
     },
-    transitionSpec: TransitionSpec<BackStack.State, Float> = {
+    scaleSpec: TransitionSpec<BackStack.State, Float> = {
         val easing = Easing {
             PathInterpolatorCompat.create(path).getInterpolation(it)
         }
         tween(300, 0, easing)
     }
 ): ModifierTransitionHandler<T, BackStack.State> = remember {
-    DefaultAnimation(transitionSpec = transitionSpec, alphaSpec = alphaSpec)
+    DefaultAnimation(scaleSpec = scaleSpec, alphaSpec = alphaSpec)
 }
+
+private data class Props(
+    val alpha: Float = 1f,
+    val scale: Float = 1f
+)
+
+private val created = Props()
+private val active = created.copy(alpha = 1f, scale = 1f)
+private val stashed = active.copy(alpha = 0f, scale = 1.1f)
+private val destroyed = stashed
+
+private fun BackStack.State.toProps(): Props =
+    when (this) {
+        BackStack.State.CREATED -> created
+        BackStack.State.ACTIVE -> active
+        BackStack.State.STASHED -> stashed
+        BackStack.State.DESTROYED -> destroyed
+    }

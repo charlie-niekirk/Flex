@@ -3,7 +3,9 @@ package me.cniekirk.flex.ui.submission
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,6 +41,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.*
 import me.cniekirk.flex.ui.compose.VideoPlayer
@@ -55,7 +58,16 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
-fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), subreddit: String = "", onClick: (UiSubmission) -> Unit) {
+fun SubmissionList(
+    viewModel: SubmissionListViewModel = viewModel(),
+    subreddit: String = "",
+    onClick: (UiSubmission) -> Unit,
+    onLongClick: (UiSubmission) -> Unit
+) {
+    if (subreddit.isNotEmpty()) {
+        viewModel.updateSubreddit(subreddit)
+    }
+
     val context = LocalContext.current
     val state = viewModel.collectAsState()
     viewModel.collectSideEffect { effect ->
@@ -68,11 +80,15 @@ fun SubmissionList(viewModel: SubmissionListViewModel = viewModel(), subreddit: 
             }
         }
     }
-    SubmissionListContent(state, onClick)
+    SubmissionListContent(state, onClick, onLongClick)
 }
 
 @Composable
-fun SubmissionListContent(state: State<SubmissionListState>, onClick: (UiSubmission) -> Unit) {
+fun SubmissionListContent(
+    state: State<SubmissionListState>,
+    onClick: (UiSubmission) -> Unit,
+    onLongClick: (UiSubmission) -> Unit
+) {
     val pagingItems = state.value.submissions.collectAsLazyPagingItems()
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -100,19 +116,22 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: (UiSubmiss
                         }
                     }
                     is UiSubmission.SelfTextSubmission -> {
-                        SelfTextItem(modifier = Modifier.padding(top = 8.dp), item) {
-                            onClick(item)
-                        }
+                        SelfTextItem(modifier = Modifier.padding(top = 8.dp), item,
+                            onClick = { onClick(item) },
+                            onLongClick = { onLongClick(item) }
+                        )
                     }
                     is UiSubmission.VideoSubmission -> {
-                        VideoItem(modifier = Modifier.padding(top = 8.dp), item = item) {
-                            onClick(item)
-                        }
+                        VideoItem(modifier = Modifier.padding(top = 8.dp), item = item,
+                            onClick = { onClick(item) },
+                            onLongClick = { onLongClick(item) }
+                        )
                     }
                     is UiSubmission.TwitterSubmission -> {
-                        TweetItem(modifier = Modifier.padding(top = 8.dp), item = item) {
-                            onClick(item)
-                        }
+                        TweetItem(modifier = Modifier.padding(top = 8.dp), item = item,
+                            onClick = { onClick(item) },
+                            onLongClick = { onLongClick(item) }
+                        )
                     }
                     is UiSubmission.ExternalLinkSubmission -> {
 
@@ -147,7 +166,7 @@ fun SubmissionListContent(state: State<SubmissionListState>, onClick: (UiSubmiss
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SubmissionItem(
     modifier: Modifier = Modifier,
@@ -156,10 +175,14 @@ fun SubmissionItem(
     upvote: Int,
     numComments: String,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     Surface(
-        onClick = { onClick() }
+        modifier = Modifier.combinedClickable(
+            onClick = { onClick() },
+            onLongClick = { onLongClick() }
+        )
     ) {
         Column(modifier = modifier.fillMaxWidth()) {
             Column(
@@ -189,14 +212,18 @@ fun SubmissionItem(
 fun SelfTextItem(
     modifier: Modifier = Modifier,
     item: UiSubmission.SelfTextSubmission,
-    onClick: () -> Unit) {
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
     SubmissionItem(
         modifier = modifier,
         title = item.title,
         author = item.author,
         upvote = item.upVotes,
         numComments = item.numComments,
-        onClick = { onClick() }) {
+        onClick = { onClick() },
+        onLongClick = { onLongClick() }
+    ) {
         Text(
             modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
             text = item.selfText,
@@ -211,14 +238,18 @@ fun SelfTextItem(
 fun TweetItem(
     modifier: Modifier = Modifier,
     item: UiSubmission.TwitterSubmission,
-    onClick: () -> Unit) {
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
     SubmissionItem(
         modifier = modifier,
         title = item.title,
         author = item.author,
         upvote = item.upVotes,
         numComments = item.numComments,
-        onClick = { onClick() }) {
+        onClick = { onClick() },
+        onLongClick = { onLongClick() }
+    ) {
         item.tweetImageUrl?.let {
             Column(modifier = Modifier.padding(all = 8.dp)) {
                 AsyncImage(
@@ -340,14 +371,18 @@ fun TweetItem(
 fun VideoItem(
     modifier: Modifier = Modifier,
     item: UiSubmission.VideoSubmission,
-    onClick: () -> Unit) {
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
     SubmissionItem(
         modifier = modifier,
         title = item.title,
         author = item.author,
         upvote = item.upVotes,
         numComments = item.numComments,
-        onClick = { onClick() }) {
+        onClick = { onClick() },
+        onLongClick = { onLongClick() }
+    ) {
         VideoPlayer(
             modifier = Modifier.padding(bottom = 8.dp),
             uri = Uri.parse(item.videoLink)
@@ -486,9 +521,10 @@ fun ItemFooterPreview() {
 @Composable
 fun SubmissionListPreview() {
     val items = flowOf(PagingData.from(createFakeData()))
-    val state = mutableStateOf(SubmissionListState(items, "flexapp", "new"))
+    val settings = FlexSettings.getDefaultInstance()
+    val state = mutableStateOf(SubmissionListState(items, settings, "flexapp", "new"))
     FlexTheme {
-        SubmissionListContent(state) {}
+        SubmissionListContent(state, onClick = {}, onLongClick = {})
     }
 }
 

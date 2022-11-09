@@ -68,26 +68,35 @@ class SubmissionListViewModel @Inject constructor(
         loadSubmissions()
     }
 
-    val settingsFlow: Flow<FlexSettings> = flexSettings.data
-        .catch { exception ->
-            if (exception is IOException) {
-                Timber.e(exception)
-                emit(FlexSettings.getDefaultInstance())
-            } else {
-                throw exception
-            }
-        }
-
     private fun loadSubmissions() = intent {
-        val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
-            SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
-                imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
-        }.flow.map { pagingData ->
-                pagingData.map { submission -> submission.toUiSubmission() }
-            }.cachedIn(viewModelScope)
-        reduce {
-            state.copy(submissions = pager)
-        }
+        flexSettings.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    Timber.e(exception)
+                    val profile = FlexSettings.Profile.newBuilder()
+                        .setBlurNsfw(true)
+                        .setSelected(true)
+                        .setName("Default")
+                        .setShowPreviews(true)
+                        .setPersonalNotifications(false)
+                        .build()
+                    val settings = FlexSettings.newBuilder().setProfiles(0, profile).build()
+                    emit(settings)
+                } else {
+                    postSideEffect(SubmissionListSideEffect.Error(R.string.generic_network_error))
+                }
+            }
+            .collect { settings ->
+                val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
+                    SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
+                        imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
+                }.flow.map { pagingData ->
+                    pagingData.map { submission -> submission.toUiSubmission() }
+                }.cachedIn(viewModelScope)
+                reduce {
+                    state.copy(submissions = pager, settings = settings)
+                }
+            }
     }
 
     fun updateSubreddit(subreddit: String) = intent {
