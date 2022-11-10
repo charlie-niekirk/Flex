@@ -13,11 +13,12 @@ sealed class UiSubmission : Parcelable {
     abstract val numComments: String
     abstract val submissionId: String
     abstract val submissionName: String
+    abstract val author: String
 
     @Parcelize
     data class SelfTextSubmission(
         val title: String,
-        val author: String,
+        override val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
@@ -30,7 +31,7 @@ sealed class UiSubmission : Parcelable {
     @Parcelize
     data class ImageSubmission(
         val title: String,
-        val author: String,
+        override val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
@@ -44,7 +45,7 @@ sealed class UiSubmission : Parcelable {
     @Parcelize
     data class VideoSubmission(
         val title: String,
-        val author: String,
+        override val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
@@ -58,7 +59,7 @@ sealed class UiSubmission : Parcelable {
     @Parcelize
     data class TwitterSubmission(
         val title: String,
-        val author: String,
+        override val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,
@@ -77,7 +78,7 @@ sealed class UiSubmission : Parcelable {
     @Parcelize
     data class ExternalLinkSubmission(
         val title: String,
-        val author: String,
+        override val author: String,
         val selfText: String,
         val upVotes: Int,
         val upVotePercentage: Int,

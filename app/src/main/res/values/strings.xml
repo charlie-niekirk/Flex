@@ -83,7 +83,7 @@
     <string name="subscribe">Subscribe</string>
     <string name="unsubscribe">Unsubscribe</string>
     <string name="favourite">Favourite</string>
-    <string name="options_sub_title">options</string>
+    <string name="options_sub_title">Options</string>
     <string name="rules_title_format">r/%1$s rules</string>
     <string name="sidebar_title_format">r/%1$s sidebar</string>
     <string name="moderators_title_format">r/%1$s mods</string>
@@ -152,4 +152,7 @@
     <string name="tweet_image">Tweet image</string>
     <string name="search_title">Search</string>
     <string name="tick">Tick icon</string>
+    <string name="upvote_success">Upvoted!</string>
+    <string name="remove_vote_success">Removed vote!</string>
+    <string name="downvote_success">Downvoted!</string>
 </resources>
