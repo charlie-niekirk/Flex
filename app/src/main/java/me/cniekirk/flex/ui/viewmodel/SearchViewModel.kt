@@ -56,7 +56,7 @@ class SearchViewModel @Inject constructor(
                 RedditResult.Loading -> {}
                 is RedditResult.Success -> {
                     result.data.displayName?.let { name ->
-                        postSideEffect(SearchSideEffect.RandomSelected(name))
+                        postSideEffect(SearchSideEffect.SubredditSelected(name))
                     } ?: run {
                         postSideEffect(SearchSideEffect.Error(R.string.generic_network_error))
                     }

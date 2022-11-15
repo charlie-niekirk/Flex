@@ -16,6 +16,7 @@ import com.bumble.appyx.core.node.ParentNode
 import com.bumble.appyx.core.node.node
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.push
+import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.navigation.animation.rememberBackstackDefaultAnimation
@@ -41,33 +42,12 @@ class FlexRootNode(
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             NavTarget.Core -> {
-//                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-//                    bottomSheetState = BottomSheetState(BottomSheetValue.Collapsed)
-//                )
-//                val scope = rememberCoroutineScope()
-//
-//                BottomSheetScaffold(
-//                    scaffoldState = bottomSheetScaffoldState,
-//                    sheetContent = {
-//                        Box(
-//                            Modifier
-//                                .fillMaxWidth()
-//                                .height(200.dp)
-//                        ) {
-//                            Text(text = "Hello from sheet")
-//                        }
-//                    }, sheetPeekHeight = 0.dp
-//                ) {
-                    CoreNode(
-                        buildContext,
-                        onSubmissionClick = { submission ->
-                            backStack.push(NavTarget.SubmissionDetail(submission))
-                        },
-                        onSubmissionLongClick = {
-
-                        }
-                    )
-//                }
+                CoreNode(
+                    buildContext,
+                    onSubmissionClick = { submission ->
+                        backStack.push(NavTarget.SubmissionDetail(submission))
+                    }
+                )
             }
             is NavTarget.SubmissionDetail -> node(buildContext) {
                 SubmissionDetail(navTarget.submission)

@@ -2,6 +2,7 @@ package me.cniekirk.flex.ui.search
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,12 +43,12 @@ fun SearchPage(
             is SearchSideEffect.Error -> {
                 Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
             }
-            is SearchSideEffect.RandomSelected -> {
+            is SearchSideEffect.SubredditSelected -> {
                 subredditSelected(sideEffect.subreddit)
             }
         }
     }
-    SearchPageContent(state, viewModel::onSearch, viewModel::randomClicked)
+    SearchPageContent(state, viewModel::onSearch, viewModel::randomClicked) { subredditSelected(it) }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +56,8 @@ fun SearchPage(
 fun SearchPageContent(
     state: State<SearchState>,
     onSearchChange: (String) -> Unit,
-    onRandomSelected: (String) -> Unit
+    onRandomSelected: (String) -> Unit,
+    subredditSelected: (String) -> Unit
 ) {
     var text by remember { mutableStateOf(TextFieldValue("")) }
     Column(
@@ -80,22 +83,28 @@ fun SearchPageContent(
             shape = RoundedCornerShape(40.dp)
         )
         Button(
-            modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth(),
             onClick = { onRandomSelected("random") }
         ) {
             Text(text = "Random")
         }
         Button(
-            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
+                .fillMaxWidth(),
             onClick = { onRandomSelected("randnsfw") }
         ) {
             Text(text = "RandNSFW")
         }
 
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        LazyColumn(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
             items(state.value.searchResults.size) {
                 state.value.searchResults.forEach { subreddit ->
-                    SubredditItem(subreddit)
+                    SubredditItem(subreddit) {
+                        subredditSelected(it)
+                    }
                 }
             }
 
@@ -104,18 +113,30 @@ fun SearchPageContent(
 }
 
 @Composable
-fun SubredditItem(subreddit: Subreddit) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp, 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+fun SubredditItem(
+    subreddit: Subreddit,
+    subredditSelected: (String) -> Unit
+) {
+    Column {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { subreddit.displayName?.let(subredditSelected) }
+            .padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = subreddit.displayName ?: "",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             Text(
-                modifier = Modifier.padding(start = 8.dp),
-                text = subreddit.displayName ?: "",
-                style = MaterialTheme.typography.bodySmall
+                modifier = Modifier.padding(top = 2.dp),
+                text = subreddit.description ?: "",
+                style = MaterialTheme.typography.bodySmall,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
         }
         Divider()
@@ -128,6 +149,6 @@ fun SubredditItem(subreddit: Subreddit) {
 fun SearchPagePreview() {
     val state = mutableStateOf(SearchState())
     FlexTheme {
-        SearchPageContent(state, onSearchChange = {}, onRandomSelected = {})
+        SearchPageContent(state, onSearchChange = {}, onRandomSelected = {}, subredditSelected = {})
     }
 }

@@ -1,6 +1,7 @@
 package me.cniekirk.flex.navigation.node
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -43,7 +45,12 @@ import me.cniekirk.flex.ui.search.SearchPage
 import me.cniekirk.flex.ui.settings.SettingsPage
 import me.cniekirk.flex.ui.submission.SubmissionList
 import me.cniekirk.flex.ui.submission.model.UiSubmission
+import me.cniekirk.flex.ui.submission.state.SubmissionActionsEffect
+import me.cniekirk.flex.ui.submission.state.SubmissionActionsState
 import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
+import me.cniekirk.flex.ui.viewmodel.SubmissionActionsViewModel
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 sealed class BottomSheetItem {
     abstract val actionName: String
@@ -68,6 +75,21 @@ sealed class BottomSheetItem {
         override val actionName: String = "Downvote",
         override val actionIcon: ImageVector = Icons.Default.ArrowDownward
     ) : BottomSheetItem()
+
+    data class Report(
+        override val actionName: String = "Report",
+        override val actionIcon: ImageVector = Icons.Default.Flag
+    ) : BottomSheetItem()
+
+    data class Hide(
+        override val actionName: String = "Hide",
+        override val actionIcon: ImageVector = Icons.Default.HideSource
+    ) : BottomSheetItem()
+
+    data class Award(
+        override val actionName: String = "Gift Award",
+        override val actionIcon: ImageVector = Icons.Default.Redeem
+    ) : BottomSheetItem()
 }
 
 class CoreNode(
@@ -81,8 +103,7 @@ class CoreNode(
         ),
         savedStateMap = buildContext.savedStateMap
     ),
-    private val onSubmissionClick: (UiSubmission) -> Unit,
-    private val onSubmissionLongClick: (UiSubmission) -> Unit
+    private val onSubmissionClick: (UiSubmission) -> Unit
 ) : ParentNode<CoreTarget>(
     navModel = spotlight,
     buildContext = buildContext
@@ -184,6 +205,9 @@ class CoreNode(
                                                 is BottomSheetItem.Downvote -> {
                                                     submission?.let(onDownvote)
                                                 }
+                                                is BottomSheetItem.Award -> {}
+                                                is BottomSheetItem.Hide -> {}
+                                                is BottomSheetItem.Report -> {}
                                             }
                                         }
                                 ) {
@@ -219,7 +243,7 @@ class CoreNode(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = submission?.author ?: "?",
+                                        text = "u/${submission?.author}",
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
@@ -240,35 +264,38 @@ class CoreNode(
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
     @Composable
-    override fun View(modifier: Modifier) {
-
-        val modalBottomSheetScaffoldState = rememberModalBottomSheetState(
-            initialValue = ModalBottomSheetValue.Hidden
-        )
+    fun CoreNodeContent(
+        modifier: Modifier,
+        state: State<SubmissionActionsState>,
+        modalBottomSheetState: ModalBottomSheetState,
+        onUpvote: (UiSubmission) -> Unit,
+        onDownvote: (UiSubmission) -> Unit
+    ) {
         val currentlyActive = spotlight.activeIndex().collectAsState(initial = 0)
-
-        val state = bottomSheetValue.collectAsState(null)
+        val bottomState = bottomSheetValue.collectAsState(null)
 
         LaunchedEffect(bottomSheetValue) {
             bottomSheetValue.collect {
-                modalBottomSheetScaffoldState.show()
+                modalBottomSheetState.expand()
             }
         }
-        
+
         BottomSheet(
-            modalBottomSheetState = modalBottomSheetScaffoldState,
-            submission = state.value,
+            modalBottomSheetState = modalBottomSheetState,
+            submission = bottomState.value,
             onSave = { /* TODO: Tell the parent node */ },
             onShare = { /* TODO: Tell the parent node */ },
-            onUpvote = { /* TODO: Tell the parent node */ },
-            onDownvote = { /* TODO: Tell the parent node */ },
+            onUpvote = { onUpvote(it) },
+            onDownvote = { onDownvote(it) },
             items = listOf(
                 BottomSheetItem.Save(),
                 BottomSheetItem.Share(),
                 BottomSheetItem.Upvote(),
-                BottomSheetItem.Downvote()
+                BottomSheetItem.Downvote(),
+                BottomSheetItem.Report(),
+                BottomSheetItem.Hide(),
+                BottomSheetItem.Award()
             )
         ) {
             Scaffold(
@@ -310,7 +337,7 @@ class CoreNode(
                 }
             ) { paddingValues ->
                 Children(
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxSize()
                         .padding(bottom = paddingValues.calculateBottomPadding()),
                     navModel = spotlight,
@@ -318,15 +345,39 @@ class CoreNode(
                 )
             }
         }
+    }
 
-//        BottomSheetScaffold(
-//            scaffoldState = bottomSheetScaffoldState,
-//            sheetContent = {
-//
-//            },
-//            sheetPeekHeight = 0.dp
-//        ) {
-//
-//        }
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
+    @Composable
+    override fun View(modifier: Modifier) {
+
+        val context = LocalContext.current
+        val modalBottomSheetScaffoldState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden
+        )
+
+        val viewModel: SubmissionActionsViewModel = viewModel()
+        val state = viewModel.collectAsState()
+
+        viewModel.collectSideEffect { sideEffect ->
+            when (sideEffect) {
+                is SubmissionActionsEffect.ActionCompleted -> {
+                    // Hide the bottom sheet using hoisted state
+                    modalBottomSheetScaffoldState.hide()
+                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                }
+                is SubmissionActionsEffect.Error -> {
+                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        CoreNodeContent(
+            modifier = modifier,
+            state = state,
+            modalBottomSheetState = modalBottomSheetScaffoldState,
+            onUpvote = viewModel::upvote,
+            onDownvote = viewModel::downvote
+        )
     }
 }

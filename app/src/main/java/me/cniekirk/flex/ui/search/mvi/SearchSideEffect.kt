@@ -4,5 +4,5 @@ import androidx.annotation.StringRes
 
 sealed class SearchSideEffect {
     data class Error(@StringRes val message: Int) : SearchSideEffect()
-    data class RandomSelected(val subreddit: String) : SearchSideEffect()
+    data class SubredditSelected(val subreddit: String) : SearchSideEffect()
 }
