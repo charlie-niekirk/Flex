@@ -1,26 +1,28 @@
 package me.cniekirk.flex.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.workDataOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.Cause
 import me.cniekirk.flex.domain.RedditResult
+import me.cniekirk.flex.domain.WorkerRepository
 import me.cniekirk.flex.domain.usecase.DownvoteThingUseCase
 import me.cniekirk.flex.domain.usecase.GetThingInfoUseCase
 import me.cniekirk.flex.domain.usecase.RemoveVoteThingUseCase
 import me.cniekirk.flex.domain.usecase.UpvoteThingUseCase
 import me.cniekirk.flex.ui.submission.model.UiSubmission
-import me.cniekirk.flex.ui.submission.state.SubmissionActionsEffect
-import me.cniekirk.flex.ui.submission.state.SubmissionActionsState
-import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
-import me.cniekirk.flex.ui.submission.state.VoteState
+import me.cniekirk.flex.ui.submission.state.*
+import me.cniekirk.flex.worker.ScheduledNotificationWorker
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,7 +30,8 @@ class SubmissionActionsViewModel @Inject constructor(
     private val upvoteThingUseCase: UpvoteThingUseCase,
     private val removeVoteThingUseCase: RemoveVoteThingUseCase,
     private val downvoteThingUseCase: DownvoteThingUseCase,
-    private val getThingInfoUseCase: GetThingInfoUseCase
+    private val getThingInfoUseCase: GetThingInfoUseCase,
+    private val workerRepository: WorkerRepository
 ) : ViewModel(), ContainerHost<SubmissionActionsState, SubmissionActionsEffect> {
 
     override val container = container<SubmissionActionsState, SubmissionActionsEffect>(
@@ -149,5 +152,14 @@ class SubmissionActionsViewModel @Inject constructor(
                     }
             }
         }
+    }
+
+    fun postReminderSet(uiSubmission: UiSubmission) = intent {
+        val request = OneTimeWorkRequestBuilder<ScheduledNotificationWorker>()
+            .setInitialDelay(10, TimeUnit.SECONDS)
+            .setInputData(workDataOf("THING_ID" to uiSubmission.submissionName))
+            .build()
+        workerRepository.scheduleOneTimeWork(request)
+        postSideEffect(SubmissionActionsEffect.SubmissionReminderSet)
     }
 }

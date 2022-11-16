@@ -128,15 +128,6 @@ class SubmissionListViewModel @Inject constructor(
         }
     }
 
-    fun postReminderSet(postId: String) = intent {
-        val request = OneTimeWorkRequestBuilder<ScheduledNotificationWorker>()
-            .setInitialDelay(10, TimeUnit.SECONDS)
-            .setInputData(workDataOf("THING_ID" to postId))
-            .build()
-        workerRepository.scheduleOneTimeWork(request)
-        postSideEffect(SubmissionListSideEffect.SubmissionReminderSet)
-    }
-
     suspend fun searchSubreddit(query: String): Flow<RedditResult<List<Subreddit>>> =
         searchSubredditsUseCase(SubredditSearchRequest(query))
 

@@ -156,6 +156,7 @@ class CoreNode(
         onShare: (UiSubmission) -> Unit,
         onUpvote: (UiSubmission) -> Unit,
         onDownvote: (UiSubmission) -> Unit,
+        onReminderSet: (UiSubmission) -> Unit,
         content: @Composable () -> Unit
     ) {
         ModalBottomSheetLayout(
@@ -207,7 +208,9 @@ class CoreNode(
                                                 is BottomSheetItem.Downvote -> {
                                                     submission?.let(onDownvote)
                                                 }
-                                                is BottomSheetItem.Award -> {}
+                                                is BottomSheetItem.Award -> {
+                                                    submission?.let(onReminderSet)
+                                                }
                                                 is BottomSheetItem.Hide -> {}
                                                 is BottomSheetItem.Report -> {}
                                             }
@@ -299,7 +302,8 @@ class CoreNode(
         modalBottomSheetState: ModalBottomSheetState,
         onUpvote: (UiSubmission) -> Unit,
         onDownvote: (UiSubmission) -> Unit,
-        onNewSubmission: (UiSubmission) -> Unit
+        onNewSubmission: (UiSubmission) -> Unit,
+        onReminderSet: (UiSubmission) -> Unit
     ) {
         val currentlyActive = spotlight.activeIndex().collectAsState(initial = 0)
         val bottomState = bottomSheetValue.collectAsState(null)
@@ -319,6 +323,7 @@ class CoreNode(
             onShare = { /* TODO: Tell the parent node */ },
             onUpvote = { onUpvote(it) },
             onDownvote = { onDownvote(it) },
+            onReminderSet = { onReminderSet(it) },
             items = listOf(
                 BottomSheetItem.Save(),
                 BottomSheetItem.Share(),
@@ -400,6 +405,9 @@ class CoreNode(
                 is SubmissionActionsEffect.Error -> {
                     Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
                 }
+                SubmissionActionsEffect.SubmissionReminderSet -> {
+                    Toast.makeText(context, "Reminder set!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -409,7 +417,8 @@ class CoreNode(
             modalBottomSheetState = modalBottomSheetScaffoldState,
             onUpvote = viewModel::upvote,
             onDownvote = viewModel::downvote,
-            onNewSubmission = viewModel::submissionUpdated
+            onNewSubmission = viewModel::submissionUpdated,
+            onReminderSet = viewModel::postReminderSet
         )
     }
 }

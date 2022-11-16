@@ -9,4 +9,5 @@ data class SubmissionActionsState(
 sealed class SubmissionActionsEffect {
     data class ActionCompleted(@StringRes val message: Int) : SubmissionActionsEffect()
     data class Error(@StringRes val message: Int) : SubmissionActionsEffect()
+    object SubmissionReminderSet : SubmissionActionsEffect()
 }
