@@ -4,13 +4,16 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import me.cniekirk.flex.R
+import me.cniekirk.flex.data.Cause
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.DownvoteThingUseCase
+import me.cniekirk.flex.domain.usecase.GetThingInfoUseCase
 import me.cniekirk.flex.domain.usecase.RemoveVoteThingUseCase
 import me.cniekirk.flex.domain.usecase.UpvoteThingUseCase
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionActionsEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionActionsState
+import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
 import me.cniekirk.flex.ui.submission.state.VoteState
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -24,54 +27,126 @@ import javax.inject.Inject
 class SubmissionActionsViewModel @Inject constructor(
     private val upvoteThingUseCase: UpvoteThingUseCase,
     private val removeVoteThingUseCase: RemoveVoteThingUseCase,
-    private val downvoteThingUseCase: DownvoteThingUseCase
+    private val downvoteThingUseCase: DownvoteThingUseCase,
+    private val getThingInfoUseCase: GetThingInfoUseCase
 ) : ViewModel(), ContainerHost<SubmissionActionsState, SubmissionActionsEffect> {
 
     override val container = container<SubmissionActionsState, SubmissionActionsEffect>(
         SubmissionActionsState()
-    )
+    ) {
 
-    fun upvote(uiSubmission: UiSubmission) = intent {
-        upvoteThingUseCase(uiSubmission.submissionName).collect { response ->
-            when (response) {
+    }
+
+    fun submissionUpdated(uiSubmission: UiSubmission) = intent {
+        getThingInfoUseCase(uiSubmission.submissionName).collect { result ->
+            when (result) {
                 is RedditResult.Error -> {
-                    postSideEffect(SubmissionActionsEffect.Error(R.string.generic_network_error))
+                    val message = when (result.cause) {
+                        Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+                        Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+                        Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+                    }
+                    postSideEffect(SubmissionActionsEffect.Error(message))
                 }
                 RedditResult.Loading -> {}
                 is RedditResult.Success -> {
-                    reduce { state.copy(voteState = VoteState.Upvote) }
-                    postSideEffect(SubmissionActionsEffect.ActionCompleted(R.string.upvote_success))
+                    val voteState = result.data.likes?.let { hasUpvoted ->
+                        if (hasUpvoted) {
+                            VoteState.Upvote
+                        } else {
+                            VoteState.Downvote
+                        }
+                    } ?: run {
+                        VoteState.NoVote
+                    }
+                    reduce { state.copy(voteState = voteState) }
                 }
             }
         }
     }
 
-    fun removeVote(uiSubmission: UiSubmission) = intent {
-        removeVoteThingUseCase(uiSubmission.submissionName).collect { response ->
-            when (response) {
-                is RedditResult.Error -> {
-                    postSideEffect(SubmissionActionsEffect.Error(R.string.generic_network_error))
-                }
-                RedditResult.Loading -> {}
-                is RedditResult.Success -> {
-                    reduce { state.copy(voteState = VoteState.NoVote) }
-                    postSideEffect(SubmissionActionsEffect.ActionCompleted(R.string.remove_vote_success))
-                }
+    fun upvote(uiSubmission: UiSubmission) = intent {
+        when (state.voteState) {
+            VoteState.Upvote -> {
+                removeVoteThingUseCase(uiSubmission.submissionName)
+                    .collect { result ->
+                        when (result) {
+                            is RedditResult.Error -> {
+                                val message = when (result.cause) {
+                                    Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+                                    Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+                                    Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+                                }
+                                postSideEffect(SubmissionActionsEffect.Error(message))
+                            }
+                            RedditResult.Loading -> {}
+                            is RedditResult.Success -> {
+                                reduce { state.copy(voteState = VoteState.NoVote) }
+                            }
+                        }
+                    }
+            }
+            VoteState.NoVote, VoteState.Downvote -> {
+                upvoteThingUseCase(uiSubmission.submissionName)
+                    .collect { result ->
+                        when (result) {
+                            is RedditResult.Error -> {
+                                val message = when (result.cause) {
+                                    Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+                                    Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+                                    Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+                                }
+                                postSideEffect(SubmissionActionsEffect.Error(message))
+                            }
+                            RedditResult.Loading -> {}
+                            is RedditResult.Success -> {
+                                reduce { state.copy(voteState = VoteState.Upvote) }
+                            }
+                        }
+                    }
             }
         }
     }
 
     fun downvote(uiSubmission: UiSubmission) = intent {
-        downvoteThingUseCase(uiSubmission.submissionName).collect { response ->
-            when (response) {
-                is RedditResult.Error -> {
-                    postSideEffect(SubmissionActionsEffect.Error(R.string.generic_network_error))
-                }
-                RedditResult.Loading -> {}
-                is RedditResult.Success -> {
-                    reduce { state.copy(voteState = VoteState.Downvote) }
-                    postSideEffect(SubmissionActionsEffect.ActionCompleted(R.string.downvote_success))
-                }
+        when (state.voteState) {
+            VoteState.Downvote -> {
+                removeVoteThingUseCase(uiSubmission.submissionName)
+                    .collect { result ->
+                        when (result) {
+                            is RedditResult.Error -> {
+                                val message = when (result.cause) {
+                                    Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+                                    Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+                                    Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+                                }
+                                postSideEffect(SubmissionActionsEffect.Error(message))
+                            }
+                            RedditResult.Loading -> {}
+                            is RedditResult.Success -> {
+                                reduce { state.copy(voteState = VoteState.NoVote) }
+                            }
+                        }
+                    }
+            }
+            VoteState.NoVote, VoteState.Upvote -> {
+                downvoteThingUseCase(uiSubmission.submissionName)
+                    .collect { result ->
+                        when (result) {
+                            is RedditResult.Error -> {
+                                val message = when (result.cause) {
+                                    Cause.NetworkError, Cause.ServerError, Cause.NotFound, Cause.NoConnection -> { R.string.generic_network_error }
+                                    Cause.Unauthenticated -> { R.string.action_error_aunauthenticated }
+                                    Cause.Unknown, Cause.InsufficientStorage -> { R.string.unknown_error }
+                                }
+                                postSideEffect(SubmissionActionsEffect.Error(message))
+                            }
+                            RedditResult.Loading -> {}
+                            is RedditResult.Success -> {
+                                reduce { state.copy(voteState = VoteState.Downvote) }
+                            }
+                        }
+                    }
             }
         }
     }

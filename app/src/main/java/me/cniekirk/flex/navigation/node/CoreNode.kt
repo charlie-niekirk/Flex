@@ -47,6 +47,7 @@ import me.cniekirk.flex.ui.submission.SubmissionList
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionActionsEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionActionsState
+import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SettingsViewModel
 import me.cniekirk.flex.ui.viewmodel.SubmissionActionsViewModel
 import org.orbitmvi.orbit.compose.collectAsState
@@ -111,7 +112,7 @@ class CoreNode(
     private var subreddit: String? = null
     private val bottomSheetValue: MutableSharedFlow<UiSubmission?> = MutableSharedFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun resolve(navTarget: CoreTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             CoreTarget.Account -> node(buildContext) {
@@ -147,6 +148,7 @@ class CoreNode(
 
     @Composable
     fun BottomSheet(
+        submissionActionsState: State<SubmissionActionsState>,
         modalBottomSheetState: ModalBottomSheetState,
         submission: UiSubmission?,
         items: List<BottomSheetItem>,
@@ -218,12 +220,38 @@ class CoreNode(
                                             .padding(16.dp),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
+                                        val (actionName, icon) = when (it) {
+                                            is BottomSheetItem.Upvote -> {
+                                                when (submissionActionsState.value.voteState) {
+                                                    VoteState.Upvote -> {
+                                                        Pair("Remove upvote", Icons.Default.Cancel)
+                                                    }
+                                                    VoteState.NoVote, VoteState.Downvote -> {
+                                                        Pair(it.actionName, it.actionIcon)
+                                                    }
+                                                }
+                                            }
+                                            is BottomSheetItem.Downvote -> {
+                                                when (submissionActionsState.value.voteState) {
+                                                    VoteState.Downvote -> {
+                                                        Pair("Remove downvote", Icons.Default.Cancel)
+                                                    }
+                                                    VoteState.NoVote, VoteState.Upvote -> {
+                                                        Pair(it.actionName, it.actionIcon)
+                                                    }
+                                                }
+                                            }
+                                            else -> {
+                                                Pair(it.actionName, it.actionIcon)
+                                            }
+                                        }
+
                                         Text(
-                                            text = it.actionName,
+                                            text = actionName,
                                             style = MaterialTheme.typography.bodySmall
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
-                                        Icon(imageVector = it.actionIcon, contentDescription = it.actionIcon.name)
+                                        Icon(imageVector = icon, contentDescription = it.actionIcon.name)
                                     }
                                 }
                             }
@@ -270,18 +298,21 @@ class CoreNode(
         state: State<SubmissionActionsState>,
         modalBottomSheetState: ModalBottomSheetState,
         onUpvote: (UiSubmission) -> Unit,
-        onDownvote: (UiSubmission) -> Unit
+        onDownvote: (UiSubmission) -> Unit,
+        onNewSubmission: (UiSubmission) -> Unit
     ) {
         val currentlyActive = spotlight.activeIndex().collectAsState(initial = 0)
         val bottomState = bottomSheetValue.collectAsState(null)
 
         LaunchedEffect(bottomSheetValue) {
             bottomSheetValue.collect {
+                it?.let(onNewSubmission)
                 modalBottomSheetState.expand()
             }
         }
 
         BottomSheet(
+            submissionActionsState = state,
             modalBottomSheetState = modalBottomSheetState,
             submission = bottomState.value,
             onSave = { /* TODO: Tell the parent node */ },
@@ -377,7 +408,8 @@ class CoreNode(
             state = state,
             modalBottomSheetState = modalBottomSheetScaffoldState,
             onUpvote = viewModel::upvote,
-            onDownvote = viewModel::downvote
+            onDownvote = viewModel::downvote,
+            onNewSubmission = viewModel::submissionUpdated
         )
     }
 }

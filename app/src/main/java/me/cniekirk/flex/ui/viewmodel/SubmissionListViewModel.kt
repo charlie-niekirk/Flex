@@ -100,8 +100,11 @@ class SubmissionListViewModel @Inject constructor(
     }
 
     fun updateSubreddit(subreddit: String) = intent {
-        reduce { state.copy(subreddit = subreddit) }
-        loadSubmissions()
+        // Only issue an update if the subreddit has changed
+        if (!subreddit.equals(state.subreddit, true)) {
+            reduce { state.copy(subreddit = subreddit) }
+            loadSubmissions()
+        }
     }
 
     fun randomSubredditSelected(randomType: String) = intent {

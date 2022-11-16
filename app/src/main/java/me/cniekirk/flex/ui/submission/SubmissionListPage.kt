@@ -64,12 +64,11 @@ fun SubmissionList(
     onClick: (UiSubmission) -> Unit,
     onLongClick: (UiSubmission) -> Unit
 ) {
-    if (subreddit.isNotEmpty()) {
-        viewModel.updateSubreddit(subreddit)
-    }
-
     val context = LocalContext.current
     val state = viewModel.collectAsState()
+
+    viewModel.updateSubreddit(subreddit)
+
     viewModel.collectSideEffect { effect ->
         when (effect) {
             SubmissionListSideEffect.SubmissionReminderSet -> {
