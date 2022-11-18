@@ -44,6 +44,7 @@ import me.cniekirk.flex.data.remote.model.reddit.Comment
 import me.cniekirk.flex.data.remote.model.reddit.MoreComments
 import me.cniekirk.flex.data.remote.model.reddit.Resolution
 import me.cniekirk.flex.ui.compose.VideoPlayer
+import me.cniekirk.flex.ui.compose.components.MarkdownText
 import me.cniekirk.flex.ui.submission.model.UiSubmission
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionDetailState
@@ -433,10 +434,10 @@ fun SelfTextItem(
 //        ) {
 //            Markdown(content = item.selfText.trimIndent())
 //        }
-        Text(
-            modifier = modifier.padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+        MarkdownText(
+            modifier = modifier.fillMaxWidth().padding(top = 16.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
             style = MaterialTheme.typography.bodySmall,
-            text = item.selfText
+            markdown = item.selfText
         )
     }
 }

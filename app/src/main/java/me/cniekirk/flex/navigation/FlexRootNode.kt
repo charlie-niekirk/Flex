@@ -14,12 +14,15 @@ import com.bumble.appyx.core.navigation.transition.ModifierTransitionHandler
 import com.bumble.appyx.core.node.Node
 import com.bumble.appyx.core.node.ParentNode
 import com.bumble.appyx.core.node.node
+import com.bumble.appyx.core.plugin.Plugin
 import com.bumble.appyx.navmodel.backstack.BackStack
 import com.bumble.appyx.navmodel.backstack.operation.push
+import com.bumble.appyx.navmodel.backstack.operation.replace
 import com.bumble.appyx.navmodel.backstack.operation.singleTop
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.parcelize.Parcelize
 import me.cniekirk.flex.navigation.animation.rememberBackstackDefaultAnimation
+import me.cniekirk.flex.navigation.children.SubmissionDetailNode
 import me.cniekirk.flex.navigation.node.CoreNode
 import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetScaffold
 import me.cniekirk.flex.ui.compose.bottomsheet.BottomSheetState
@@ -33,10 +36,12 @@ class FlexRootNode(
     private val backStack: BackStack<NavTarget> = BackStack(
         initialElement = NavTarget.Core,
         savedStateMap = buildContext.savedStateMap,
-    )
+    ),
+    plugins: List<Plugin> = emptyList()
 ) : ParentNode<NavTarget>(
     navModel = backStack,
-    buildContext = buildContext
+    buildContext = buildContext,
+    plugins = plugins
 ) {
 
     override fun resolve(navTarget: NavTarget, buildContext: BuildContext): Node {
@@ -49,9 +54,18 @@ class FlexRootNode(
                     }
                 )
             }
-            is NavTarget.SubmissionDetail -> node(buildContext) {
-                SubmissionDetail(navTarget.submission)
-            }
+            is NavTarget.SubmissionDetail -> SubmissionDetailNode(buildContext, navTarget.submission)
+        }
+    }
+
+    /**
+     * Used to directly deeplink into a Reddit post
+     *
+     * @param uiSubmission the submission to show the details for
+     */
+    suspend fun attachSubmissionDetail(uiSubmission: UiSubmission): SubmissionDetailNode {
+        return attachWorkflow {
+            backStack.push(NavTarget.SubmissionDetail(uiSubmission))
         }
     }
 

@@ -16,6 +16,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.cniekirk.flex.FlexSettings
+import me.cniekirk.flex.FlexSettings.Profile
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.local.db.dao.PreLoginUserDao
 import me.cniekirk.flex.data.local.db.dao.UserDao
@@ -73,7 +74,7 @@ class SubmissionListViewModel @Inject constructor(
             .catch { exception ->
                 if (exception is IOException) {
                     Timber.e(exception)
-                    val profile = FlexSettings.Profile.newBuilder()
+                    val profile = Profile.newBuilder()
                         .setBlurNsfw(true)
                         .setSelected(true)
                         .setName("Default")
@@ -87,6 +88,22 @@ class SubmissionListViewModel @Inject constructor(
                 }
             }
             .collect { settings ->
+                // Init with default profile
+                val blur = if (settings.profilesList.isEmpty()) {
+                    flexSettings.updateData {
+                        val defaultProfile = Profile.newBuilder()
+                            .setName("Default")
+                            .setBlurNsfw(true)
+                            .setSelected(true)
+                            .build()
+                        it.toBuilder()
+                            .addProfiles(defaultProfile)
+                            .build()
+                    }
+                    true
+                } else {
+                    settings.profilesList.first().blurNsfw
+                }
                 val pager = Pager(config = PagingConfig(pageSize = 15, prefetchDistance = 5)) {
                     SubredditSubmissionsPagingSource(redditApi, authRedditApi, streamableApi,
                         imgurApi, gfycatApi, redGifsApi, twitterApi, state.subreddit, "/${state.sort}", preLoginUserDao, userDao)
@@ -94,9 +111,19 @@ class SubmissionListViewModel @Inject constructor(
                     pagingData.map { submission -> submission.toUiSubmission() }
                 }.cachedIn(viewModelScope)
                 reduce {
-                    state.copy(submissions = pager, settings = settings)
+                    state.copy(
+                        submissions = pager,
+                        shouldBlurNsfw = blur,
+                        shouldShowAnalyticsDialog = !settings.consentDialog
+                    )
                 }
             }
+    }
+
+    fun consentDismissed() = intent {
+        flexSettings.updateData {
+            it.toBuilder().setConsentDialog(true).build()
+        }
     }
 
     fun updateSubreddit(subreddit: String) = intent {

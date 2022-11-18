@@ -155,4 +155,5 @@
     <string name="upvote_success">Upvoted!</string>
     <string name="remove_vote_success">Removed vote!</string>
     <string name="downvote_success">Downvoted!</string>
+    <string name="notification_permission_denied">You need to grant the notification permission!</string>
 </resources>

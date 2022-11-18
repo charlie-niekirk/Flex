@@ -24,4 +24,7 @@ message FlexSettings {
   repeated Profile profiles = 1;
   string download_location = 2;
   string device_token = 3;
+  bool analytics_enabled = 4;
+  bool crashlytics_enabled = 5;
+  bool consent_dialog = 6;
 }

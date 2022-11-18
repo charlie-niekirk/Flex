@@ -1,7 +1,10 @@
 package me.cniekirk.flex.navigation.node
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,6 +20,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker.PERMISSION_DENIED
+import androidx.core.content.PermissionChecker.PERMISSION_GRANTED
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.bumble.appyx.core.composable.Children
@@ -28,6 +34,8 @@ import com.bumble.appyx.navmodel.spotlight.Spotlight
 import com.bumble.appyx.navmodel.spotlight.activeIndex
 import com.bumble.appyx.navmodel.spotlight.operation.activate
 import com.bumble.appyx.navmodel.spotlight.transitionhandler.rememberSpotlightFader
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,9 +124,7 @@ class CoreNode(
     override fun resolve(navTarget: CoreTarget, buildContext: BuildContext): Node {
         return when (navTarget) {
             CoreTarget.Account -> node(buildContext) {
-                LoginPage {
-                    // replace with the authenticated page
-                }
+                LoginPage()
             }
             CoreTarget.Search -> node(buildContext) {
                 SearchPage { searchResult ->
@@ -146,6 +152,7 @@ class CoreNode(
         }
     }
 
+    @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     fun BottomSheet(
         submissionActionsState: State<SubmissionActionsState>,
@@ -159,6 +166,18 @@ class CoreNode(
         onReminderSet: (UiSubmission) -> Unit,
         content: @Composable () -> Unit
     ) {
+        val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                submission?.let(onReminderSet)
+            } else {
+                // Toast message
+                Toast.makeText(context, R.string.notification_permission_denied, Toast.LENGTH_SHORT).show()
+            }
+        }
+
         ModalBottomSheetLayout(
             sheetContent = {
                 Column(modifier = Modifier
@@ -209,7 +228,22 @@ class CoreNode(
                                                     submission?.let(onDownvote)
                                                 }
                                                 is BottomSheetItem.Award -> {
-                                                    submission?.let(onReminderSet)
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                        val notificationState = ContextCompat.checkSelfPermission(
+                                                            context,
+                                                            android.Manifest.permission.POST_NOTIFICATIONS
+                                                        )
+                                                        when (notificationState) {
+                                                            PERMISSION_GRANTED -> {
+                                                                submission?.let(onReminderSet)
+                                                            }
+                                                            PERMISSION_DENIED -> {
+                                                                launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                                            }
+                                                        }
+                                                    } else {
+                                                        submission?.let(onReminderSet)
+                                                    }
                                                 }
                                                 is BottomSheetItem.Hide -> {}
                                                 is BottomSheetItem.Report -> {}
@@ -294,7 +328,7 @@ class CoreNode(
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
     @Composable
     fun CoreNodeContent(
         modifier: Modifier,

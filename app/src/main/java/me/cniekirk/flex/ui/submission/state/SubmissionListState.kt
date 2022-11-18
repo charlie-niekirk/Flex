@@ -10,8 +10,9 @@ import me.cniekirk.flex.ui.submission.model.UiSubmission
 
 data class SubmissionListState(
     val submissions: Flow<PagingData<UiSubmission>> = flowOf(),
-    val settings: FlexSettings = FlexSettings.getDefaultInstance(),
-    val subreddit: String = "ukpersonalfinance",
+    val shouldBlurNsfw: Boolean = false,
+    val shouldShowAnalyticsDialog: Boolean = false,
+    val subreddit: String = "nfl",
     val sort: String = "best"
 )
 

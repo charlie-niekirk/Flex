@@ -3,8 +3,10 @@ package me.cniekirk.flex.ui.submission
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +18,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +48,8 @@ import me.cniekirk.flex.FlexSettings
 import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.*
 import me.cniekirk.flex.ui.compose.VideoPlayer
+import me.cniekirk.flex.ui.compose.clickableNoRipple
+import me.cniekirk.flex.ui.compose.components.MarkdownText
 import me.cniekirk.flex.ui.compose.rememberLazyListState
 import me.cniekirk.flex.ui.compose.styles.FlexTheme
 import me.cniekirk.flex.ui.submission.model.UiSubmission
@@ -53,6 +58,7 @@ import me.cniekirk.flex.ui.submission.state.SubmissionListSideEffect
 import me.cniekirk.flex.ui.submission.state.SubmissionListState
 import me.cniekirk.flex.ui.submission.state.VoteState
 import me.cniekirk.flex.ui.viewmodel.SubmissionListViewModel
+import me.cniekirk.flex.util.condense
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
@@ -79,7 +85,95 @@ fun SubmissionList(
             }
         }
     }
+
+    var dataCollectionDialog = state.value.shouldShowAnalyticsDialog
+
+    if (dataCollectionDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                dataCollectionDialog = false
+                viewModel.consentDismissed()
+            },
+            title = { stringResource(id = R.string.analytics_dialog_title) },
+            text = {
+                AnalyticsDialogContent(
+                    onAnalyticsCheckChanged = {},
+                    onCrashlyticsCheckChanged = {}
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        dataCollectionDialog = false
+                        viewModel.consentDismissed()
+                    }
+                ) {
+                    Text(text = stringResource(id = R.string.ok))
+                }
+            }
+        )
+    }
+
     SubmissionListContent(state, onClick, onLongClick)
+}
+
+@Composable
+fun AnalyticsDialogContent(
+    onAnalyticsCheckChanged: (Boolean) -> Unit,
+    onCrashlyticsCheckChanged: (Boolean) -> Unit,
+) {
+    val analyticsChecked = remember { mutableStateOf(false) }
+    val crashlyticsChecked = remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = stringResource(id = R.string.analytics_dialog_title),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            modifier = Modifier.padding(top = 12.dp),
+            text = stringResource(id = R.string.analytics_explanation),
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center
+        )
+        Row(
+            modifier = Modifier.padding(top = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.analytics_checkbox),
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = analyticsChecked.value,
+                onCheckedChange = {
+                    analyticsChecked.value = it
+                    onAnalyticsCheckChanged(it)
+                }
+            )
+        }
+        Row(
+            modifier = Modifier.padding(top = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.crashlytics_checkbox),
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold)
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Switch(
+                checked = crashlyticsChecked.value,
+                onCheckedChange = {
+                    crashlyticsChecked.value = it
+                    onCrashlyticsCheckChanged(it)
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -93,14 +187,17 @@ fun SubmissionListContent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(
             modifier = Modifier
                 .padding(top = 16.dp)
-                .testTag("subreddit"),
+                .testTag("subreddit")
+                .clickable { /* Nav to sidebar */ },
             text = state.value.subreddit,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
         )
+
         LazyColumn(
             modifier = Modifier
                 .padding(top = 16.dp)
@@ -197,7 +294,7 @@ fun SubmissionItem(
                 ItemFooter(
                     modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                     author = author,
-                    upvote = "$upvote",
+                    upvote = upvote.condense(),
                     commentCount = numComments
                 )
             }
@@ -206,7 +303,6 @@ fun SubmissionItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelfTextItem(
     modifier: Modifier = Modifier,
@@ -223,12 +319,11 @@ fun SelfTextItem(
         onClick = { onClick() },
         onLongClick = { onLongClick() }
     ) {
-        Text(
+        MarkdownText(
             modifier = modifier.padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-            text = item.selfText,
+            markdown = item.selfText,
             style = MaterialTheme.typography.bodySmall,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
+            maxLines = 3
         )
     }
 }
@@ -252,7 +347,9 @@ fun TweetItem(
         item.tweetImageUrl?.let {
             Column(modifier = Modifier.padding(all = 8.dp)) {
                 AsyncImage(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                     model = it,
                     contentScale = ContentScale.FillWidth,
                     contentDescription = stringResource(id = R.string.tweet_image)
@@ -412,7 +509,8 @@ fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission.ImageSubmission,
                 val widthPx = LocalConfiguration.current.screenWidthDp.dp.toPx()
                 val scale = widthPx / (resolution?.width ?: 0)
                 AsyncImage(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 8.dp, bottom = 8.dp)
                         .fillMaxWidth()
                         .height((resolution?.height?.times(scale))?.toDp() ?: 0.dp)
                         .background(Color.DarkGray.copy(alpha = 0.5f)),
@@ -427,7 +525,7 @@ fun ImageItem(modifier: Modifier = Modifier, item: UiSubmission.ImageSubmission,
             ItemFooter(
                 modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                 author = item.author,
-                upvote = "${item.upVotes}",
+                upvote = item.upVotes.condense(),
                 commentCount = item.numComments
             )
             Divider()
@@ -520,8 +618,15 @@ fun ItemFooterPreview() {
 @Composable
 fun SubmissionListPreview() {
     val items = flowOf(PagingData.from(createFakeData()))
-    val settings = FlexSettings.getDefaultInstance()
-    val state = mutableStateOf(SubmissionListState(items, settings, "flexapp", "new"))
+    val state = mutableStateOf(
+        SubmissionListState(
+            items,
+            shouldBlurNsfw = false,
+            shouldShowAnalyticsDialog = false,
+            subreddit = "flexapp",
+            sort = "new"
+        )
+    )
     FlexTheme {
         SubmissionListContent(state, onClick = {}, onLongClick = {})
     }

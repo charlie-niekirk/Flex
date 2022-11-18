@@ -1,12 +1,12 @@
 package me.cniekirk.flex.worker
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.PendingIntent
 import android.content.Context
-import android.os.Bundle
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
@@ -16,7 +16,8 @@ import me.cniekirk.flex.R
 import me.cniekirk.flex.data.remote.model.reddit.AuthedSubmission
 import me.cniekirk.flex.domain.RedditResult
 import me.cniekirk.flex.domain.usecase.GetThingInfoUseCase
-import me.cniekirk.flex.ui.submission.SubmissionDetailFragmentArgs
+import me.cniekirk.flex.ui.activity.ContainerActivity
+import me.cniekirk.flex.ui.submission.model.toUiSubmission
 import me.cniekirk.flex.util.isAllowedByUser
 import java.security.SecureRandom
 
@@ -50,21 +51,20 @@ class ScheduledNotificationWorker @AssistedInject constructor(
 
     private fun postNotification(post: AuthedSubmission): Boolean {
         return if (isAllowedByUser(appContext, POST_NOTIFICATIONS)) {
-            val args = Bundle().apply { putParcelable("post", post) }
-            val safeArgs = SubmissionDetailFragmentArgs.fromBundle(args)
+            val uiSubmission = post.toUiSubmission()
 
-            val pendingIntent = NavDeepLinkBuilder(appContext)
-                .setDestination(R.id.submissionDetailFragment, safeArgs.toBundle())
-                .setGraph(R.navigation.app_nav_graph)
-                .createPendingIntent()
+            val intent = Intent(appContext, ContainerActivity::class.java).apply {
+                putExtra("submission", uiSubmission)
+            }
+            val pending = PendingIntent.getActivity(appContext, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT)
 
             val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.account_circle)
+                .setSmallIcon(R.drawable.lightbulb)
                 .setContentTitle("Reminder: ${post.title}")
                 .setContentText("by ${post.authorFullname}")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
+                .setContentIntent(pending)
             with(NotificationManagerCompat.from(appContext)) {
                 notify(SecureRandom().nextInt(), builder.build())
             }

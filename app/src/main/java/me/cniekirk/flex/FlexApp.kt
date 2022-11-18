@@ -19,12 +19,9 @@ class FlexApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-//        DynamicColors.applyToActivitiesIfAvailable(this)
         createNotificationChannel()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-        } else {
-
         }
     }
 
